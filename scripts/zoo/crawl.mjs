@@ -2,7 +2,7 @@
 //
 //   node scripts/zoo/crawl.mjs [--category "Kuru Kedi Maması"] [--ids ids.json] [--limit N] [--refresh]
 //
-// --ids: a JSON array of external ids (the sync passes newly stocked items); their listing siblings of
+// --ids: a JSON array of external ids (e.g. newly stocked items); their listing siblings of
 // the same brand and category are fetched too, because grouping needs the whole bucket.
 //
 // Writes .data/zoo/listing.json (all in-stock products) and .data/zoo/products/<externalId>.json.

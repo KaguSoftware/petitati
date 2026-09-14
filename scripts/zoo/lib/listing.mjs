@@ -1,6 +1,6 @@
 // Ticimax listing API: the catalog-wide product list the storefront's category pages use. It returns
 // only products that are currently purchasable (in stock), 500 per page, with price and stock, which
-// makes it the cheap source for the daily price/stock sync (2 requests instead of ~1,000 pages).
+// is how the import finds what is purchasable right now (2 requests instead of ~6,000 pages).
 import { fetchWithRetry } from "./http.mjs";
 import { ZOO_ORIGIN, toKurus } from "./parse.mjs";
 

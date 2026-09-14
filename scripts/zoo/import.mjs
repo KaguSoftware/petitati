@@ -283,7 +283,7 @@ async function setStock(variantId, target, isNew) {
       variant_id: variantId,
       delta,
       reason: isNew ? "initial" : "correction",
-      note: "zoo.com.tr stock sync",
+      note: "zoo.com.tr import",
     }),
     "stock movement",
   );

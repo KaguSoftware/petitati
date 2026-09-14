@@ -62,9 +62,6 @@ if (opts.ids) {
   const ids = new Set(JSON.parse(readFileSync(opts.ids, "utf8")));
   for (const [key, products] of buckets) if (!products.some((p) => ids.has(p.externalId))) buckets.delete(key);
 }
-// Grouping already live in the store ({externalId: {product, name}}), written by sync.mjs. Used as the
-// "keep these" hint when the local cache is cold (e.g. a fresh CI runner).
-const live = readJson("live-groups.json", {});
 const stats = { buckets: buckets.size, sent: 0, cached: 0, singles: 0, grouped: 0, variants: 0, rejected: 0, failed: 0, pending: 0 };
 const answers = opts.answers ? JSON.parse(readFileSync(opts.answers, "utf8")) : null;
 const exportWork = [];
@@ -72,7 +69,7 @@ const exportWork = [];
 await mapPool([...buckets.entries()], 4, async ([key, products]) => {
   const file = `groups/${sha(key)}.json`;
   const membership = sha(products.map((p) => `${p.externalId}:${p.contentHash}`).sort().join(","));
-  const previous = readJson(file) ?? liveGrouping(products);
+  const previous = readJson(file);
   if (previous?.membership === membership && !opts.force) {
     stats.cached++;
     return tally(previous.groups);
@@ -119,15 +116,6 @@ function tally(groups) {
       stats.variants += g.members.length;
     } else stats.singles++;
   }
-}
-
-function liveGrouping(products) {
-  const byProduct = new Map();
-  for (const p of products) {
-    const hit = live[p.externalId];
-    if (hit) byProduct.set(hit.product, { baseName: hit.name, members: [...(byProduct.get(hit.product)?.members ?? []), { externalId: p.externalId }] });
-  }
-  return byProduct.size ? { groups: [...byProduct.values()] } : null;
 }
 
 function single(p) {
