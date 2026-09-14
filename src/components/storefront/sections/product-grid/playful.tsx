@@ -4,7 +4,7 @@ import { renderSection } from "@/lib/theme/registry";
 import { getTranslations } from "next-intl/server";
 import type { ProductGridProps } from "../types";
 
-/** Carousel: one row that scrolls sideways and snaps to each card. */
+/** Carousel: one row that scrolls sideways and snaps to each card (home sections); a plain grid on listing pages. */
 export async function ProductGridPlayful({ title, products, currency, locale, cardVariant, emptyLabel, emptyAction, wishlistSlots, viewAllHref, viewAllLabel, bare }: ProductGridProps) {
   const t = await getTranslations("product");
   const labels = { new: t("new"), outOfStock: t("outOfStock"), from: t("priceFrom") };
@@ -15,6 +15,16 @@ export async function ProductGridPlayful({ title, products, currency, locale, ca
         <p className="text-muted-foreground">{emptyLabel}</p>
         {emptyAction}
       </div>
+    ) : bare ? (
+      // Listing pages (shop, category, brand, wishlist) are browsed page by page: a carousel hides all but
+      // three products, so they get a plain grid. The sideways row stays for home-page sections.
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-7 @tablet:grid-cols-3 @tablet:gap-x-5 @desktop:grid-cols-4 @desktop:gap-x-6 @desktop:gap-y-9">
+        {products.map((p) => (
+          <li key={p.id} className="min-w-0">
+            {renderSection("productCard", cardVariant, { product: p, currency, locale, labels, wishlistSlot: wishlistSlots?.[p.id] })}
+          </li>
+        ))}
+      </ul>
     ) : (
       <ul className="bleed-gutter flex snap-x snap-mandatory gap-4 overflow-x-auto pt-2 pb-6 contain-inline-size [scrollbar-width:thin] [mask-image:linear-gradient(to_right,black_92%,transparent)] rtl:[mask-image:linear-gradient(to_left,black_92%,transparent)]">
         {products.map((p) => (
