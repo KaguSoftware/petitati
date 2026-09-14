@@ -7,7 +7,8 @@
 // 2. Known variants: re-price (supplier price + markup), mirror stock, reactivate if they were retired.
 // 3. Known variants missing from the listing are sold out: stock → 0. Ones whose page is gone (404) are
 //    retired (is_active = false); a product with no active variant left is archived.
-// 4. New in-stock items: crawl → group → translate → import (active) for just their buckets.
+// 4. New in-stock items: crawl → group → translate → import (active) for just their buckets. Needs
+//    ANTHROPIC_API_KEY; without it they are only counted (new_items_pending) for a Claude Code session.
 //
 // Guards (abort before writing, run recorded as "aborted"; --force overrides):
 //   - the listing shrank below half of the variants we believed in stock
@@ -112,7 +113,12 @@ try {
   const knownIds = new Set(sources.map((s) => Number(s.external_id)));
   const newIds = listing.map((p) => p.externalId).filter((id) => !knownIds.has(id));
   stats.new_items = newIds.length;
-  if (newIds.length && !opts["skip-new"] && !opts["dry-run"]) {
+  // Grouping and translating need Claude. Without an API key they wait for a Claude Code session
+  // ("import new zoo items"): the run records them as pending instead.
+  if (newIds.length && !process.env.ANTHROPIC_API_KEY) {
+    stats.new_items_pending = newIds.length;
+    console.log(`${newIds.length} newly stocked items waiting for grouping/translation (no ANTHROPIC_API_KEY)`);
+  } else if (newIds.length && !opts["skip-new"] && !opts["dry-run"]) {
     const idsFile = join(DATA, "new-ids.json");
     writeJson("new-ids.json", newIds);
     writeJson("live-groups.json", await liveGroups(sources));

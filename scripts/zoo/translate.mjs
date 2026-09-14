@@ -1,6 +1,10 @@
 // Stage 3: translate grouped products and categories from Turkish into English and Persian.
 //
-//   node scripts/zoo/translate.mjs [--category "Kuru Kedi Maması"]
+//   node scripts/zoo/translate.mjs [--category "Kuru Kedi Maması"] [--export work.json | --answers answers.json]
+//
+// Same hand-off mode as group.mjs when there is no ANTHROPIC_API_KEY: --export writes the texts to
+// translate, --answers reads {"categories": [{slug, en, fa}], "products": {"<key>": {en, fa, values}}}
+// and validates it with the same schemas before saving.
 //
 // Writes .data/zoo/translations/<key>.json per product text and .data/zoo/categories.json. Keys hash
 // the source text, so only new or changed text is ever sent again.
@@ -9,6 +13,7 @@ import { structured, claudeUsage } from "./lib/claude.mjs";
 import { groupText, loadCatalog, loadGroups } from "./lib/catalog.mjs";
 import { mapPool } from "./lib/http.mjs";
 import { args, hasJson, readJson, writeJson } from "./lib/store.mjs";
+import { readFileSync, writeFileSync } from "node:fs";
 
 const SYSTEM = `You translate product listings of a Turkish pet shop into English and Persian (Farsi) for the same shop's English and Persian storefronts.
 
@@ -32,13 +37,20 @@ const opts = args();
 const catalog = loadCatalog({ category: opts.category });
 const byId = new Map(catalog.map((p) => [p.externalId, p]));
 const groups = loadGroups().filter((g) => g.members.some((m) => byId.has(m.externalId)));
+const answers = opts.answers ? JSON.parse(readFileSync(opts.answers, "utf8")) : null;
+const handOff = !answers && (opts.export || !process.env.ANTHROPIC_API_KEY);
+const exportWork = { instructions: SYSTEM, categories: [], products: [] };
 
 // ---- categories: one call for every breadcrumb name not translated yet ----
 const categories = readJson("categories.json", {});
 const missing = new Map();
 for (const p of catalog) for (const c of p.categories) if (!categories[c.slug]) missing.set(c.slug, c.name);
-if (missing.size) {
-  const result = await structured({
+if (missing.size && handOff) {
+  exportWork.categories = [...missing].map(([slug, name]) => ({ slug, tr: name }));
+} else if (missing.size && answers && !answers.categories) {
+  console.log(`categories: ${missing.size} still untranslated`);
+} else if (missing.size) {
+  const result = answers ? categorySchema.parse({ categories: answers.categories }) : await structured({
     schema: categorySchema,
     system: SYSTEM,
     prompt: `Translate these pet-shop category names. Return one entry per slug.\n\n${[...missing].map(([slug, name]) => `${slug}\t${name}`).join("\n")}`,
@@ -62,8 +74,13 @@ await mapPool(unique, 4, async (t) => {
     t.values.length ? `Option values (tr): ${t.values.join(" | ")}` : "Option values: none (return an empty list)",
     `Description (tr):\n${t.description || "(none, return an empty string)"}`,
   ].join("\n\n");
+  if (handOff) {
+    exportWork.products.push({ key: t.key, name: t.name, values: t.values, description: t.description });
+    return;
+  }
   try {
-    const out = await structured({ schema: productSchema, system: SYSTEM, prompt, effort: "low" });
+    if (answers && !answers.products?.[t.key]) return;
+    const out = answers ? productSchema.parse(answers.products[t.key]) : await structured({ schema: productSchema, system: SYSTEM, prompt, effort: "low" });
     writeJson(`translations/${t.key}.json`, { source: t, ...out });
   } catch (e) {
     failed++;
@@ -71,4 +88,8 @@ await mapPool(unique, 4, async (t) => {
   }
   if (++done % 20 === 0) console.log(`  ${done}/${unique.length}`, claudeUsage());
 });
-console.log({ translated: done - failed, failed }, claudeUsage());
+if (handOff) {
+  const out = opts.export ?? "translate-work.json";
+  writeFileSync(out, JSON.stringify(exportWork, null, 2));
+  console.log(`${exportWork.categories.length} categories and ${exportWork.products.length} products need translating → ${out}`);
+} else console.log({ translated: done - failed, failed }, claudeUsage());

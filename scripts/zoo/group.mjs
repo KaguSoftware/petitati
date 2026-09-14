@@ -1,6 +1,12 @@
 // Stage 2: fold zoo's per-size / per-colour listings into products with options.
 //
 //   node scripts/zoo/group.mjs [--category "Kuru Kedi Maması"] [--ids ids.json] [--force]
+//                              [--export work.json | --answers answers.json]
+//
+// Who does the grouping: with ANTHROPIC_API_KEY set, the Claude API. Without it, hand-off mode:
+// --export writes every bucket that needs grouping (instructions + products) to a file, someone (a
+// Claude Code session) writes {"<bucket>": {"groups": [...]}} in the same shape the API returns, and
+// --answers feeds that file through the exact same verification before anything is saved.
 //
 // zoo lists "X Kedi Maması 1,5 kg", "X Kısır Kedi Maması 5 kg" and "X ve Y Kedi Maması 10 kg" as three
 // products with drifting names, so string rules miss real siblings. Claude groups each brand+category
@@ -8,7 +14,7 @@
 // value combinations must be unique) and splits anything that fails back into single products.
 // Writes .data/zoo/groups/<bucket>.json. A bucket is only re-sent when its membership changes, and the
 // previous grouping is passed along so existing products stay stable.
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { z } from "zod";
 import { structured, claudeUsage } from "./lib/claude.mjs";
 import { AXIS_KEYS, bucketize, loadCatalog, looseKey, normalizeValue, sha } from "./lib/catalog.mjs";
@@ -59,7 +65,9 @@ if (opts.ids) {
 // Grouping already live in the store ({externalId: {product, name}}), written by sync.mjs. Used as the
 // "keep these" hint when the local cache is cold (e.g. a fresh CI runner).
 const live = readJson("live-groups.json", {});
-const stats = { buckets: buckets.size, sent: 0, cached: 0, singles: 0, grouped: 0, variants: 0, rejected: 0, failed: 0 };
+const stats = { buckets: buckets.size, sent: 0, cached: 0, singles: 0, grouped: 0, variants: 0, rejected: 0, failed: 0, pending: 0 };
+const answers = opts.answers ? JSON.parse(readFileSync(opts.answers, "utf8")) : null;
+const exportWork = [];
 
 await mapPool([...buckets.entries()], 4, async ([key, products]) => {
   const file = `groups/${sha(key)}.json`;
@@ -75,8 +83,17 @@ await mapPool([...buckets.entries()], 4, async ([key, products]) => {
     groups = [single(products[0])];
   } else {
     try {
-      const result = await structured({ schema: outputSchema, system: SYSTEM, prompt: promptFor(products, previous), effort: "medium" });
-      stats.sent++;
+      let result;
+      if (answers) {
+        if (!answers[key]) return void stats.pending++;
+        result = outputSchema.parse(answers[key]);
+      } else if (opts.export || !process.env.ANTHROPIC_API_KEY) {
+        exportWork.push({ bucket: key, prompt: promptFor(products, previous) });
+        return void stats.pending++;
+      } else {
+        result = await structured({ schema: outputSchema, system: SYSTEM, prompt: promptFor(products, previous), effort: "medium" });
+        stats.sent++;
+      }
       groups = verify(result.groups, products);
     } catch (e) {
       stats.failed++;
@@ -88,6 +105,11 @@ await mapPool([...buckets.entries()], 4, async ([key, products]) => {
   tally(groups);
 });
 
+if (exportWork.length) {
+  const out = opts.export ?? "group-work.json";
+  writeFileSync(out, JSON.stringify({ instructions: SYSTEM, answerShape: '{"<bucket>": {"groups": [{"base_name": str, "axes": [axis], "members": [{"id": int, "values": [{"axis": axis, "value": str}]}]}]}}', axes: AXIS_KEYS, buckets: exportWork }, null, 2));
+  console.log(`${exportWork.length} buckets need grouping → ${out}`);
+}
 console.log(stats, claudeUsage());
 
 function tally(groups) {
