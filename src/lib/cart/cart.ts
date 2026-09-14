@@ -98,7 +98,8 @@ export const getCart = cache(
     const lines: CartLine[] = (items ?? []).map((it) => {
       const v = it.product_variants;
       const tr = pickTranslation(v.products.product_translations, locale, store.default_locale);
-      const img = [...v.products.product_images].sort((a, b) => a.sort_order - b.sort_order)[0];
+      const images = [...v.products.product_images].sort((a, b) => a.sort_order - b.sort_order);
+      const img = images.find((i) => i.variant_id === v.id) ?? images.find((i) => !i.variant_id) ?? images[0];
       const label = v.variant_option_values
         .map((x) => pickJson(x.product_option_values.value, locale, store.default_locale))
         .filter(Boolean)

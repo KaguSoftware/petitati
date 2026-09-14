@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
-import { ProductImage } from "@/components/storefront/shared/product-image";
 import { RatingStars } from "@/components/storefront/shared/rating-stars";
 import type { ProductPageProps } from "../types";
+import { EditorialPhotos } from "./editorial-photos";
 
 /** Lookbook: every photo full size, stacked down one column, while the text column stays in view. */
 export function ProductPageEditorial({ product, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
@@ -22,23 +22,7 @@ export function ProductPageEditorial({ product, labels, purchasePanel, reviewsSe
         ))}
       </nav>
       <div className="grid gap-10 @desktop:grid-cols-12 @desktop:gap-14">
-        <ul className="flex flex-col gap-4 @desktop:col-span-7">
-          {product.images.map((img, i) => (
-            <li key={img.url} className="relative">
-              <ProductImage src={img.url} alt={img.alt} className="aspect-[4/5] rounded-none" sizes="(min-width: 1024px) 58vw, 100vw" priority={i === 0} />
-              {i === 0 && wishlistSlot && <div className="absolute end-3 top-3">{wishlistSlot}</div>}
-              <span aria-hidden className="mt-2 block font-mono text-micro tracking-[0.2em] text-muted-foreground">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-            </li>
-          ))}
-          {product.images.length === 0 && (
-            <li className="relative">
-              <ProductImage src={null} alt={product.name} className="aspect-[4/5] rounded-none" />
-              {wishlistSlot && <div className="absolute end-3 top-3">{wishlistSlot}</div>}
-            </li>
-          )}
-        </ul>
+        <EditorialPhotos images={product.images} name={product.name} wishlistSlot={wishlistSlot} />
         <div className="flex flex-col gap-8 self-start @desktop:sticky @desktop:top-24 @desktop:col-span-5">
           <div className="flex flex-col gap-3">
             {product.brand && (

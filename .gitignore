@@ -46,3 +46,6 @@ next-env.d.ts
 /*.xlsx
 /PHOTO-*.jpg
 /PHOTO-*.jpeg
+
+# supplier import cache (scripts/zoo): crawled pages, groupings, translations
+/.data/

@@ -6,7 +6,7 @@ import type { ProductGridProps } from "../types";
 /** Dense catalogue: tight gaps, four across on desktop, under a heavy title band. */
 export async function ProductGridBold({ title, products, currency, locale, cardVariant, emptyLabel, emptyAction, wishlistSlots, viewAllHref, viewAllLabel, bare }: ProductGridProps) {
   const t = await getTranslations("product");
-  const labels = { new: t("new"), outOfStock: t("outOfStock") };
+  const labels = { new: t("new"), outOfStock: t("outOfStock"), from: t("priceFrom") };
   if (products.length === 0 && !emptyLabel) return null;
   const body =
     products.length === 0 ? (

@@ -18,4 +18,6 @@ export const env = {
   appUrl: () => process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   resendApiKey: () => process.env.RESEND_API_KEY,
   emailFromFallback: () => process.env.EMAIL_FROM_FALLBACK ?? "noreply@example.com",
+  /** Shared secret for POST /api/internal/revalidate-catalog (supplier import scripts). Unset = endpoint disabled. */
+  catalogRevalidateSecret: () => process.env.CATALOG_REVALIDATE_SECRET,
 };

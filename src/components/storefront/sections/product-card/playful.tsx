@@ -30,7 +30,10 @@ export function ProductCardPlayful({ product, currency, locale, labels, wishlist
         </Link>
         <div className="min-h-5">{product.ratingCount > 0 && <RatingStars value={product.ratingAvg} count={product.ratingCount} />}</div>
         <p className="mt-auto flex flex-wrap items-center gap-2 pt-2">
-          <span className="rounded-full bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground tabular-nums">{formatMoney(product.price, currency, locale)}</span>
+          <span className="rounded-full bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground tabular-nums">
+            {product.priceVaries && labels.from && <span className="me-1 font-normal opacity-80">{labels.from}</span>}
+            {formatMoney(product.price, currency, locale)}
+          </span>
           {onSale && product.compareAtPrice !== null && <s className="text-xs text-muted-foreground tabular-nums">{formatMoney(product.compareAtPrice, currency, locale)}</s>}
         </p>
       </div>

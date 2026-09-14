@@ -34,6 +34,7 @@ export function ProductCardBold({ product, currency, locale, labels, wishlistSlo
         <Price
           amount={product.price}
           compareAt={product.compareAtPrice}
+          from={product.priceVaries ? labels.from : undefined}
           currency={currency}
           locale={locale}
           className="mt-auto self-start bg-inverse px-2 py-1 text-sm text-inverse-foreground [&_s]:text-inverse-foreground/60 [&_span]:text-inverse-foreground"

@@ -5,9 +5,10 @@ import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { ofLabel, useCarousel } from "./use-carousel";
+import { useVariantImages, useVariantSelection } from "./variant-selection";
 
 interface Props {
-  images: { url: string; alt: string }[];
+  images: { url: string; alt: string; variantId?: string | null }[];
   /** Alt text when a photo has none / for the empty placeholder. */
   fallbackAlt: string;
   labels: { previous: string; next: string; imageOf: string };
@@ -35,9 +36,13 @@ const LIST: Record<Props["thumbs"], { list: string; item: string }> = {
  * Product photo gallery: a stage that cross-fades between photos, thumbnails that select one,
  * swipe on touch, arrow keys and hover arrows on the stage, and an "n / total" counter.
  */
-export function ProductGallery({ images, fallbackAlt, labels, stageClassName, sizes = "(min-width: 768px) 55vw, 100vw", thumbs, thumbClassName, activeThumbClassName, overlay, className }: Props) {
+export function ProductGallery({ images: allImages, fallbackAlt, labels, stageClassName, sizes = "(min-width: 768px) 55vw, 100vw", thumbs, thumbClassName, activeThumbClassName, overlay, className }: Props) {
+  // Choosing a size or colour in the purchase panel narrows the photos to that variant's.
+  const images = useVariantImages(allImages);
   const count = images.length;
   const { active, go, next, prev, rootProps } = useCarousel({ count });
+  const selectedVariant = useVariantSelection()?.variantId;
+  useEffect(() => go(0), [selectedVariant, go]);
   const many = count > 1;
   const listRef = useRef<HTMLUListElement>(null);
 

@@ -9,6 +9,7 @@ import { getSessionUser } from "@/lib/auth/session";
 import { getMyWishlistIds } from "@/lib/account/queries";
 import { AddToCartPanel } from "@/components/storefront/shared/add-to-cart-panel";
 import { ReviewForm } from "@/components/storefront/shared/review-form";
+import { VariantSelectionProvider } from "@/components/storefront/shared/variant-selection";
 import { GuestWishlistButton, WishlistButton } from "@/components/storefront/shared/wishlist-button";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]/p/[slug]">): Promise<Metadata> {
@@ -34,7 +35,8 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
   // The catalog query reports a missing reviewer name as null rather than inventing the English
   // word "Customer", which used to render verbatim on the Persian storefront.
   const reviews = rawReviews.map((r) => ({ ...r, authorName: r.authorName ?? tc("customer") }));
-  return renderSection("productPage", store.theme.sections.productPage, {
+  // The provider lets the theme's gallery follow the size/colour picked in the purchase panel.
+  const page = renderSection("productPage", store.theme.sections.productPage, {
     product,
     currency: store.currency,
     locale,
@@ -67,6 +69,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
       ),
     }),
   });
+  return <VariantSelectionProvider>{page}</VariantSelectionProvider>;
 }
 
 async function ProductWishlist({ storeId, storeSlug, productId }: { storeId: string; storeSlug: string; productId: string }) {

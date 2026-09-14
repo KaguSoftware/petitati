@@ -66,6 +66,7 @@
   },
   "product": {
     "addToCart": "Add to cart",
+    "priceFrom": "From",
     "outOfStock": "Out of stock",
     "lowStock": "Only {count} left",
     "inStock": "In stock",

@@ -9,6 +9,8 @@ export interface ProductCardData {
   shortDescription: string | null;
   price: number;
   compareAtPrice: number | null;
+  /** variants sell at different prices, so `price` is a starting price ("From …") */
+  priceVaries?: boolean;
   imageUrl: string | null;
   imageAlt: string;
   ratingAvg: number;
@@ -59,7 +61,8 @@ export interface ProductDetail extends ProductCardData {
   description: string | null;
   /** brand slug for the /b/<slug> link; null when the product has no brand */
   brandSlug: string | null;
-  images: { url: string; alt: string }[];
+  /** `variantId` set = a photo of that variant only; null = shared by every variant */
+  images: { url: string; alt: string; variantId?: string | null }[];
   options: OptionData[];
   variants: VariantData[];
   categories: { slug: string; name: string }[];

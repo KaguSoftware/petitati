@@ -66,6 +66,7 @@
   },
   "product": {
     "addToCart": "Sepete ekle",
+    "priceFrom": "En düşük",
     "outOfStock": "Stokta yok",
     "lowStock": "Sadece {count} adet kaldı",
     "inStock": "Stokta",

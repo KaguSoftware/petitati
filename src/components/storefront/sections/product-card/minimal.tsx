@@ -41,7 +41,7 @@ export function ProductCardMinimal({ product, currency, locale, labels, wishlist
           {product.brand && <p className="truncate text-xs text-muted-foreground">{product.brand}</p>}
           <h3 className="bidi-auto line-clamp-2 text-label leading-snug font-medium text-balance">{product.name}</h3>
           <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pt-1">
-            <Price amount={product.price} compareAt={product.compareAtPrice} currency={currency} locale={locale} className="text-base" />
+            <Price amount={product.price} compareAt={product.compareAtPrice} from={product.priceVaries ? labels.from : undefined} currency={currency} locale={locale} className="text-base" />
             {product.ratingCount > 0 && <RatingStars value={product.ratingAvg} count={product.ratingCount} size={13} />}
           </div>
         </div>

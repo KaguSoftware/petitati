@@ -66,6 +66,7 @@
   },
   "product": {
     "addToCart": "افزودن به سبد",
+    "priceFrom": "از",
     "outOfStock": "ناموجود",
     "lowStock": "فقط {count} عدد باقی مانده",
     "inStock": "موجود",

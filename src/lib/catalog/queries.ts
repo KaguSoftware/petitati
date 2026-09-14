@@ -48,12 +48,18 @@ function toCard(p: ProductWithRelations, locale: Locale, fallback: Locale): Prod
   const tr = pickTranslation(p.product_translations, locale, fallback);
   const variants = p.product_variants.filter((v) => v.is_active);
   const def = variants.find((v) => v.is_default) ?? variants[0];
-  const cheapest = variants.reduce<ProductVariantRow | undefined>(
+  const available = (v: ProductVariantRow) => !v.track_inventory || v.allow_backorder || v.stock_qty > 0;
+  // Starting price: the cheapest variant a shopper can actually buy, else the cheapest at all.
+  const pool = variants.some(available) ? variants.filter(available) : variants;
+  const cheapest = pool.reduce<ProductVariantRow | undefined>(
     (acc, v) => (!acc || v.price < acc.price ? v : acc),
     undefined,
   );
-  const img = [...p.product_images].sort((a, b) => a.sort_order - b.sort_order)[0];
-  const inStock = variants.some((v) => !v.track_inventory || v.allow_backorder || v.stock_qty > 0);
+  const images = [...p.product_images].sort((a, b) => a.sort_order - b.sort_order);
+  // Photo of the variant whose price is shown, so a 1.5 kg price never sits next to a 10 kg bag.
+  const shown = cheapest ?? def;
+  const img = images.find((i) => shown && i.variant_id === shown.id) ?? images.find((i) => !i.variant_id) ?? images[0];
+  const inStock = variants.some(available);
   const ageDays = (Date.now() - new Date(p.created_at).getTime()) / 86_400_000;
   return {
     id: p.id,
@@ -62,6 +68,7 @@ function toCard(p: ProductWithRelations, locale: Locale, fallback: Locale): Prod
     shortDescription: tr?.short_description ?? null,
     price: (cheapest ?? def)?.price ?? 0,
     compareAtPrice: (cheapest ?? def)?.compare_at_price ?? null,
+    priceVaries: new Set(variants.map((v) => v.price)).size > 1,
     imageUrl: img?.url ?? null,
     imageAlt: img ? pickJson(img.alt, locale, fallback) || (tr?.name ?? "") : (tr?.name ?? ""),
     ratingAvg: Number(p.rating_avg),
@@ -259,7 +266,7 @@ export async function getProductBySlug(
     seoDescription: tr?.seo_description ?? null,
     images: [...data.product_images]
       .sort((a, b) => a.sort_order - b.sort_order)
-      .map((i) => ({ url: i.url, alt: pickJson(i.alt, locale, fallback) || card.name })),
+      .map((i) => ({ url: i.url, alt: pickJson(i.alt, locale, fallback) || card.name, variantId: i.variant_id })),
     options: [...data.product_options]
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((o) => ({

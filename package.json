@@ -43,6 +43,7 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.125.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -6,17 +6,21 @@ export function Price({
   compareAt,
   currency,
   locale,
+  from,
   className,
 }: {
   amount: number;
   compareAt?: number | null;
   currency: string;
   locale: string;
+  /** label shown before a starting price when variants sell at different prices, e.g. "From" */
+  from?: string;
   className?: string;
 }) {
   const onSale = compareAt !== null && compareAt !== undefined && compareAt > amount;
   return (
     <span className={cn("inline-flex items-baseline gap-2", className)}>
+      {from && <span className="text-[0.7em] font-normal text-muted-foreground">{from}</span>}
       <span className={cn("font-semibold tabular-nums", onSale && "text-primary")}>
         {formatMoney(amount, currency, locale)}
       </span>

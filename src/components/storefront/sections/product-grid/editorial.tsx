@@ -8,7 +8,7 @@ import type { ProductGridProps } from "../types";
 /** Feature first: the opening product takes a 2×2 cell on desktop, the rest fill in around it. */
 export async function ProductGridEditorial({ title, products, currency, locale, cardVariant, emptyLabel, emptyAction, wishlistSlots, viewAllHref, viewAllLabel, bare }: ProductGridProps) {
   const t = await getTranslations("product");
-  const labels = { new: t("new"), outOfStock: t("outOfStock") };
+  const labels = { new: t("new"), outOfStock: t("outOfStock"), from: t("priceFrom") };
   if (products.length === 0 && !emptyLabel) return null;
   const body =
     products.length === 0 ? (

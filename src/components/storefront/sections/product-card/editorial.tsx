@@ -30,6 +30,7 @@ export function ProductCardEditorial({ product, currency, locale, labels, wishli
         <Price
           amount={product.price}
           compareAt={product.compareAtPrice}
+          from={product.priceVaries ? labels.from : undefined}
           currency={currency}
           locale={locale}
           className="text-xs uppercase tracking-[0.15em] text-muted-foreground [&>span]:font-normal"

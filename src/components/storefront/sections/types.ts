@@ -73,7 +73,7 @@ export interface ProductCardProps {
   product: ProductCardData;
   currency: string;
   locale: string;
-  labels: { new: string; outOfStock: string };
+  labels: { new: string; outOfStock: string; from?: string };
   wishlistSlot?: ReactNode;
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { addToCartAction, type CartActionState } from "@/lib/cart/actions";
 import type { ProductDetail } from "@/lib/catalog/types";
 import { Price } from "./price";
 import { QuantityStepper } from "./quantity-stepper";
+import { useVariantSelection } from "./variant-selection";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -39,9 +40,32 @@ export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) 
     return product.variants.find((v) => chosen.every((id) => v.optionValueIds.includes(id)));
   }, [product, selected, defaultVariant]);
 
-  const available = variant
-    ? !variant.trackInventory || variant.allowBackorder || variant.stockQty > 0
-    : false;
+  const inStock = (v: (typeof product.variants)[number]) => !v.trackInventory || v.allowBackorder || v.stockQty > 0;
+  const available = variant ? inStock(variant) : false;
+
+  const selection = useVariantSelection();
+  const setSelectedVariant = selection?.setVariantId;
+  useEffect(() => setSelectedVariant?.(variant?.id ?? null), [variant, setSelectedVariant]);
+
+  /** The variant this value leads to: same choices elsewhere if that combination exists, else any with the value. */
+  function resolve(optionId: string, valueId: string) {
+    const chosen = { ...selected, [optionId]: valueId };
+    const exact = product.variants.find((v) => Object.values(chosen).every((id) => v.optionValueIds.includes(id)));
+    const withValue = product.variants.filter((v) => v.optionValueIds.includes(valueId));
+    return exact ?? withValue.find(inStock) ?? withValue[0];
+  }
+
+  function choose(optionId: string, valueId: string) {
+    const target = resolve(optionId, valueId);
+    if (!target) return setSelected((s) => ({ ...s, [optionId]: valueId }));
+    // Snap every option to the resolved variant so the choice never lands on a combination that doesn't exist.
+    const next: Record<string, string> = {};
+    for (const opt of product.options) {
+      const v = opt.values.find((val) => target.optionValueIds.includes(val.id));
+      if (v) next[opt.id] = v.id;
+    }
+    setSelected(next);
+  }
   const maxQty = variant && variant.trackInventory && !variant.allowBackorder ? variant.stockQty : 99;
 
   const [state, action, pending] = useActionState(
@@ -70,14 +94,18 @@ export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) 
           <div className="flex flex-wrap gap-2">
             {opt.values.map((val) => {
               const active = selected[opt.id] === val.id;
+              const target = resolve(opt.id, val.id);
+              const soldOut = !target || !inStock(target);
               return (
                 <button
                   key={val.id}
                   type="button"
-                  onClick={() => setSelected((s) => ({ ...s, [opt.id]: val.id }))}
+                  aria-pressed={active}
+                  onClick={() => choose(opt.id, val.id)}
                   className={cn(
                     "min-w-10 rounded-md border bg-background px-3 py-1.5 text-sm transition",
                     active ? "border-primary bg-primary text-primary-foreground" : "hover:border-foreground",
+                    soldOut && !active && "text-muted-foreground line-through decoration-muted-foreground/60",
                   )}
                   style={val.swatch ? { backgroundColor: active ? undefined : val.swatch } : undefined}
                 >
