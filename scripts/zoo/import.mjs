@@ -1,6 +1,6 @@
 // Stage 4: make the store's catalog match the grouped, translated zoo data.
 //
-//   node scripts/zoo/import.mjs [--category "Kuru Kedi Maması"] [--ids ids.json] [--status draft|active] [--dry-run]
+//   node scripts/zoo/import.mjs [--category "Kuru Kedi Maması"] [--ids ids.json] [--status draft|active] [--translated-only] [--dry-run]
 //
 // A reconciler, not an inserter: every zoo item is a variant keyed by product_sources(external_id), so a
 // re-run updates in place, a regrouping moves variants between products, and products left without
@@ -22,7 +22,9 @@ const categoryNames = readJson("categories.json", {});
 const groups = loadGroups()
   .map((g) => ({ ...g, members: g.members.filter((m) => byId.has(m.externalId)) }))
   .filter((g) => g.members.length)
-  .filter((g) => !opts.ids || g.members.some((m) => onlyIds.has(m.externalId)));
+  .filter((g) => !opts.ids || g.members.some((m) => onlyIds.has(m.externalId)))
+  // --translated-only: hold back products whose en/fa text is not ready, so nothing goes live in Turkish only
+  .filter((g) => !opts["translated-only"] || translationFor(g));
 
 if (opts["dry-run"]) {
   for (const g of groups) {
