@@ -112,19 +112,30 @@ export function OrderSkeleton() {
   );
 }
 
-/** Toolbar row + a 2/3/4-up grid of tiles, so the page does not jump when the results land. */
+/** The listing's shape — sidebar (desktop), toolbar row and a 2/3/4-up grid — so the page does not jump when the results land. */
 export function ResultsSkeleton() {
   return (
-    <div className="flex flex-col gap-6" aria-hidden>
-      <div className="h-11 w-40 animate-pulse rounded-lg bg-muted" />
-      <div className="grid grid-cols-2 gap-x-3 gap-y-7 @tablet:grid-cols-3 @tablet:gap-x-5 @desktop:grid-cols-4 @desktop:gap-x-6">
-        {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="flex flex-col gap-3">
-            <div className="aspect-square animate-pulse rounded-xl bg-muted" />
-            <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-            <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
-          </div>
+    <div className="grid gap-6 @desktop:grid-cols-[14rem_minmax(0,1fr)] @desktop:gap-8 @wide:grid-cols-[16rem_minmax(0,1fr)] @wide:gap-10" aria-hidden>
+      <div className="hidden flex-col gap-3 @desktop:flex">
+        <Line className="h-4 w-1/2" />
+        {Array.from({ length: 6 }, (_, i) => (
+          <Line key={i} className="h-3" />
         ))}
+      </div>
+      <div className="flex flex-col gap-5">
+        <div className="flex items-center justify-between">
+          <Line className="h-4 w-24" />
+          <Block className="h-10 w-40 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-7 @tablet:grid-cols-3 @tablet:gap-x-5 @desktop:grid-cols-4 @desktop:gap-x-6">
+          {Array.from({ length: 8 }, (_, i) => (
+            <div key={i} className="flex flex-col gap-3">
+              <Block className="aspect-square rounded-xl" />
+              <Line className="w-3/4" />
+              <Line className="w-1/3" />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -18,9 +18,9 @@ export interface AnnouncementBarProps {
 export interface NavbarProps {
   storeName: string;
   logoUrl: string | null;
-  /** the whole active tree; variants show top-level links on desktop and nest children in the drawer */
-  categories: Pick<CategoryData, "id" | "slug" | "name" | "parentId">[];
-  labels: { home: string; shop: string; brands: string; search: string; menu: string; closeMenu: string; categories: string; call: string };
+  /** the whole active tree; the desktop bars open it as a mega-menu, the drawer nests children */
+  categories: Pick<CategoryData, "id" | "slug" | "name" | "parentId" | "imageUrl">[];
+  labels: { home: string; shop: string; brands: string; search: string; menu: string; closeMenu: string; categories: string; call: string; viewAll: string };
   /** shown by layouts that have room for it (stacked bar at wide) */
   contactPhone: string | null;
   /** dynamic slots rendered by the page inside Suspense */
@@ -81,7 +81,10 @@ export interface ProductPageProps {
   product: ProductDetail;
   currency: string;
   locale: string;
+  /** Shop › parent › … › the product's deepest category; the page resolves the chain from the tree */
+  breadcrumb: { href: string; label: string }[];
   labels: {
+    breadcrumb: string;
     description: string;
     sku: string;
     reviews: string;

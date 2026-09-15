@@ -1,23 +1,15 @@
 import { Link } from "@/i18n/navigation";
 import { ProductGallery } from "@/components/storefront/shared/product-gallery";
 import { RatingStars } from "@/components/storefront/shared/rating-stars";
+import { Breadcrumb } from "@/components/storefront/shared/breadcrumb";
 import type { ProductPageProps } from "../types";
 
 /** Wide stage: one wide photo across the top with the thumbnails beside it, then details in two columns inside a dark band. */
-export function ProductPageBold({ product, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
+export function ProductPageBold({ product, breadcrumb, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
   return (
     <main className="pb-8">
       <div className="mx-auto max-w-7xl px-gutter pt-6">
-        <nav className="mb-4 text-xs font-bold tracking-widest text-muted-foreground uppercase">
-          {product.categories.map((c, i) => (
-            <span key={c.slug}>
-              {i > 0 && <span className="mx-2 text-foreground">/</span>}
-              <Link href={`/c/${c.slug}`} className="decoration-2 underline-offset-4 hover:text-foreground hover:underline">
-                {c.name}
-              </Link>
-            </span>
-          ))}
-        </nav>
+        <Breadcrumb items={breadcrumb} label={labels.breadcrumb} className="mb-4 text-xs font-bold tracking-widest uppercase" />
         <ProductGallery
           images={product.images}
           fallbackAlt={product.name}

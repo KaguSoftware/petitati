@@ -1,26 +1,14 @@
 import { Link } from "@/i18n/navigation";
 import { RatingStars } from "@/components/storefront/shared/rating-stars";
+import { Breadcrumb } from "@/components/storefront/shared/breadcrumb";
 import type { ProductPageProps } from "../types";
 import { EditorialPhotos } from "./editorial-photos";
 
 /** Lookbook: every photo full size, stacked down one column, while the text column stays in view. */
-export function ProductPageEditorial({ product, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
+export function ProductPageEditorial({ product, breadcrumb, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
   return (
     <main className="mx-auto max-w-7xl px-gutter py-10">
-      <nav className="mb-6 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-        {product.categories.map((c, i) => (
-          <span key={c.slug}>
-            {i > 0 && (
-              <span aria-hidden className="mx-2">
-                /
-              </span>
-            )}
-            <Link href={`/c/${c.slug}`} className="transition-colors hover:text-foreground">
-              {c.name}
-            </Link>
-          </span>
-        ))}
-      </nav>
+      <Breadcrumb items={breadcrumb} label={labels.breadcrumb} className="mb-6 text-xs uppercase tracking-[0.18em]" />
       <div className="grid gap-10 @desktop:grid-cols-12 @desktop:gap-14">
         <EditorialPhotos images={product.images} name={product.name} wishlistSlot={wishlistSlot} />
         <div className="flex flex-col gap-8 self-start @desktop:sticky @desktop:top-24 @desktop:col-span-5">

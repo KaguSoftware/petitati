@@ -28,7 +28,7 @@ export function QuantityStepper({ value, onChange, min = 1, max = null, disabled
   const step = "grid size-11 place-items-center transition-colors hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset";
 
   return (
-    <div dir="ltr" className={cn("inline-flex h-11 items-center rounded-lg border bg-background", className)}>
+    <div dir="ltr" className={cn("inline-flex h-11 items-center rounded-lg border bg-card", className)}>
       <button type="button" aria-label={t("decreaseQty")} className={cn(step, "rounded-s-lg")} disabled={atMin} onClick={() => onChange(Math.max(min, value - 1))}>
         <Minus className="size-4" />
       </button>

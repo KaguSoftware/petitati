@@ -30,7 +30,7 @@ export async function StoreChrome({ ctx, children }: { ctx: StoreContext; childr
     phone: store.contact_phone,
     categories: topLevel,
     resolved: resolveFooter(store.footer, locale, fallback),
-    localeSlot: <LocaleSwitcher enabled={store.enabled_locales} />,
+    localeSlot: <LocaleSwitcher enabled={store.enabled_locales} notice={t("translationNotice")} />,
     year,
     pages: { content: (store.settings.pages ?? {}) as Record<string, Record<string, string>>, locale, fallback },
   });
@@ -56,12 +56,13 @@ export async function StoreChrome({ ctx, children }: { ctx: StoreContext; childr
           closeMenu: t("closeMenu"),
           categories: t("categories"),
           call: t("call"),
+          viewAll: t("viewAll"),
         },
         contactPhone: store.contact_phone,
-        localeSlot: <LocaleSwitcher enabled={store.enabled_locales} variant="compact" />,
+        localeSlot: <LocaleSwitcher enabled={store.enabled_locales} variant="compact" notice={t("translationNotice")} />,
         accountSlot: (
           <Suspense fallback={<AccountMenuFallback />}>
-            <AccountMenuSlot enabledLocales={store.enabled_locales} />
+            <AccountMenuSlot />
           </Suspense>
         ),
         cartSlot: (

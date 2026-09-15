@@ -1,26 +1,15 @@
-import { ChevronRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { PageShell } from "@/components/storefront/shared/page-shell";
 import { ProductGallery } from "@/components/storefront/shared/product-gallery";
 import { RatingStars } from "@/components/storefront/shared/rating-stars";
+import { Breadcrumb } from "@/components/storefront/shared/breadcrumb";
 import type { ProductPageProps } from "../types";
 
 /** Gallery + panel: a square photo with a thumbnail strip, the buy panel sticky beside it, reviews below. */
-export function ProductPageMinimal({ product, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
+export function ProductPageMinimal({ product, breadcrumb, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
   return (
     <PageShell>
-      {product.categories.length > 0 && (
-        <nav className="-mb-2 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-          {product.categories.map((c, i) => (
-            <span key={c.slug} className="inline-flex items-center gap-1">
-              {i > 0 && <ChevronRight aria-hidden className="size-3.5 rtl:-scale-x-100" />}
-              <Link href={`/c/${c.slug}`} className="transition-colors hover:text-primary">
-                {c.name}
-              </Link>
-            </span>
-          ))}
-        </nav>
-      )}
+      <Breadcrumb items={breadcrumb} label={labels.breadcrumb} className="-mb-2" />
       <div className="grid gap-8 @tablet:grid-cols-2 @tablet:gap-10 @desktop:grid-cols-[1.1fr_1fr] @desktop:gap-14">
         <ProductGallery
           images={product.images}
@@ -49,7 +38,7 @@ export function ProductPageMinimal({ product, labels, purchasePanel, reviewsSect
             {product.ratingCount > 0 && <RatingStars value={product.ratingAvg} count={product.ratingCount} size={16} />}
             {product.shortDescription && <p className="bidi-auto text-muted-foreground">{product.shortDescription}</p>}
           </div>
-          <div className="rounded-2xl bg-muted/60 p-5 @tablet:p-6">{purchasePanel}</div>
+          <div className="rounded-2xl bg-card p-5 shadow-sm ring-1 ring-foreground/5 @tablet:p-6">{purchasePanel}</div>
           {product.description && (
             <section className="flex flex-col gap-2 border-t pt-6">
               <h2 className="font-semibold">{labels.description}</h2>

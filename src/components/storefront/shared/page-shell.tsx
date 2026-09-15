@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 interface Props {
   /** Page heading; omit when the page draws its own header (banner, brand mark). */
   title?: ReactNode;
+  /** Small line ABOVE the heading — a breadcrumb. */
+  eyebrow?: ReactNode;
   /** Small text under the title. */
   description?: ReactNode;
   /** Right-aligned controls on the title row. */
@@ -36,13 +38,14 @@ const HEADING = pageHeading;
  * one vertical rhythm and one heading style, so titles line up with the navbar wordmark and the
  * footer columns on every page. Sections on the home page use the same edge on their own.
  */
-export function PageShell({ title, description, actions, width = "wide", size = "page", as: Tag = "main", className, children }: Props) {
+export function PageShell({ title, eyebrow, description, actions, width = "wide", size = "page", as: Tag = "main", className, children }: Props) {
   return (
     <Tag className={cn("mx-auto w-full max-w-7xl px-gutter py-8 @desktop:py-12", className)}>
       <div className={cn("flex flex-col gap-6 @desktop:gap-8", width === "narrow" && "mx-auto max-w-3xl")}>
         {(title || actions) && (
           <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div className="flex min-w-0 flex-col gap-1.5">
+              {eyebrow && <div className="mb-1">{eyebrow}</div>}
               {title && <h1 className={cn("bidi-auto font-semibold tracking-tight text-balance", HEADING[size])}>{title}</h1>}
               {description && <p className="bidi-auto max-w-xl text-muted-foreground">{description}</p>}
             </div>

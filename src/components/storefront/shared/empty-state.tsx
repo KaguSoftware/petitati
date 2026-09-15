@@ -21,8 +21,8 @@ interface Props {
  */
 export function EmptyState({ icon: Icon = PackageOpen, title, description, action, tone = "panel", className }: Props) {
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-4 px-6 text-center", tone === "panel" ? "rounded-xl bg-muted/60 py-14 @tablet:py-20" : "py-10", className)}>
-      <span aria-hidden className="grid size-16 place-items-center rounded-full bg-background text-primary shadow-sm ring-1 ring-foreground/5">
+    <div className={cn("flex flex-col items-center justify-center gap-4 px-6 text-center", tone === "panel" ? "rounded-xl bg-card py-14 shadow-sm ring-1 ring-foreground/5 @tablet:py-20" : "py-10", className)}>
+      <span aria-hidden className="grid size-16 place-items-center rounded-full bg-muted text-primary">
         <Icon className="size-7" strokeWidth={1.75} />
       </span>
       <div className="flex flex-col gap-1.5">

@@ -40,7 +40,7 @@ export function SearchForm({
         defaultValue={params.get("q") ?? ""}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="h-9 rounded-full border-transparent bg-muted/60 ps-8 pe-3 focus-visible:bg-background [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+        className="h-9 rounded-full border-transparent bg-muted/60 ps-8 pe-3 focus-visible:bg-card [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
       />
     </form>
   );

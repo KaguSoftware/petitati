@@ -86,6 +86,7 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
   const [brandId, setBrandId] = useState(product?.product.brand_id ?? NO_BRAND);
   const [tags, setTags] = useState(product?.product.tags.join(", ") ?? "");
   const [featured, setFeatured] = useState(product?.product.is_featured ?? false);
+  const [bestseller, setBestseller] = useState(product?.product.is_bestseller ?? false);
   const [slugTouched, setSlugTouched] = useState(!!product);
   const [status, setStatus] = useState<ProductStatus>(product?.product.status ?? "draft");
 
@@ -189,6 +190,13 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
             <Label className="flex items-center justify-between gap-3">
               <span>{t("products.featured")}</span>
               <Switch name="is_featured" checked={featured} onCheckedChange={setFeatured} />
+            </Label>
+            <Label className="flex items-center justify-between gap-3">
+              <span className="flex flex-col gap-0.5">
+                <span>{t("products.bestseller")}</span>
+                <span className="text-xs font-normal text-muted-foreground">{t("products.bestsellerHint")}</span>
+              </span>
+              <Switch name="is_bestseller" checked={bestseller} onCheckedChange={setBestseller} />
             </Label>
           </section>
 

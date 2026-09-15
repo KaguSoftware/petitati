@@ -34,7 +34,8 @@
     "accountMenu": "Hesap menüsü",
     "errorOffline": "Bağlantınız kopmuş görünüyor. İnternetinizi kontrol edip tekrar deneyin.",
     "errorRef": "Referans",
-    "backHome": "Ana sayfaya dön"
+    "backHome": "Ana sayfaya dön",
+    "breadcrumb": "Buradasınız"
   },
   "nav": {
     "home": "Ana sayfa",
@@ -49,7 +50,9 @@
     "menu": "Menü",
     "closeMenu": "Menüyü kapat",
     "brands": "Markalar",
-    "call": "Bizi arayın"
+    "call": "Bizi arayın",
+    "translationNotice": "Bu mağaza Türkçedir. Diğer diller otomatik çeviridir ve hata olabilir.",
+    "viewAll": "Tümünü gör"
   },
   "home": {
     "heroTitle": "Evcil dostunuzun sevdiği her şey",
@@ -62,7 +65,8 @@
     "previousSlide": "Önceki slayt",
     "nextSlide": "Sonraki slayt",
     "slideOf": "Slayt {n} / {total}",
-    "shopByBrand": "Markaya göre alışveriş"
+    "shopByBrand": "Markaya göre alışveriş",
+    "bestSellers": "Çok satanlar"
   },
   "product": {
     "addToCart": "Sepete ekle",
@@ -887,7 +891,9 @@
         }
       },
       "allBrands": "Tüm markalar",
-      "filterBrand": "Markaya göre filtrele"
+      "filterBrand": "Markaya göre filtrele",
+      "bestseller": "Çok satan",
+      "bestsellerHint": "Gerçek satışlar öne geçene kadar ana sayfadaki “Çok satanlar” bölümünde gösterilir."
     },
     "categories": {
       "title": "Kategoriler",
@@ -1006,7 +1012,8 @@
         "background": "Arka plan",
         "foreground": "Metin",
         "muted": "Soluk arka plan",
-        "mutedForeground": "Soluk metin"
+        "mutedForeground": "Soluk metin",
+        "card": "Kutu arka planı"
       },
       "shape": {
         "title": "Biçim ve yazı",
@@ -1769,11 +1776,36 @@
     "sort_price_asc": "Fiyat: düşükten yükseğe",
     "sort_price_desc": "Fiyat: yüksekten düşüğe",
     "sort_rating": "En çok beğenilen",
-    "brand": "Marka",
-    "allBrands": "Tüm markalar",
     "noResultsTitle": "Eşleşen ürün yok",
     "clearFilters": "Filtreleri temizle",
-    "browseAll": "Mağazaya göz at"
+    "browseAll": "Mağazaya göz at",
+    "filters": "Filtreler",
+    "filtersWithCount": "Filtreler ({count})",
+    "closeFilters": "Filtreleri kapat",
+    "showResults": "{count} ürünü göster",
+    "clearAll": "Hepsini temizle",
+    "activeFilters": "Seçili filtreler",
+    "remove": "{label} filtresini kaldır",
+    "brands": "Markalar",
+    "searchBrands": "Marka ara",
+    "noBrandsFound": "Eşleşen marka yok",
+    "showAllBrands": "Hepsini göster ({count})",
+    "showFewer": "Daha az göster",
+    "price": "Fiyat",
+    "priceMin": "En az",
+    "priceMax": "En çok",
+    "apply": "Uygula",
+    "under": "{amount} altı",
+    "over": "{amount} üstü",
+    "priceRange": "{min} – {max}",
+    "inStockOnly": "Sadece stoktakiler",
+    "onSaleOnly": "İndirimdekiler",
+    "searchChip": "Arama: {q}",
+    "pagination": "Sayfalar",
+    "pageOf": "Sayfa {page} / {total}",
+    "goToPage": "Sayfaya git",
+    "go": "Git",
+    "allIn": "Tüm {name}"
   },
   "brands": {
     "title": "Markalar",
@@ -1939,7 +1971,8 @@
         "background": "Arka plan",
         "foreground": "Metin",
         "muted": "Soluk yüzey",
-        "mutedForeground": "Soluk metin"
+        "mutedForeground": "Soluk metin",
+        "card": "Kutu arka planı"
       },
       "radius": "Köşe yuvarlaklığı",
       "radiusNames": {

@@ -34,7 +34,8 @@
     "accountMenu": "منوی حساب",
     "errorOffline": "به نظر می‌رسد اینترنت ندارید. اتصال را بررسی کنید و دوباره تلاش کنید.",
     "errorRef": "کد پیگیری",
-    "backHome": "برگشت به خانه"
+    "backHome": "برگشت به خانه",
+    "breadcrumb": "مسیر شما"
   },
   "nav": {
     "home": "خانه",
@@ -49,7 +50,9 @@
     "menu": "منو",
     "closeMenu": "بستن منو",
     "brands": "برندها",
-    "call": "با ما تماس بگیرید"
+    "call": "با ما تماس بگیرید",
+    "translationNotice": "این فروشگاه ترکیه‌ای است. صفحه‌ها به‌صورت خودکار ترجمه شده‌اند و ممکن است اشتباه داشته باشند.",
+    "viewAll": "مشاهده همه"
   },
   "home": {
     "heroTitle": "هر چیزی که حیوان خانگی شما دوست دارد",
@@ -62,7 +65,8 @@
     "previousSlide": "اسلاید قبلی",
     "nextSlide": "اسلاید بعدی",
     "slideOf": "اسلاید {n} از {total}",
-    "shopByBrand": "خرید بر اساس برند"
+    "shopByBrand": "خرید بر اساس برند",
+    "bestSellers": "پرفروش‌ها"
   },
   "product": {
     "addToCart": "افزودن به سبد",
@@ -887,7 +891,9 @@
         }
       },
       "allBrands": "همهٔ برندها",
-      "filterBrand": "فیلتر بر اساس برند"
+      "filterBrand": "فیلتر بر اساس برند",
+      "bestseller": "پرفروش",
+      "bestsellerHint": "تا وقتی فروش واقعی نداریم، در بخش «پرفروش‌ها» صفحهٔ اول نشان داده می‌شود."
     },
     "categories": {
       "title": "دسته‌بندی‌ها",
@@ -1006,7 +1012,8 @@
         "background": "پس‌زمینه",
         "foreground": "متن",
         "muted": "پس‌زمینه کم‌رنگ",
-        "mutedForeground": "متن کم‌رنگ"
+        "mutedForeground": "متن کم‌رنگ",
+        "card": "پس‌زمینهٔ کادرها"
       },
       "shape": {
         "title": "شکل و فونت",
@@ -1769,11 +1776,36 @@
     "sort_price_asc": "قیمت: کم به زیاد",
     "sort_price_desc": "قیمت: زیاد به کم",
     "sort_rating": "بالاترین امتیاز",
-    "brand": "برند",
-    "allBrands": "همه برندها",
     "noResultsTitle": "محصولی مطابق جستجو نیست",
     "clearFilters": "پاک کردن فیلترها",
-    "browseAll": "مشاهده فروشگاه"
+    "browseAll": "مشاهده فروشگاه",
+    "filters": "فیلترها",
+    "filtersWithCount": "فیلترها ({count})",
+    "closeFilters": "بستن فیلترها",
+    "showResults": "نمایش {count} محصول",
+    "clearAll": "پاک کردن همه",
+    "activeFilters": "فیلترهای فعال",
+    "remove": "حذف {label}",
+    "brands": "برندها",
+    "searchBrands": "جستجوی برند",
+    "noBrandsFound": "برندی پیدا نشد",
+    "showAllBrands": "نمایش همه ({count})",
+    "showFewer": "نمایش کمتر",
+    "price": "قیمت",
+    "priceMin": "از",
+    "priceMax": "تا",
+    "apply": "اعمال",
+    "under": "کمتر از {amount}",
+    "over": "بیشتر از {amount}",
+    "priceRange": "{min} تا {max}",
+    "inStockOnly": "فقط موجود",
+    "onSaleOnly": "فقط تخفیف‌دار",
+    "searchChip": "جستجو: {q}",
+    "pagination": "صفحه‌ها",
+    "pageOf": "صفحهٔ {page} از {total}",
+    "goToPage": "رفتن به صفحهٔ",
+    "go": "برو",
+    "allIn": "همهٔ {name}"
   },
   "brands": {
     "title": "برندها",
@@ -1939,7 +1971,8 @@
         "background": "پس‌زمینه",
         "foreground": "متن",
         "muted": "سطح کم‌رنگ",
-        "mutedForeground": "متن کم‌رنگ"
+        "mutedForeground": "متن کم‌رنگ",
+        "card": "پس‌زمینهٔ کادرها"
       },
       "radius": "گردی گوشه‌ها",
       "radiusNames": {

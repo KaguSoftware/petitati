@@ -27,7 +27,7 @@ function Column({ title, links }: { title: string; links: FooterLink[] }) {
  */
 export function FooterMinimal({ storeName, logoUrl, tagline, shopLinks, infoLinks, contact, social, trustItems, payments, labels, localeSlot, year }: FooterProps) {
   return (
-    <footer className="border-t bg-muted/40">
+    <footer className="border-t bg-background">
       <TrustStrip items={trustItems} tone="line" />
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-10 px-gutter py-12 @desktop:grid-cols-[1.4fr_1fr_1fr_1.3fr] @desktop:gap-8 @desktop:py-16">
         <div className="col-span-2 flex flex-col gap-4 @desktop:col-span-1">

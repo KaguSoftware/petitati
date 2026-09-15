@@ -1146,6 +1146,7 @@ export type Database = {
           brand_id: string | null
           created_at: string
           id: string
+          is_bestseller: boolean
           is_featured: boolean
           rating_avg: number
           rating_count: number
@@ -1159,6 +1160,7 @@ export type Database = {
           brand_id?: string | null
           created_at?: string
           id?: string
+          is_bestseller?: boolean
           is_featured?: boolean
           rating_avg?: number
           rating_count?: number
@@ -1172,6 +1174,7 @@ export type Database = {
           brand_id?: string | null
           created_at?: string
           id?: string
+          is_bestseller?: boolean
           is_featured?: boolean
           rating_avg?: number
           rating_count?: number

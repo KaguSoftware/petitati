@@ -17,7 +17,7 @@ export function ReviewForm({ storeSlug, productId }: { storeSlug: string; produc
   if (state.ok) return <p className="text-sm text-muted-foreground">{t("reviewSubmitted")}</p>;
 
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-xl bg-muted/60 p-4">
+    <form action={action} className="flex flex-col gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-foreground/5">
       <input type="hidden" name="storeSlug" value={storeSlug} />
       <input type="hidden" name="productId" value={productId} />
       <input type="hidden" name="rating" value={rating} />

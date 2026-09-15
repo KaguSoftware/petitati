@@ -44,13 +44,14 @@ export { PREVIEW_STORE_SLUG } from "./preview-slug";
  */
 export async function buildSectionPreviews(input: PreviewInput): Promise<SectionPreviews> {
   const { locale, storeName, logoUrl, currency, announcement, gridSize = 6 } = input;
-  const [t, tn, tf, tp, tc, tco] = await Promise.all([
+  const [t, tn, tf, tp, tc, tco, tcommon] = await Promise.all([
     getTranslations("home"),
     getTranslations("nav"),
     getTranslations("footer"),
     getTranslations("product"),
     getTranslations("cart"),
     getTranslations("checkout"),
+    getTranslations("common"),
   ]);
   const totals = computeTotals(
     fixtureCart,
@@ -85,7 +86,7 @@ export async function buildSectionPreviews(input: PreviewInput): Promise<Section
     phone: fixtureContactPhone,
     categories: fixtureTopCategories,
     resolved: resolveFooter(fixtureFooterContent, locale, "en"),
-    localeSlot: <LocaleSwitcher />,
+    localeSlot: <LocaleSwitcher notice={tn("translationNotice")} />,
     year: 2026,
   });
 
@@ -116,9 +117,9 @@ export async function buildSectionPreviews(input: PreviewInput): Promise<Section
         storeName,
         logoUrl,
         categories: fixtureCategories,
-        labels: { home: tn("home"), shop: tn("shop"), brands: tn("brands"), search: tn("search"), menu: tn("menu"), closeMenu: tn("closeMenu"), categories: tn("categories"), call: tn("call") },
+        labels: { home: tn("home"), shop: tn("shop"), brands: tn("brands"), search: tn("search"), menu: tn("menu"), closeMenu: tn("closeMenu"), categories: tn("categories"), call: tn("call"), viewAll: tn("viewAll") },
         contactPhone: fixtureContactPhone,
-        localeSlot: <LocaleSwitcher variant="compact" />,
+        localeSlot: <LocaleSwitcher variant="compact" notice={tn("translationNotice")} />,
         accountSlot: <AccountMenuFallback />,
         cartSlot: <CartButtonFallback />,
       }),
@@ -131,7 +132,9 @@ export async function buildSectionPreviews(input: PreviewInput): Promise<Section
         product: fixtureProduct,
         currency,
         locale,
+        breadcrumb: [{ href: "/shop", label: tn("shop") }, ...fixtureProduct.categories.map((c) => ({ href: `/c/${c.slug}`, label: c.name }))],
         labels: {
+          breadcrumb: tcommon("breadcrumb"),
           description: tp("description"),
           sku: tp("sku"),
           reviews: tp("reviews"),

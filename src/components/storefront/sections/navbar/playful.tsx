@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { CategoryMenu } from "@/components/storefront/shared/category-menu";
 import { categoryNavItems } from "@/components/storefront/shared/category-nav";
 import { MobileNav } from "@/components/storefront/shared/mobile-nav";
 import { SearchForm } from "@/components/storefront/shared/search-form";
@@ -11,7 +12,7 @@ import type { NavbarProps } from "../types";
 const navLink =
   "inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all hover:bg-background hover:text-foreground hover:shadow-sm focus-visible:bg-background focus-visible:text-foreground focus-visible:shadow-sm focus-ring";
 
-/** Category budget: Shop + Brands until @wide, then categories #1–#3 (the drawer lists them all); icon-only search at @tablet, the field from @desktop. A floating capsule: the whole header lives in a rounded pill that hovers over the page, with a pill nav inside. */
+/** A floating capsule: the whole header lives in a rounded pill that hovers over the page, with a pill nav (Shop · Categories mega-menu · Brands) inside; icon-only search at @tablet, the field from @desktop. */
 export function NavbarPlayful({ storeName, logoUrl, categories, labels, cartSlot, accountSlot, localeSlot }: NavbarProps) {
   const primary = [
     { href: "/", label: labels.home },
@@ -19,12 +20,11 @@ export function NavbarPlayful({ storeName, logoUrl, categories, labels, cartSlot
     { href: "/brands", label: labels.brands },
   ];
   const categoryTree = categoryNavItems(categories);
-  const categoryLinks = categoryTree.map(({ href, label }) => ({ href, label }));
   const brand = <StoreLogo storeName={storeName} logoUrl={logoUrl} markClassName="rounded-full" />;
 
   return (
     <header className="sticky top-0 z-40 pt-3 px-gutter">
-      <div className="relative mx-auto flex h-14 max-w-7xl items-center gap-2 rounded-full bg-background/85 ps-2 pe-2 shadow-lg shadow-primary/10 ring-1 ring-foreground/10 backdrop-blur supports-backdrop-filter:bg-background/75 @tablet:h-16 @tablet:ps-3 @tablet:pe-3">
+      <div className="relative mx-auto flex h-14 max-w-7xl items-center gap-2 rounded-full bg-card ps-2 pe-2 shadow-lg shadow-primary/10 ring-1 ring-foreground/10 @tablet:h-16 @tablet:ps-3 @tablet:pe-3">
         <MobileNav
           labels={{ menu: labels.menu, closeMenu: labels.closeMenu, categories: labels.categories, search: labels.search }}
           brand={brand}
@@ -46,14 +46,10 @@ export function NavbarPlayful({ storeName, logoUrl, categories, labels, cartSlot
             <Link href="/shop" className={navLink}>
               {labels.shop}
             </Link>
+            <CategoryMenu items={categoryTree} labels={{ categories: labels.categories, viewAll: labels.viewAll }} triggerClassName={navLink} />
             <Link href="/brands" className={navLink}>
               {labels.brands}
             </Link>
-            {categoryLinks.map((l, i) => (
-              <Link key={l.href} href={l.href} className={cn(navLink, i >= 3 ? "hidden" : "hidden @wide:inline-flex")}>
-                {l.label}
-              </Link>
-            ))}
           </div>
         </nav>
         <div className="ms-auto flex items-center gap-0.5 @tablet:gap-1">
@@ -61,6 +57,7 @@ export function NavbarPlayful({ storeName, logoUrl, categories, labels, cartSlot
             <Search className="size-5" />
           </Link>
           <SearchForm placeholder={labels.search} className="hidden w-48 shrink-0 @desktop:block @desktop:me-1 @wide:w-52" />
+          {localeSlot}
           {accountSlot}
           {cartSlot}
         </div>

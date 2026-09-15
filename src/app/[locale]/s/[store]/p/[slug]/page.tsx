@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
-import { getApprovedReviews, getProductBySlug } from "@/lib/catalog/queries";
+import { getApprovedReviews, getCategories, getProductBySlug } from "@/lib/catalog/queries";
+import { categoryChain } from "@/lib/catalog/tree";
 import { renderSection } from "@/lib/theme/registry";
 import { getSessionUser } from "@/lib/auth/session";
 import { getMyWishlistIds } from "@/lib/account/queries";
@@ -31,7 +32,17 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
   const product = await getProductBySlug(store.id, slug, locale, fallback);
   if (!product) notFound();
 
-  const [t, tc, rawReviews] = await Promise.all([getTranslations("product"), getTranslations("common"), getApprovedReviews(product.id)]);
+  const [t, tc, tn, rawReviews, categories] = await Promise.all([
+    getTranslations("product"),
+    getTranslations("common"),
+    getTranslations("nav"),
+    getApprovedReviews(product.id),
+    getCategories(store.id, locale, fallback),
+  ]);
+  // A product is filed in its leaf category; the breadcrumb shows the whole chain above the
+  // deepest one (Shop › Cats › Cat food › Dry food), not the flat list of assigned categories.
+  const deepest = product.categories.map((c) => categoryChain(categories, c.slug)).sort((a, b) => b.length - a.length)[0] ?? [];
+  const breadcrumb = [{ href: "/shop", label: tn("shop") }, ...deepest.map((c) => ({ href: `/c/${c.slug}`, label: c.name }))];
   // The catalog query reports a missing reviewer name as null rather than inventing the English
   // word "Customer", which used to render verbatim on the Persian storefront.
   const reviews = rawReviews.map((r) => ({ ...r, authorName: r.authorName ?? tc("customer") }));
@@ -40,7 +51,9 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
     product,
     currency: store.currency,
     locale,
+    breadcrumb,
     labels: {
+      breadcrumb: tc("breadcrumb"),
       description: t("description"),
       sku: t("sku"),
       reviews: t("reviews"),

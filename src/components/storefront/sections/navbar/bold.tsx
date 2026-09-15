@@ -1,16 +1,16 @@
 import { Link } from "@/i18n/navigation";
+import { CategoryMenu } from "@/components/storefront/shared/category-menu";
 import { categoryNavItems } from "@/components/storefront/shared/category-nav";
 import { MobileNav } from "@/components/storefront/shared/mobile-nav";
 import { SearchForm } from "@/components/storefront/shared/search-form";
 import { StoreLogo } from "@/components/storefront/shared/store-logo";
 import { Phone } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { NavbarProps } from "../types";
 
 const navLink =
   "inline-flex shrink-0 items-center border-b-2 border-transparent px-1 py-2 text-xs font-bold tracking-widest whitespace-nowrap uppercase text-inverse-foreground/80 transition-colors hover:border-inverse-foreground hover:text-inverse-foreground focus-visible:border-inverse-foreground focus-visible:text-inverse-foreground focus-ring";
 
-/** Category budget: #1–#3 from @tablet, #1–#5 at @wide (own full-width row). Department-store header: search / big centred logo / icons on the first row, a dark full-width category bar below. */
+/** Department-store header: search / big centred logo / icons on the first row, a dark full-width bar below with Shop · Categories (mega-menu) · Brands. */
 export function NavbarBold({ storeName, logoUrl, categories, labels, contactPhone, cartSlot, accountSlot, localeSlot }: NavbarProps) {
   const primary = [
     { href: "/", label: labels.home },
@@ -18,7 +18,6 @@ export function NavbarBold({ storeName, logoUrl, categories, labels, contactPhon
     { href: "/brands", label: labels.brands },
   ];
   const categoryTree = categoryNavItems(categories);
-  const categoryLinks = categoryTree.map(({ href, label }) => ({ href, label }));
   const brand = <StoreLogo storeName={storeName} logoUrl={logoUrl} wordmarkClassName="text-xl font-extrabold uppercase @tablet:text-2xl" />;
 
   return (
@@ -47,6 +46,7 @@ export function NavbarBold({ storeName, logoUrl, categories, labels, contactPhon
         </div>
         <div className="justify-self-center">{brand}</div>
         <div className="flex min-w-0 items-center justify-end gap-0.5 @tablet:gap-1">
+          {localeSlot}
           {accountSlot}
           {cartSlot}
         </div>
@@ -56,14 +56,10 @@ export function NavbarBold({ storeName, logoUrl, categories, labels, contactPhon
           <Link href="/shop" className={navLink}>
             {labels.shop}
           </Link>
+          <CategoryMenu items={categoryTree} labels={{ categories: labels.categories, viewAll: labels.viewAll }} triggerClassName={navLink} />
           <Link href="/brands" className={navLink}>
             {labels.brands}
           </Link>
-          {categoryLinks.map((l, i) => (
-            <Link key={l.href} href={l.href} className={cn(navLink, i >= 5 ? "hidden" : i >= 3 ? "hidden @wide:inline-flex" : undefined)}>
-              {l.label}
-            </Link>
-          ))}
         </div>
       </nav>
     </header>

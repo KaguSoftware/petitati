@@ -35,7 +35,7 @@ async function productIdsByName(db: Db, storeId: string, term: string): Promise<
   return [...new Set((data ?? []).map((r) => r.product_id))];
 }
 
-type ListRaw = Pick<ProductRow, "id" | "slug" | "status" | "is_featured" | "updated_at"> & {
+type ListRaw = Pick<ProductRow, "id" | "slug" | "status" | "is_featured" | "is_bestseller" | "updated_at"> & {
   product_translations: Pick<ProductTranslationRow, "locale" | "name">[];
   product_images: Pick<ProductImageRow, "url" | "sort_order">[];
   product_variants: Pick<ProductVariantRow, "price" | "stock_qty" | "track_inventory" | "is_active">[];
@@ -44,7 +44,7 @@ type ListRaw = Pick<ProductRow, "id" | "slug" | "status" | "is_featured" | "upda
 };
 
 const LIST_SELECT =
-  "id, slug, status, is_featured, updated_at, brands(name), product_translations(locale, name), product_images(url, sort_order), product_variants(price, stock_qty, track_inventory, is_active), product_categories(categories(id, category_translations(locale, name)))";
+  "id, slug, status, is_featured, is_bestseller, updated_at, brands(name), product_translations(locale, name), product_images(url, sort_order), product_variants(price, stock_qty, track_inventory, is_active), product_categories(categories(id, category_translations(locale, name)))";
 
 function toListRow(r: ListRaw, locale: Locale, fallback: Locale): ProductListRow {
   const tr = pickTranslation(r.product_translations, locale, fallback);
@@ -57,6 +57,7 @@ function toListRow(r: ListRaw, locale: Locale, fallback: Locale): ProductListRow
     slug: r.slug,
     status: r.status,
     is_featured: r.is_featured,
+    is_bestseller: r.is_bestseller,
     updated_at: r.updated_at,
     name: tr?.name ?? r.slug,
     thumbnail: image?.url ?? null,

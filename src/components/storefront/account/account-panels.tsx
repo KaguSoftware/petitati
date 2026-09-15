@@ -38,7 +38,7 @@ export function AccountPanels({ panels, labels, userCard, signOut }: Props) {
     <div className="grid grid-cols-1 gap-6 @tablet:grid-cols-[16rem_minmax(0,1fr)] @tablet:gap-10">
       <aside className="flex min-w-0 flex-col gap-4 @tablet:sticky @tablet:top-24 @tablet:self-start">
         {userCard}
-        <div className="@tablet:rounded-xl @tablet:bg-muted/60 @tablet:p-2">
+        <div className="@tablet:rounded-xl @tablet:bg-card @tablet:p-2 @tablet:shadow-sm @tablet:ring-1 @tablet:ring-foreground/5">
           <AccountNav labels={labels} active={active} onSelect={select} signOut={signOut} />
         </div>
       </aside>

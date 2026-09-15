@@ -47,8 +47,8 @@ values ('10000000-0000-0000-0000-000000000001', 'default', 'Petitati', 'Everythi
           "colors": {
             "primary": "#157fa1", "primaryForeground": "#ffffff",
             "accent": "#f7a83b", "accentForeground": "#1c1917",
-            "background": "#ffffff", "foreground": "#17323d",
-            "muted": "#eef8fb", "mutedForeground": "#4f6b75"
+            "background": "#faf3fc", "card": "#ffffff", "foreground": "#17323d",
+            "muted": "#f0e2f5", "mutedForeground": "#4a5f68"
           },
           "fonts": { "heading": "Inter", "body": "Inter" },
           "radius": "0.75rem"
@@ -159,8 +159,9 @@ begin
     ('grooming',  null,          'paw-balm',                'Paw Balm',                  'Pati Balsamı',                 'بالم پنجه',                   8900,  3000, false, false)
   ) as p(cat, brand, slug, en, tr, fa, price, cost, sized, featured) loop
     v_n := v_n + 1;
-    insert into public.products (id, store_id, slug, status, is_featured, tags, brand_id)
+    insert into public.products (id, store_id, slug, status, is_featured, is_bestseller, tags, brand_id)
     values (gen_random_uuid(), v_store, v_prod.slug, 'active', v_prod.featured,
+            v_prod.slug in ('rope-tug-toy', 'royal-canin-kitten', 'orthopedic-dog-bed', 'feather-wand'),
             case when v_n % 3 = 0 then array['new'] else '{}'::text[] end,
             (select id from public.brands where store_id = v_store and slug = v_prod.brand))
     returning id into v_pid;

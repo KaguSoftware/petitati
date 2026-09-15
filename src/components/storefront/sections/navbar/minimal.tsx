@@ -1,8 +1,8 @@
 import { Link } from "@/i18n/navigation";
+import { CategoryMenu } from "@/components/storefront/shared/category-menu";
 import { categoryNavItems } from "@/components/storefront/shared/category-nav";
 import { MobileNav } from "@/components/storefront/shared/mobile-nav";
 import { SearchForm } from "@/components/storefront/shared/search-form";
-import { NavScrollState } from "@/components/storefront/shared/nav-scroll-state";
 import { StoreLogo } from "@/components/storefront/shared/store-logo";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
@@ -12,7 +12,7 @@ import type { NavbarProps } from "../types";
 const navLink =
   "inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground focus-ring";
 
-/** Classic bar. Category budget: Shop + Brands until @wide, then categories #1–#3 (the drawer lists them all); the search field never truncates its placeholder. */
+/** Classic bar: Shop · Categories (mega-menu with the whole tree) · Brands on the page centre; the search field never truncates its placeholder. */
 export function NavbarMinimal({ storeName, logoUrl, categories, labels, cartSlot, accountSlot, localeSlot }: NavbarProps) {
   const primary = [
     { href: "/", label: labels.home },
@@ -20,14 +20,13 @@ export function NavbarMinimal({ storeName, logoUrl, categories, labels, cartSlot
     { href: "/brands", label: labels.brands },
   ];
   const categoryTree = categoryNavItems(categories);
-  const categoryLinks = categoryTree.map(({ href, label }) => ({ href, label }));
   const brand = <StoreLogo storeName={storeName} logoUrl={logoUrl} />;
 
   return (
-    <header data-navbar-overlay data-at-top="true" className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/70">
-      <NavScrollState />
-      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-gutter">
-        <div className="flex min-w-0 items-center gap-1">
+    <header className="sticky top-0 z-40 border-b bg-background">
+      {/* Phones: a flex row so the wordmark takes what the icon cluster leaves (the symmetric grid gave it 77 px → "Pe…"). From @tablet: the 3-column grid whose centre cell keeps the nav on the page centre. */}
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-gutter @tablet:grid @tablet:grid-cols-[1fr_auto_1fr]">
+        <div className="flex min-w-0 flex-1 items-center gap-1 @tablet:flex-none">
           <MobileNav
             labels={{ menu: labels.menu, closeMenu: labels.closeMenu, categories: labels.categories, search: labels.search }}
             brand={brand}
@@ -48,21 +47,18 @@ export function NavbarMinimal({ storeName, logoUrl, categories, labels, cartSlot
           <Link href="/shop" className={navLink}>
             {labels.shop}
           </Link>
+          <CategoryMenu items={categoryTree} labels={{ categories: labels.categories, viewAll: labels.viewAll }} triggerClassName={navLink} />
           <Link href="/brands" className={navLink}>
             {labels.brands}
           </Link>
-          {categoryLinks.map((l, i) => (
-            <Link key={l.href} href={l.href} className={cn(navLink, i >= 3 ? "hidden" : "hidden @wide:inline-flex")}>
-              {l.label}
-            </Link>
-          ))}
         </nav>
 
-        <div className="flex min-w-0 items-center justify-end gap-0.5 @tablet:gap-1">
+        <div className="flex shrink-0 items-center justify-end gap-0.5 @tablet:min-w-0 @tablet:gap-1">
           <Link href="/shop" aria-label={labels.search} className={cn(buttonVariants({ variant: "ghost", size: "icon-lg" }), "hidden @tablet:inline-flex @desktop:hidden")}>
             <Search className="size-5" />
           </Link>
           <SearchForm placeholder={labels.search} className="hidden w-48 shrink-0 @desktop:block @desktop:me-1 @wide:w-52" />
+          {localeSlot}
           {accountSlot}
           {cartSlot}
         </div>

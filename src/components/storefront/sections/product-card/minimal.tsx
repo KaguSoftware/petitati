@@ -15,7 +15,7 @@ export function ProductCardMinimal({ product, currency, locale, labels, wishlist
   return (
     <article className="group relative flex h-full flex-col">
       <Link href={`/p/${product.slug}`} className="flex flex-1 flex-col gap-3 rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-ring/50">
-        <div className="relative overflow-hidden rounded-xl bg-muted">
+        <div className="relative overflow-hidden rounded-xl bg-card">
           <ProductImage
             src={product.imageUrl}
             alt={product.imageAlt}

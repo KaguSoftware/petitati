@@ -34,7 +34,8 @@
     "accountMenu": "Account menu",
     "errorOffline": "You appear to be offline. Check your connection and try again.",
     "errorRef": "Reference",
-    "backHome": "Back to home"
+    "backHome": "Back to home",
+    "breadcrumb": "You are here"
   },
   "nav": {
     "home": "Home",
@@ -49,7 +50,9 @@
     "menu": "Menu",
     "closeMenu": "Close menu",
     "brands": "Brands",
-    "call": "Call us"
+    "call": "Call us",
+    "translationNotice": "This shop is Turkish. Pages are translated automatically and may contain mistakes.",
+    "viewAll": "View all"
   },
   "home": {
     "heroTitle": "Everything your pet loves",
@@ -62,7 +65,8 @@
     "previousSlide": "Previous slide",
     "nextSlide": "Next slide",
     "slideOf": "Slide {n} of {total}",
-    "shopByBrand": "Shop by brand"
+    "shopByBrand": "Shop by brand",
+    "bestSellers": "Best sellers"
   },
   "product": {
     "addToCart": "Add to cart",
@@ -887,7 +891,9 @@
         }
       },
       "allBrands": "All brands",
-      "filterBrand": "Filter by brand"
+      "filterBrand": "Filter by brand",
+      "bestseller": "Best seller",
+      "bestsellerHint": "Shown under “Best sellers” on the home page until real sales take over."
     },
     "categories": {
       "title": "Categories",
@@ -1006,7 +1012,8 @@
         "background": "Background",
         "foreground": "Text",
         "muted": "Muted background",
-        "mutedForeground": "Muted text"
+        "mutedForeground": "Muted text",
+        "card": "Tile background"
       },
       "shape": {
         "title": "Shape & type",
@@ -1769,11 +1776,36 @@
     "sort_price_asc": "Price: low to high",
     "sort_price_desc": "Price: high to low",
     "sort_rating": "Top rated",
-    "brand": "Brand",
-    "allBrands": "All brands",
     "noResultsTitle": "No products match",
     "clearFilters": "Clear filters",
-    "browseAll": "Browse the shop"
+    "browseAll": "Browse the shop",
+    "filters": "Filters",
+    "filtersWithCount": "Filters ({count})",
+    "closeFilters": "Close filters",
+    "showResults": "Show {count} products",
+    "clearAll": "Clear all",
+    "activeFilters": "Active filters",
+    "remove": "Remove {label}",
+    "brands": "Brands",
+    "searchBrands": "Search brands",
+    "noBrandsFound": "No brands match",
+    "showAllBrands": "Show all ({count})",
+    "showFewer": "Show fewer",
+    "price": "Price",
+    "priceMin": "Min",
+    "priceMax": "Max",
+    "apply": "Apply",
+    "under": "Under {amount}",
+    "over": "Over {amount}",
+    "priceRange": "{min} – {max}",
+    "inStockOnly": "In stock only",
+    "onSaleOnly": "On sale",
+    "searchChip": "Search: {q}",
+    "pagination": "Pagination",
+    "pageOf": "Page {page} of {total}",
+    "goToPage": "Go to page",
+    "go": "Go",
+    "allIn": "All {name}"
   },
   "brands": {
     "title": "Brands",
@@ -1939,7 +1971,8 @@
         "background": "Background",
         "foreground": "Text",
         "muted": "Muted surface",
-        "mutedForeground": "Muted text"
+        "mutedForeground": "Muted text",
+        "card": "Tile background"
       },
       "radius": "Corner radius",
       "radiusNames": {

@@ -31,7 +31,7 @@ export function BrandRow({ title, viewAllLabel, brands }: Props) {
             <li key={b.id} className="w-28 shrink-0 snap-start @desktop:w-auto">
               <Link
                 href={`/b/${b.slug}`}
-                className="flex h-full flex-col items-center gap-3 rounded-xl bg-background p-4 text-center shadow-sm ring-1 ring-foreground/5 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-reduce:transition-none"
+                className="flex h-full flex-col items-center gap-3 rounded-xl bg-card p-4 text-center shadow-sm ring-1 ring-foreground/5 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none motion-reduce:transition-none"
               >
                 <BrandMark name={b.name} logoUrl={b.logoUrl} size={56} className="rounded-lg" />
                 <span className="bidi-auto line-clamp-2 text-sm font-medium leading-snug">{b.name}</span>

@@ -3,6 +3,7 @@ import { Tags } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
 import { getBrands } from "@/lib/catalog/queries";
+import { featuredBrands } from "@/lib/catalog/brands";
 import { Link } from "@/i18n/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/storefront/shared/brand-mark";
@@ -15,10 +16,11 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store
   return { title: t("title") };
 }
 
-/** Brand index: a tile per active brand linking to /b/<slug>. */
+/** Brand index: a tile per brand worth showing (≥ MIN_BRAND_PRODUCTS active products), biggest first, linking to /b/<slug>. */
 export default async function BrandsPage({ params }: PageProps<"/[locale]/s/[store]/brands">) {
   const ctx = await storeContext(params);
-  const [t, tn, brands] = await Promise.all([getTranslations("brands"), getTranslations("nav"), getBrands(ctx.store.id)]);
+  const [t, tn, allBrands] = await Promise.all([getTranslations("brands"), getTranslations("nav"), getBrands(ctx.store.id)]);
+  const brands = featuredBrands(allBrands);
 
   return (
     <PageShell title={t("title")}>
@@ -39,9 +41,9 @@ export default async function BrandsPage({ params }: PageProps<"/[locale]/s/[sto
             <li key={b.id}>
               <Link
                 href={`/b/${b.slug}`}
-                className="flex h-full flex-col items-center gap-3 rounded-xl bg-muted/60 p-5 text-center transition-colors hover:bg-muted focus-visible:bg-muted focus-ring"
+                className="flex h-full flex-col items-center gap-3 rounded-xl bg-card p-5 text-center shadow-sm ring-1 ring-foreground/5 transition-colors hover:bg-muted focus-visible:bg-muted focus-ring"
               >
-                <BrandMark name={b.name} logoUrl={b.logoUrl} size={72} className="bg-background" />
+                <BrandMark name={b.name} logoUrl={b.logoUrl} size={72} />
                 <span className="bidi-auto font-medium">{b.name}</span>
               </Link>
             </li>

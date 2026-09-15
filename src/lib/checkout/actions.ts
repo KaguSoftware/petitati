@@ -9,7 +9,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getStoreBySlug } from "@/lib/tenant/store";
 import { getSessionUser } from "@/lib/auth/session";
 import { cartCookieName, getCart } from "@/lib/cart/cart";
-import { getShippingRates } from "@/lib/catalog/queries";
+import { getShippingRates, salesTag } from "@/lib/catalog/queries";
+import { updateTag } from "next/cache";
 import { computeTotals } from "./totals";
 import { getPaymentProvider } from "@/lib/payments";
 import { sendEmail } from "@/lib/email/send";
@@ -196,6 +197,7 @@ export async function placeOrderAction(_prev: CheckoutState, formData: FormData)
     currency: store.currency,
   });
   await db.from("order_events").insert({ order_id: order.id, type: "placed", data: { provider: provider.key } });
+  updateTag(salesTag(store.id)); // the home "Best sellers" ranking counts this order
 
   // Clear cart.
   await db.from("carts").delete().eq("id", cart.id);

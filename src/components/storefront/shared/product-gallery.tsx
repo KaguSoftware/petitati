@@ -60,7 +60,7 @@ export function ProductGallery({ images: allImages, fallbackAlt, labels, stageCl
       onClick={dir === "prev" ? prev : next}
       aria-label={dir === "prev" ? labels.previous : labels.next}
       className={cn(
-        "absolute top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-background/90 text-foreground shadow-md ring-1 ring-foreground/10 transition-opacity hover:bg-background focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "absolute top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-card/90 text-foreground shadow-md ring-1 ring-foreground/10 transition-opacity hover:bg-card focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "@desktop:opacity-0 @desktop:group-hover:opacity-100 @desktop:group-focus-within:opacity-100",
         dir === "prev" ? "start-3" : "end-3",
       )}
@@ -76,7 +76,7 @@ export function ProductGallery({ images: allImages, fallbackAlt, labels, stageCl
         role={many ? "region" : undefined}
         aria-roledescription={many ? "carousel" : undefined}
         tabIndex={many ? 0 : undefined}
-        className={cn("group relative overflow-hidden bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset", stageClassName)}
+        className={cn("group relative overflow-hidden bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset", stageClassName)}
       >
         {count === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center text-muted-foreground" role="img" aria-label={fallbackAlt}>
@@ -119,7 +119,7 @@ export function ProductGallery({ images: allImages, fallbackAlt, labels, stageCl
                 aria-label={ofLabel(labels.imageOf, i + 1, count)}
                 aria-current={i === active ? "true" : undefined}
                 className={cn(
-                  "relative block aspect-square w-full overflow-hidden bg-muted transition-[opacity,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  "relative block aspect-square w-full overflow-hidden bg-card transition-[opacity,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                   thumbClassName,
                   i === active ? (activeThumbClassName ?? "ring-2 ring-primary ring-offset-2 ring-offset-background") : "opacity-70 hover:opacity-100",
                 )}

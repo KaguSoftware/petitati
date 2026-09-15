@@ -36,6 +36,8 @@ export interface BrandData {
   slug: string;
   name: string;
   logoUrl: string | null;
+  /** active products carrying this brand; the home row and /brands hide small brands by it */
+  productCount: number;
 }
 
 export interface VariantData {
@@ -86,12 +88,34 @@ export type ProductSort = "newest" | "price_asc" | "price_desc" | "rating";
 export interface ProductListParams {
   /** a category slug; matches the category AND every descendant */
   categorySlug?: string;
+  /** fixed brand scope (the /b/<slug> page); wins over `brandSlugs` */
   brandSlug?: string;
+  /** the shopper's brand filter (any of); sort before passing so equal filters share a cache entry */
+  brandSlugs?: string[];
   search?: string;
+  /** minor units, inclusive */
+  priceMin?: number;
+  priceMax?: number;
+  inStock?: boolean;
+  onSale?: boolean;
   sort?: ProductSort;
   page?: number;
   pageSize?: number;
   featuredOnly?: boolean;
+  bestsellerOnly?: boolean;
+}
+
+/** What the filter sidebar needs for one listing scope. Prices in minor units. */
+export interface ListingFacets {
+  total: number;
+  /** brands present in the scope with the other filters applied, each with its product count */
+  brands: { id: string; slug: string; name: string; count: number }[];
+  /** the scope's child categories (or its siblings on a leaf; top-level on /shop), other filters applied */
+  categories: { id: string; slug: string; count: number }[];
+  priceMin: number | null;
+  priceMax: number | null;
+  /** price quartiles of the scope (brand filter applied, price filter not) — the quick buckets are cut here */
+  quartiles: (number | null)[];
 }
 
 export interface ProductListResult {

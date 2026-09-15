@@ -2,18 +2,13 @@ import { Link } from "@/i18n/navigation";
 import { ProductGallery } from "@/components/storefront/shared/product-gallery";
 import { RatingStars } from "@/components/storefront/shared/rating-stars";
 import { cn } from "@/lib/utils";
+import { Breadcrumb } from "@/components/storefront/shared/breadcrumb";
 import type { ProductPageProps } from "../types";
 
-export function ProductPagePlayful({ product, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
+export function ProductPagePlayful({ product, breadcrumb, labels, purchasePanel, reviewsSection, wishlistSlot }: ProductPageProps) {
   return (
     <main className="mx-auto max-w-7xl px-gutter py-8">
-      <nav className="mb-6 flex flex-wrap gap-2 text-sm">
-        {product.categories.map((c) => (
-          <Link key={c.slug} href={`/c/${c.slug}`} className="rounded-full bg-muted px-3 py-1 font-medium text-muted-foreground transition-colors hover:bg-accent/20 hover:text-accent-foreground">
-            {c.name}
-          </Link>
-        ))}
-      </nav>
+      <Breadcrumb items={breadcrumb} label={labels.breadcrumb} className="mb-6" />
       <div className="grid gap-10 @tablet:grid-cols-2">
         <ProductGallery
           images={product.images}

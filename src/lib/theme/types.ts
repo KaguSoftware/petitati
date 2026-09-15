@@ -31,6 +31,8 @@ export const themeColorsSchema = z.object({
   accent: hex,
   accentForeground: hex,
   background: hex,
+  /** Raised surfaces: product/category/brand tiles, forms, popovers. Defaults to `background`. */
+  card: hex,
   foreground: hex,
   muted: hex,
   mutedForeground: hex,
@@ -58,6 +60,7 @@ export const DEFAULT_THEME: StoreTheme = {
     accent: "#f59e0b",
     accentForeground: "#1c1917",
     background: "#ffffff",
+    card: "#ffffff",
     foreground: "#0c0a09",
     muted: "#f5f5f4",
     mutedForeground: "#57534e",
@@ -82,6 +85,7 @@ export function parseTheme(input: unknown): StoreTheme {
   const result = partialThemeSchema.safeParse(input ?? {});
   if (!result.success) return DEFAULT_THEME;
   const p = result.data;
+  const colors = stripUndefined(p.colors ?? {});
   const sections = { ...DEFAULT_THEME.sections };
   for (const key of SECTION_KEYS) {
     const v = p.sections?.[key];
@@ -89,7 +93,8 @@ export function parseTheme(input: unknown): StoreTheme {
   }
   return {
     sections,
-    colors: { ...DEFAULT_THEME.colors, ...stripUndefined(p.colors ?? {}) },
+    // A theme saved before `card` existed keeps its tiles the colour of its page, as they were.
+    colors: { ...DEFAULT_THEME.colors, ...colors, card: colors.card ?? colors.background ?? DEFAULT_THEME.colors.card },
     fonts: { ...DEFAULT_THEME.fonts, ...stripUndefined(p.fonts ?? {}) },
     radius: p.radius ?? DEFAULT_THEME.radius,
     announcement: p.announcement ?? {},
@@ -101,15 +106,15 @@ function stripUndefined<T extends object>(obj: T): Partial<T> {
 }
 
 /**
- * Per-navbar-layout CSS variables set on the storefront root: `--navbar-h` (height of the sticky
- * bar, for scroll margins) and `--hero-pull` (how far a full-bleed hero may slide under the bar, INCLUDING the
- * bar's 1px bottom border; 0 for the stacked layout, whose dark category strip must not cover the photo).
+ * Per-navbar-layout CSS variable set on the storefront root: `--navbar-h`, the height of the sticky
+ * bar, used for scroll margins. Bars are always solid and the hero starts below them (owner's rule,
+ * 2026-09-15), so there is no longer a `--hero-pull`.
  */
 export const NAVBAR_VARS: Record<VariantKey, string> = {
-  minimal: "[--navbar-h:4rem] [--hero-pull:calc(4rem_+_1px)]",
-  bold: "[--navbar-h:4rem] [--hero-pull:0px] @tablet:[--navbar-h:7.75rem]",
-  editorial: "[--navbar-h:4rem] [--hero-pull:4rem] @tablet:[--navbar-h:5rem] @tablet:[--hero-pull:5rem]",
-  playful: "[--navbar-h:4.25rem] [--hero-pull:4.25rem] @tablet:[--navbar-h:4.75rem] @tablet:[--hero-pull:4.75rem]",
+  minimal: "[--navbar-h:4rem]",
+  bold: "[--navbar-h:4rem] @tablet:[--navbar-h:7.75rem]",
+  editorial: "[--navbar-h:4rem] @tablet:[--navbar-h:5rem]",
+  playful: "[--navbar-h:4.25rem] @tablet:[--navbar-h:4.75rem]",
 };
 
 /**
@@ -132,6 +137,7 @@ export function themeToCssVars(theme: StoreTheme, locale = "en"): Record<string,
     "--store-accent": c.accent,
     "--store-accent-foreground": c.accentForeground,
     "--store-background": c.background,
+    "--store-card": c.card,
     "--store-foreground": c.foreground,
     "--store-muted": c.muted,
     "--store-muted-foreground": c.mutedForeground,

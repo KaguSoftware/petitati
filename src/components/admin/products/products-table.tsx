@@ -8,7 +8,7 @@ import { DataTable, type Column } from "../shared/data-table";
 import { EmptyState } from "../shared/empty-state";
 import { SortHeader } from "../shared/sort-header";
 import { OptimisticStatusBadge } from "../shared/optimistic-status-badge";
-import { FeaturedSwitch, ProductRowActions } from "./product-row-controls";
+import { BestsellerSwitch, FeaturedSwitch, ProductRowActions } from "./product-row-controls";
 import { dateTimeFormat, numberFormat } from "@/lib/number";
 
 interface Props {
@@ -92,6 +92,13 @@ export async function ProductsTable({ rows, storeId, locale, currency, lowStockT
       cell: (r) => <FeaturedSwitch storeId={storeId} productId={r.id} checked={r.is_featured} disabled={!canWrite} />,
       className: "text-center",
       hideBelow: "md",
+    },
+    {
+      key: "bestseller",
+      header: t("products.bestseller"),
+      cell: (r) => <BestsellerSwitch storeId={storeId} productId={r.id} checked={r.is_bestseller} disabled={!canWrite} />,
+      className: "text-center",
+      hideBelow: "lg",
     },
     ...(canWrite
       ? [

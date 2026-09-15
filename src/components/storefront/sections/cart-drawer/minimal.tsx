@@ -44,7 +44,7 @@ export function CartViewMinimal({ cart, totals, currency, locale, labels, lineCo
               </li>
             ))}
           </ul>
-          <aside className="flex h-fit flex-col gap-4 rounded-2xl bg-muted/60 p-5 @desktop:sticky @desktop:top-24">
+          <aside className="flex h-fit flex-col gap-4 rounded-2xl bg-card p-5 shadow-sm ring-1 ring-foreground/5 @desktop:sticky @desktop:top-24">
             {couponSlot}
             <dl className="flex flex-col gap-2 text-sm">
               <Row label={labels.subtotal} value={money(totals.subtotal)} />

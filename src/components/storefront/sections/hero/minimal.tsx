@@ -3,15 +3,13 @@ import { PawPrint } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { HeroCarousel } from "@/components/storefront/shared/hero-carousel";
-import { HeroTone } from "@/components/storefront/shared/hero-tone";
 import { cn } from "@/lib/utils";
 import type { HeroProps, HeroSlideProps } from "../types";
 
-/** Full-bleed photo with the copy laid over a bottom scrim; a brand gradient stands in when there is no photo. */
+/** Full-bleed photo with the copy laid over a bottom scrim; a brand gradient stands in when there is no photo. Starts below the (always solid) navbar. */
 export function HeroMinimal({ slides, labels, autoplay }: HeroProps) {
   return (
-    <section data-hero-overlay className="relative isolate overflow-hidden bg-inverse text-white" style={{ marginTop: "calc(var(--hero-pull, 0px) * -1)" }}>
-      <HeroTone />
+    <section className="relative isolate overflow-hidden bg-inverse text-white">
       <HeroCarousel
         slides={slides.map((s, i) => (
           <Slide key={i} {...s} first={i === 0} secondaryLabel={labels.secondary} secondaryHref="/brands" />

@@ -13,7 +13,7 @@ export const RADIUS_PRESETS = [
   { key: "large", value: "1.25rem" },
 ] as const;
 
-export const THEME_COLOR_KEYS = ["primary", "primaryForeground", "accent", "accentForeground", "background", "foreground", "muted", "mutedForeground"] as const;
+export const THEME_COLOR_KEYS = ["primary", "primaryForeground", "accent", "accentForeground", "background", "card", "foreground", "muted", "mutedForeground"] as const;
 
 /** Patch accepted by `saveThemeAction`: every part optional, merged into the stored theme. */
 export const themePatchSchema = z.object({

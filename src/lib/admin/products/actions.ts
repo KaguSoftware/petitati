@@ -61,6 +61,7 @@ const saveProductSchema = z.object({
   brand_id: z.preprocess((v) => (v === "" || v == null ? null : v), uuidField.nullable()),
   tags: optionalText(1000),
   is_featured: boolField,
+  is_bestseller: boolField,
   categoryIds: multi(uuidField),
   translations: jsonField(z.partialRecord(localeEnum, productTranslationSchema)),
 });
@@ -69,7 +70,7 @@ const saveProductSchema = z.object({
 export async function saveProductAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = parseForm(saveProductSchema, formData);
   if (!parsed.data) return { error: "invalid", fieldErrors: parsed.fieldErrors };
-  const { storeId, locale, productId, slug, status, brand_id, tags, is_featured, categoryIds, translations } = parsed.data;
+  const { storeId, locale, productId, slug, status, brand_id, tags, is_featured, is_bestseller, categoryIds, translations } = parsed.data;
   let createdId: string | null = null;
   try {
     const { db } = await adminMutation(storeId, "products.write");
@@ -81,7 +82,7 @@ export async function saveProductAction(_prev: ActionState, formData: FormData):
     }
 
     const tagList = [...new Set((tags ?? "").split(",").map((t) => t.trim()).filter(Boolean))].slice(0, 30);
-    const patch = { slug, status, brand_id, tags: tagList, is_featured };
+    const patch = { slug, status, brand_id, tags: tagList, is_featured, is_bestseller };
     let id = productId ?? null;
     if (id) {
       await assertProductInStore(db, id, storeId);
@@ -157,6 +158,24 @@ export async function toggleFeaturedAction(_prev: ActionState, formData: FormDat
     const { db } = await adminMutation(storeId, "products.write");
     await assertProductInStore(db, productId, storeId);
     const { error } = await db.from("products").update({ is_featured }).eq("id", productId).eq("store_id", storeId);
+    if (error) throw error;
+    updateTag(catalogTag(storeId));
+    refresh();
+    return { ok: true };
+  } catch (err) {
+    return { error: actionError(err) };
+  }
+}
+
+/** "Best seller" switch in the products table: the home section shows these until real sales outrank them. */
+export async function toggleBestsellerAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = parseForm(productRef.extend({ is_bestseller: boolField }), formData);
+  if (!parsed.data) return { error: "invalid", fieldErrors: parsed.fieldErrors };
+  const { storeId, productId, is_bestseller } = parsed.data;
+  try {
+    const { db } = await adminMutation(storeId, "products.write");
+    await assertProductInStore(db, productId, storeId);
+    const { error } = await db.from("products").update({ is_bestseller }).eq("id", productId).eq("store_id", storeId);
     if (error) throw error;
     updateTag(catalogTag(storeId));
     refresh();

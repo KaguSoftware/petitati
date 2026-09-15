@@ -19,7 +19,7 @@ export function Price({
 }) {
   const onSale = compareAt !== null && compareAt !== undefined && compareAt > amount;
   return (
-    <span className={cn("inline-flex items-baseline gap-2", className)}>
+    <span className={cn("inline-flex flex-wrap items-baseline gap-x-2", className)}>
       {from && <span className="text-[0.7em] font-normal text-muted-foreground">{from}</span>}
       <span className={cn("font-semibold tabular-nums", onSale && "text-primary")}>
         {formatMoney(amount, currency, locale)}

@@ -63,12 +63,16 @@ function SelectContent({
   align = "center",
   alignOffset = 0,
   alignItemWithTrigger = true,
+  footer,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
     SelectPrimitive.Positioner.Props,
     "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
-  >) {
+  > & {
+    /** Rendered under the options, outside the listbox (a note, never an option). */
+    footer?: React.ReactNode
+  }) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
@@ -87,6 +91,7 @@ function SelectContent({
         >
           <SelectScrollUpButton />
           <SelectPrimitive.List>{children}</SelectPrimitive.List>
+          {footer}
           <SelectScrollDownButton />
         </SelectPrimitive.Popup>
       </SelectPrimitive.Positioner>

@@ -26,7 +26,7 @@ export function DeliverForm({ slug, defaultNumber }: { slug: string; defaultNumb
   }
 
   return (
-    <form action={action} className="flex flex-col gap-5 rounded-xl bg-muted/60 p-5 @tablet:p-6">
+    <form action={action} className="flex flex-col gap-5 rounded-xl bg-card p-5 shadow-sm ring-1 ring-foreground/5 @tablet:p-6">
       <input type="hidden" name="slug" value={slug} />
       <div className="flex flex-col gap-2">
         <Label htmlFor="number">{t("orderNumber")}</Label>

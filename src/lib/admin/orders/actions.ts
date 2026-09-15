@@ -5,7 +5,7 @@ import { z } from "zod";
 import { adminMutation, actionError } from "@/lib/admin/guard";
 import type { ActionState } from "@/lib/admin/types";
 import { moneyField, multi, optionalMoneyField, optionalText, parseForm, uuidField } from "@/lib/admin/validate";
-import { catalogTag } from "@/lib/catalog/queries";
+import { catalogTag, salesTag } from "@/lib/catalog/queries";
 import type { OrderItemRow, OrderRow, OrderStatus, PaymentRow } from "@/lib/db/types";
 import { confirmDeliveryWithCode, markDelivered } from "@/lib/delivery/confirm";
 import { getProviderByKey } from "@/lib/payments";
@@ -41,6 +41,7 @@ async function restockCancelled(db: Db, storeId: string, orders: Pick<OrderRow, 
     .map((i) => ({ store_id: storeId, variant_id: i.variant_id, delta: i.quantity, reason: "return", order_id: i.order_id, actor_id: actorId, note: `Cancelled ${numbers.get(i.order_id) ?? ""}`.trim() }));
   if (movements.length) await db.from("stock_movements").insert(movements);
   updateTag(catalogTag(storeId));
+  updateTag(salesTag(storeId)); // a cancelled order leaves the "Best sellers" ranking
 }
 
 /** Manual provider: money arrived offline. Marks payment + order paid. */
@@ -153,6 +154,7 @@ export async function refundOrderAction(_prev: ActionState, formData: FormData):
     await db.from("refunds").insert({ payment_id: payment.id, order_id: order.id, amount: parsed.data.amount, reason: parsed.data.reason, actor_id: user.id, provider_ref: providerRef });
     await db.from("payments").update({ status: full ? "refunded" : "partially_refunded" }).eq("id", payment.id);
     await db.from("orders").update({ refunded_total: refundedTotal, ...(full ? { status: "refunded" } : {}) }).eq("id", order.id);
+    if (full) updateTag(salesTag(storeId));
     await logEvent(db, order.id, user.id, "refund", { amount: parsed.data.amount, reason: parsed.data.reason, full });
     refresh();
     return { ok: true };

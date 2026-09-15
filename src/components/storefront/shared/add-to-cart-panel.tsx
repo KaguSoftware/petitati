@@ -103,7 +103,7 @@ export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) 
                   aria-pressed={active}
                   onClick={() => choose(opt.id, val.id)}
                   className={cn(
-                    "min-w-10 rounded-md border bg-background px-3 py-1.5 text-sm transition",
+                    "min-w-10 rounded-md border bg-card px-3 py-1.5 text-sm transition",
                     active ? "border-primary bg-primary text-primary-foreground" : "hover:border-foreground",
                     soldOut && !active && "text-muted-foreground line-through decoration-muted-foreground/60",
                   )}

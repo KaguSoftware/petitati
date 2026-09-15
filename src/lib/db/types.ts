@@ -103,6 +103,8 @@ export interface ProductRow {
   brand_id: string | null;
   tags: string[];
   is_featured: boolean;
+  /** owner's hand-picked "Best sellers" (the home section pads real sales with these) */
+  is_bestseller: boolean;
   rating_avg: number;
   rating_count: number;
   created_at: string;

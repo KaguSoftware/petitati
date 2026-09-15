@@ -17,13 +17,13 @@ export function ProductImage({
 }) {
   if (!src) {
     return (
-      <div className={cn("flex items-center justify-center bg-muted text-primary/25", className)}>
+      <div className={cn("flex items-center justify-center bg-card text-primary/25", className)}>
         <PawPrint aria-hidden className="size-[28%] max-h-16 max-w-16" strokeWidth={1.5} />
       </div>
     );
   }
   return (
-    <div className={cn("relative overflow-hidden bg-muted", className)}>
+    <div className={cn("relative overflow-hidden bg-card", className)}>
       <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
     </div>
   );

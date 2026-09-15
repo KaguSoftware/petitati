@@ -21,6 +21,7 @@ import {
   pickTranslation,
   type BrandData,
   type CategoryData,
+  type ListingFacets,
   type ProductCardData,
   type ProductDetail,
   type ProductListParams,
@@ -34,6 +35,8 @@ import {
  * Invalidate with updateTag(catalogTag(storeId)) after admin writes.
  */
 export const catalogTag = (storeId: string) => `catalog:${storeId}`;
+/** Sales ranking (home "Best sellers"); updated when an order is placed, cancelled or refunded. */
+export const salesTag = (storeId: string) => `sales:${storeId}`;
 
 const NEW_DAYS = 30;
 
@@ -83,15 +86,20 @@ function toCard(p: ProductWithRelations, locale: Locale, fallback: Locale): Prod
 const CARD_SELECT =
   "*, product_translations(*), product_images(*), product_variants(*), brands(name, slug)";
 
-/** Ids of the category with the given slug plus every descendant (categories form a tree via parent_id). */
-function categorySubtreeIds(categories: Pick<CategoryData, "id" | "slug" | "parentId">[], slug: string): string[] {
-  const root = categories.find((c) => c.slug === slug);
-  if (!root) return [];
-  const ids = [root.id];
-  for (let i = 0; i < ids.length; i++) {
-    for (const c of categories) if (c.parentId === ids[i] && !ids.includes(c.id)) ids.push(c.id);
-  }
-  return ids;
+/** Full card rows for a set of ids, returned in the order the ids were given. */
+async function cardsByIds(storeId: string, ids: string[], locale: Locale, fallback: Locale): Promise<ProductCardData[]> {
+  if (ids.length === 0) return [];
+  const db = createSupabaseAdminClient();
+  const { data, error } = await db
+    .from("products")
+    .select(CARD_SELECT)
+    .eq("store_id", storeId)
+    .eq("status", "active")
+    .in("id", ids)
+    .returns<ProductWithRelations[]>();
+  if (error) throw error;
+  const byId = new Map(data.map((p) => [p.id, toCard(p, locale, fallback)]));
+  return ids.map((id) => byId.get(id)).filter((c): c is ProductCardData => !!c);
 }
 
 export async function getCategories(
@@ -131,16 +139,40 @@ export async function getBrands(storeId: string): Promise<BrandData[]> {
   cacheLife("hours");
 
   const db = createSupabaseAdminClient();
+  // Every active brand, each with its live count of active products (an embedded aggregate; the
+  // `products.status` filter scopes the count, not the brand rows). Callers that want only the
+  // brands worth showing to a shopper go through `featuredBrands` in ./brands.ts.
   const { data, error } = await db
     .from("brands")
-    .select("id, slug, name, logo_url")
+    .select("id, slug, name, logo_url, products(count)")
     .eq("store_id", storeId)
     .eq("is_active", true)
+    .eq("products.status", "active")
     .order("sort_order")
     .order("name")
-    .returns<Pick<BrandRow, "id" | "slug" | "name" | "logo_url">[]>();
+    .returns<(Pick<BrandRow, "id" | "slug" | "name" | "logo_url"> & { products: { count: number }[] })[]>();
   if (error) throw error;
-  return data.map((b) => ({ id: b.id, slug: b.slug, name: b.name, logoUrl: b.logo_url }));
+  return data.map((b) => ({ id: b.id, slug: b.slug, name: b.name, logoUrl: b.logo_url, productCount: b.products?.[0]?.count ?? 0 }));
+}
+
+/**
+ * Maps the slugs a URL carries onto the ids the listing view filters by. An unknown slug resolves
+ * to the sentinel NONE so the caller returns an empty result — never "everything".
+ */
+const NONE = "none";
+async function resolveScope(storeId: string, locale: Locale, fallback: Locale, p: ProductListParams) {
+  const [categories, brands] = await Promise.all([getCategories(storeId, locale, fallback), getBrands(storeId)]);
+  const categoryId = p.categorySlug ? (categories.find((c) => c.slug === p.categorySlug)?.id ?? NONE) : null;
+  const bySlug = new Map(brands.map((b) => [b.slug, b.id]));
+  let brandIds: string[] | null = null;
+  if (p.brandSlug) brandIds = [bySlug.get(p.brandSlug) ?? NONE];
+  else if (p.brandSlugs?.length) {
+    const ids = p.brandSlugs.map((s) => bySlug.get(s)).filter((id): id is string => !!id);
+    brandIds = ids.length ? ids : [NONE];
+  }
+  // `%` and `_` are LIKE wildcards; the view's search_text is lowercased, so lowercase the needle too.
+  const q = p.search?.replace(/[%_]/g, "").trim().toLowerCase() || null;
+  return { categoryId, brandIds, q, empty: categoryId === NONE || brandIds?.includes(NONE) === true };
 }
 
 export async function getProducts(
@@ -155,68 +187,125 @@ export async function getProducts(
 
   const page = Math.max(1, params.page ?? 1);
   const pageSize = Math.min(48, params.pageSize ?? 24);
+  const empty = { items: [], total: 0, page, pageSize };
+  const { categoryId, brandIds, q: needle, empty: unknownScope } = await resolveScope(storeId, locale, fallback, params);
+  if (unknownScope) return empty;
+
+  // The listing view (migration 0017) carries every filter and sort key, so the database does the
+  // whole page: subtree via `category_ids` (ancestors included), price sort on the card's price,
+  // store-scoped search, exact count. Only the ≤ 48 ids of the page are then hydrated into cards.
   const db = createSupabaseAdminClient();
-
-  let productIds: string[] | null = null;
-  if (params.categorySlug) {
-    // A parent category lists everything in its subtree (getCategories is cached under the same tag).
-    const categoryIds = categorySubtreeIds(await getCategories(storeId, locale, fallback), params.categorySlug);
-    if (categoryIds.length === 0) return { items: [], total: 0, page, pageSize };
-    const { data: links } = await db
-      .from("product_categories")
-      .select("product_id")
-      .in("category_id", categoryIds)
-      .returns<{ product_id: string }[]>();
-    productIds = [...new Set((links ?? []).map((l) => l.product_id))];
-    if (productIds.length === 0) return { items: [], total: 0, page, pageSize };
-  }
-  let brandId: string | null = null;
-  if (params.brandSlug) {
-    const { data: brand } = await db
-      .from("brands")
-      .select("id")
-      .eq("store_id", storeId)
-      .eq("slug", params.brandSlug)
-      .eq("is_active", true)
-      .maybeSingle<{ id: string }>();
-    if (!brand) return { items: [], total: 0, page, pageSize };
-    brandId = brand.id;
-  }
-  if (params.search) {
-    const { data: hits } = await db
-      .from("product_translations")
-      .select("product_id")
-      .ilike("name", `%${params.search.replace(/[%_]/g, "")}%`)
-      .returns<{ product_id: string }[]>();
-    const ids = new Set((hits ?? []).map((h) => h.product_id));
-    productIds = productIds ? productIds.filter((id) => ids.has(id)) : [...ids];
-    if (productIds.length === 0) return { items: [], total: 0, page, pageSize };
-  }
-
-  let q = db
-    .from("products")
-    .select(CARD_SELECT, { count: "exact" })
-    .eq("store_id", storeId)
-    .eq("status", "active");
-  if (productIds) q = q.in("id", productIds);
-  if (brandId) q = q.eq("brand_id", brandId);
+  let q = db.from("v_catalog_products").select("id", { count: "exact" }).eq("store_id", storeId);
+  if (categoryId) q = q.contains("category_ids", [categoryId]);
+  if (brandIds) q = q.in("brand_id", brandIds);
+  if (needle) q = q.like("search_text", `%${needle}%`);
+  if (params.priceMin != null) q = q.gte("price", params.priceMin);
+  if (params.priceMax != null) q = q.lte("price", params.priceMax);
+  if (params.inStock) q = q.eq("in_stock", true);
+  if (params.onSale) q = q.eq("on_sale", true);
   if (params.featuredOnly) q = q.eq("is_featured", true);
+  if (params.bestsellerOnly) q = q.eq("is_bestseller", true);
   switch (params.sort) {
+    case "price_asc":
+      q = q.order("price", { ascending: true }).order("id");
+      break;
+    case "price_desc":
+      q = q.order("price", { ascending: false }).order("id");
+      break;
     case "rating":
-      q = q.order("rating_avg", { ascending: false });
+      q = q.order("rating_avg", { ascending: false }).order("rating_count", { ascending: false }).order("id");
       break;
     default:
-      q = q.order("created_at", { ascending: false });
+      q = q.order("created_at", { ascending: false }).order("id");
   }
-  const { data, count, error } = await q
-    .range((page - 1) * pageSize, page * pageSize - 1)
-    .returns<ProductWithRelations[]>();
-  if (error) throw error;
-
-  let items = data.map((p) => toCard(p, locale, fallback));
-  if (params.sort === "price_asc") items = items.sort((a, b) => a.price - b.price);
-  if (params.sort === "price_desc") items = items.sort((a, b) => b.price - a.price);
+  const { data, count, error } = await q.range((page - 1) * pageSize, page * pageSize - 1).returns<{ id: string }[]>();
+  if (error) {
+    // PGRST103 = the page starts past the last row (a stale ?page= after a filter narrowed the
+    // set). Not an error for the shopper: an empty page with the true total, so the pagination
+    // still shows where the results are.
+    if (error.code !== "PGRST103") throw error;
+    const { count: total } = await q.range(0, 0);
+    return { items: [], total: total ?? 0, page, pageSize };
+  }
+  const items = await cardsByIds(storeId, data.map((r) => r.id), locale, fallback);
   return { items, total: count ?? items.length, page, pageSize };
+}
+
+/**
+ * Brand counts and price bounds for the filter sidebar. Pass the SAME params as the listing minus
+ * `page`, `pageSize` and `sort` (they do not change the facets, and leaving them out lets every
+ * page of a scope share one cache entry).
+ */
+export async function getListingFacets(
+  storeId: string,
+  locale: Locale,
+  fallback: Locale,
+  params: Omit<ProductListParams, "page" | "pageSize" | "sort"> = {},
+): Promise<ListingFacets> {
+  "use cache";
+  cacheTag(catalogTag(storeId));
+  cacheLife("hours");
+
+  const none: ListingFacets = { total: 0, brands: [], categories: [], priceMin: null, priceMax: null, quartiles: [] };
+  const { categoryId, brandIds, q, empty } = await resolveScope(storeId, locale, fallback, params);
+  if (empty) return none;
+  const db = createSupabaseAdminClient();
+  const { data, error } = await db.rpc("catalog_facets", {
+    p_store_id: storeId,
+    p_category_id: categoryId,
+    p_q: q,
+    p_brand_ids: brandIds,
+    p_price_min: params.priceMin ?? null,
+    p_price_max: params.priceMax ?? null,
+    p_in_stock: !!params.inStock,
+    p_on_sale: !!params.onSale,
+  });
+  if (error) throw error;
+  const f = (data ?? {}) as {
+    total?: number;
+    brands?: ListingFacets["brands"];
+    categories?: ListingFacets["categories"];
+    priceMin?: number | null;
+    priceMax?: number | null;
+    p25?: number | null;
+    p50?: number | null;
+    p75?: number | null;
+  };
+  return {
+    total: f.total ?? 0,
+    brands: (f.brands ?? []).filter((b) => b.count > 0),
+    categories: f.categories ?? [],
+    priceMin: f.priceMin ?? null,
+    priceMax: f.priceMax ?? null,
+    quartiles: [f.p25 ?? null, f.p50 ?? null, f.p75 ?? null],
+  };
+}
+
+/**
+ * Home "Best sellers": products ranked by units actually sold (v_product_sales, last 90 days),
+ * padded with the ones the owner flagged as bestsellers in the admin until real sales fill the
+ * row. Hidden by the page when both are empty.
+ */
+export async function getBestSellers(storeId: string, locale: Locale, fallback: Locale, limit = 8): Promise<ProductCardData[]> {
+  "use cache";
+  cacheTag(catalogTag(storeId), salesTag(storeId));
+  cacheLife("hours");
+
+  const db = createSupabaseAdminClient();
+  const { data: ranked, error } = await db
+    .from("v_product_sales")
+    .select("product_id, units_sold")
+    .eq("store_id", storeId)
+    .order("units_sold", { ascending: false })
+    .order("last_sold_at", { ascending: false })
+    .limit(limit)
+    .returns<{ product_id: string; units_sold: number }[]>();
+  if (error) throw error;
+  const sold = await cardsByIds(storeId, (ranked ?? []).map((r) => r.product_id), locale, fallback);
+  if (sold.length >= limit) return sold.slice(0, limit);
+  const picks = await getProducts(storeId, locale, fallback, { bestsellerOnly: true, pageSize: limit });
+  const seen = new Set(sold.map((p) => p.id));
+  return [...sold, ...picks.items.filter((p) => !seen.has(p.id))].slice(0, limit);
 }
 
 export async function getProductBySlug(

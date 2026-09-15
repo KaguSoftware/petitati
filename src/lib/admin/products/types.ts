@@ -22,6 +22,7 @@ export interface ProductListRow {
   slug: string;
   status: ProductStatus;
   is_featured: boolean;
+  is_bestseller: boolean;
   updated_at: string;
   name: string;
   thumbnail: string | null;

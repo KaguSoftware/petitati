@@ -85,7 +85,7 @@ function AddressForm({ storeSlug, address, defaultCountry, onDone }: { storeSlug
   }, {} as SimpleState);
 
   return (
-    <form action={action} className="grid gap-4 rounded-xl bg-muted/60 p-4 @phablet:grid-cols-2">
+    <form action={action} className="grid gap-4 rounded-xl bg-card p-4 shadow-sm ring-1 ring-foreground/5 @phablet:grid-cols-2">
       <input type="hidden" name="storeSlug" value={storeSlug} />
       {address && <input type="hidden" name="id" value={address.id} />}
       <F name="label" label={ta("label")} value={address?.label} />

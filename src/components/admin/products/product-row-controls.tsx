@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Link } from "@/i18n/navigation";
-import { deleteProductAction, setProductStatusAction, toggleFeaturedAction } from "@/lib/admin/products/actions";
+import { deleteProductAction, setProductStatusAction, toggleBestsellerAction, toggleFeaturedAction } from "@/lib/admin/products/actions";
 import type { ProductStatus } from "@/lib/db/types";
 import { clearOptimistic, setOptimistic, useOptimisticRow } from "../shared/optimistic-store";
 import { useOptimisticAction } from "../shared/use-optimistic-action";
@@ -33,6 +33,31 @@ export function FeaturedSwitch({ storeId, productId, checked, disabled }: { stor
         run(() => toggleFeaturedAction({}, fd), {
           optimistic: () => setOptimistic(productId, { is_featured: next }),
           rollback: () => clearOptimistic(productId, ["is_featured"]),
+        });
+      }}
+    />
+  );
+}
+
+/** "Best seller" toggle, same optimistic shape as Featured. */
+export function BestsellerSwitch({ storeId, productId, checked, disabled }: { storeId: string; productId: string; checked: boolean; disabled?: boolean }) {
+  const t = useTranslations("admin.products");
+  const row = useOptimisticRow(productId, { is_bestseller: checked });
+  const { run } = useOptimisticAction("admin.products");
+  return (
+    <Switch
+      size="sm"
+      checked={row.is_bestseller}
+      disabled={disabled}
+      aria-label={t("bestseller")}
+      onCheckedChange={(next) => {
+        const fd = new FormData();
+        fd.set("storeId", storeId);
+        fd.set("productId", productId);
+        if (next) fd.set("is_bestseller", "on");
+        run(() => toggleBestsellerAction({}, fd), {
+          optimistic: () => setOptimistic(productId, { is_bestseller: next }),
+          rollback: () => clearOptimistic(productId, ["is_bestseller"]),
         });
       }}
     />

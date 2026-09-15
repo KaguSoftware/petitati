@@ -207,9 +207,11 @@
 [data-store-theme] {
   --background: var(--store-background);
   --foreground: var(--store-foreground);
-  --card: var(--store-background);
+  /* Raised surfaces (tiles, forms, popovers) have their own source so a store can put white tiles on
+     a tinted page. Dark mode below ignores it on purpose and derives every surface from primary. */
+  --card: var(--store-card);
   --card-foreground: var(--store-foreground);
-  --popover: var(--store-background);
+  --popover: var(--store-card);
   --popover-foreground: var(--store-foreground);
   --muted: var(--store-muted);
   --muted-foreground: var(--store-muted-foreground);
@@ -434,64 +436,6 @@ html[dir="rtl"] input[aria-hidden="true"][tabindex="-1"][style*="clip-path"] {
 /* Anchored headings never land under the sticky bar. */
 [data-storefront] :is(h1, h2, h3) {
   scroll-margin-top: calc(var(--navbar-h, 4rem) + 1rem);
-}
-
-/* ---- Navbar over a full-bleed hero ---------------------------------------------------------
-   A hero that declares data-hero-overlay slides under the sticky bar (see --hero-pull). While the
-   page is at the top, overlay-capable navbars (data-navbar-overlay) go transparent and re-skin
-   their tokens to white, so links, icons and the search field read over the photo. */
-[data-storefront]:has([data-hero-overlay]) header[data-navbar-overlay][data-at-top="true"] {
-  --background: transparent;
-  --foreground: #ffffff;
-  --muted-foreground: rgb(255 255 255 / 0.82);
-  --muted: rgb(255 255 255 / 0.16);
-  --border: transparent;
-  --input: rgb(255 255 255 / 0.25);
-  --ring: rgb(255 255 255 / 0.6);
-  /* The scrim behind the bar. Tone-aware (see below) and ALWAYS present: a hero photo can be any
-     colour, and a transparent bar over a white one is simply invisible. */
-  --navbar-scrim: rgb(0 0 0 / 0.55);
-  color: #ffffff;
-  background-color: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-}
-
-/* Light photo behind the bar → dark text on a light scrim, so a bright hero keeps its brightness
-   instead of wearing a heavy dark veil. `data-hero-tone` is measured from the pixels actually
-   under the bar by <HeroTone>; absent (no JS yet, no photo, tainted canvas) means the dark
-   treatment above, which is what shipped before. */
-[data-storefront][data-hero-tone="light"]:has([data-hero-overlay]) header[data-navbar-overlay][data-at-top="true"] {
-  /* LITERAL near-black, deliberately not a theme token — the mirror of the `#ffffff` above.
-     `data-hero-tone` describes the PHOTOGRAPH, not the page's colour scheme, so binding it to
-     `--foreground` was a category error. It was also already subtly wrong: `--color-foreground` is
-     an `@theme inline` alias substituted at `:root`, so it carried shadcn's default rather than the
-     store's own foreground. And under dark mode `:root`'s foreground is near-WHITE, which would
-     have painted white text on the white scrim below — the invisible navbar, straight back. */
-  --foreground: #0c0a09;
-  --muted-foreground: rgb(12 10 9 / 0.78);
-  --muted: rgb(0 0 0 / 0.08);
-  --input: rgb(0 0 0 / 0.18);
-  --ring: rgb(12 10 9 / 0.6);
-  --navbar-scrim: rgb(255 255 255 / 0.72);
-  color: #0c0a09;
-}
-
-/* The scrim itself: a gradient that fades out just past the bar, so there is no hard edge across
-   the photo. Sits behind the bar's own children (the header is a stacking context via `sticky`). */
-[data-storefront]:has([data-hero-overlay]) header[data-navbar-overlay][data-at-top="true"]::before {
-  content: "";
-  position: absolute;
-  inset-block: 0 -2.5rem;
-  inset-inline: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(to bottom, var(--navbar-scrim), transparent);
-  transition: background 200ms ease;
-}
-header[data-navbar-overlay] {
-  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
 }
 
 /* ---- Body copy for owner-authored text (product descriptions, page bodies) -------------------
