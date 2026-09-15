@@ -73,7 +73,7 @@ export function BrandFilter({
             placeholder={t("searchBrands")}
             aria-label={t("searchBrands")}
             className={cn(
-              "bg-background rounded-lg ps-9 [&::-webkit-search-cancel-button]:appearance-none",
+              "bg-background rounded-lg ps-9! [&::-webkit-search-cancel-button]:appearance-none",
               lg ? "text-base! h-11!" : "h-10!",
             )}
           />
