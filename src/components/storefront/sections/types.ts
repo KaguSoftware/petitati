@@ -88,6 +88,8 @@ export interface ProductPageProps {
     description: string;
     sku: string;
     reviews: string;
+    /** "{n} reviews", already filled; links the rating to the reviews section */
+    reviewCount?: string;
     inStock: string;
     outOfStock: string;
     previousImage: string;
@@ -98,6 +100,10 @@ export interface ProductPageProps {
   purchasePanel: ReactNode;
   reviewsSection: ReactNode;
   wishlistSlot?: ReactNode;
+  /** the store's first promises (delivery, payment…) for layouts that show them under the buy box */
+  promises?: { icon: TrustIcon; title: string }[];
+  /** "You may also like" grid; layouts place it, the page decides whether there is one */
+  relatedSlot?: ReactNode;
 }
 
 export interface CartViewProps {

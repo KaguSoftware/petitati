@@ -46,7 +46,7 @@ export function BrandFilter({ brands: facetBrands, brandNames }: { brands: Listi
 
   return (
     <fieldset className="flex min-w-0 flex-col gap-2">
-      <legend className="mb-2 text-sm font-semibold">{t("brands")}</legend>
+      <legend className="sr-only">{t("brands")}</legend>
       {brands.length > SHOW && (
         <div className="relative">
           <Search aria-hidden className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -58,7 +58,7 @@ export function BrandFilter({ brands: facetBrands, brandNames }: { brands: Listi
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchBrands")}
             aria-label={t("searchBrands")}
-            className="h-10! rounded-lg bg-card ps-9 [&::-webkit-search-cancel-button]:appearance-none"
+            className="h-10! rounded-lg bg-background ps-9 [&::-webkit-search-cancel-button]:appearance-none"
           />
         </div>
       )}

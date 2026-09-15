@@ -30,8 +30,8 @@ export function FilterSheet(props: FilterPanelProps & { total: number }) {
           </SheetClose>
         </div>
         <OverlayScroll className="flex-1">
-          <div className="px-4 py-5">
-            <FilterPanel {...props} />
+          <div className="px-4 py-1">
+            <FilterPanel {...props} variant="sheet" />
           </div>
         </OverlayScroll>
         <div className="shrink-0 border-t p-3">

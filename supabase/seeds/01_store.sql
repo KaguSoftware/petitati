@@ -47,8 +47,8 @@ values ('10000000-0000-0000-0000-000000000001', 'default', 'Petitati', 'Everythi
           "colors": {
             "primary": "#157fa1", "primaryForeground": "#ffffff",
             "accent": "#f7a83b", "accentForeground": "#1c1917",
-            "background": "#faf3fc", "card": "#ffffff", "foreground": "#17323d",
-            "muted": "#f0e2f5", "mutedForeground": "#4a5f68"
+            "background": "#faf8f3", "card": "#ffffff", "foreground": "#17323d",
+            "muted": "#f1ede4", "mutedForeground": "#4a5f68"
           },
           "fonts": { "heading": "Inter", "body": "Inter" },
           "radius": "0.75rem"

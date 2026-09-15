@@ -64,13 +64,16 @@ const saveProductSchema = z.object({
   is_bestseller: boolField,
   categoryIds: multi(uuidField),
   translations: jsonField(z.partialRecord(localeEnum, productTranslationSchema)),
+  /** set by the storefront edit drawer: the page it sits on, `/<locale>/p/` (same-site path only) */
+  returnBase: z.preprocess((v) => (v === "" || v == null ? undefined : v), z.string().regex(/^\/[a-z]{2}\/(s\/[a-z0-9-]+\/)?p\/$/).optional()),
+  originalSlug: optionalText(120),
 });
 
 /** Create or update the product itself (translations + categories). Variants/images have their own actions. */
 export async function saveProductAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = parseForm(saveProductSchema, formData);
   if (!parsed.data) return { error: "invalid", fieldErrors: parsed.fieldErrors };
-  const { storeId, locale, productId, slug, status, brand_id, tags, is_featured, is_bestseller, categoryIds, translations } = parsed.data;
+  const { storeId, locale, productId, slug, status, brand_id, tags, is_featured, is_bestseller, categoryIds, translations, returnBase, originalSlug } = parsed.data;
   let createdId: string | null = null;
   try {
     const { db } = await adminMutation(storeId, "products.write");
@@ -128,6 +131,12 @@ export async function saveProductAction(_prev: ActionState, formData: FormData):
     return { error: actionError(err) };
   }
   if (createdId) redirect(`/${locale}/admin/products/${createdId}`);
+  // Saved from the storefront page: `refresh()` would re-render that page, which 404s once the
+  // product is no longer active or answers to another slug — so move the browser first.
+  if (returnBase && productId) {
+    if (status !== "active") redirect(`/${locale}/admin/products/${productId}`);
+    if (originalSlug && originalSlug !== slug) redirect(`${returnBase}${slug}`);
+  }
   return { ok: true, id: productId };
 }
 

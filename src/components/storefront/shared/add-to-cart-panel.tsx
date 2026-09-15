@@ -103,7 +103,7 @@ export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) 
                   aria-pressed={active}
                   onClick={() => choose(opt.id, val.id)}
                   className={cn(
-                    "min-w-10 rounded-md border bg-card px-3 py-1.5 text-sm transition",
+                    "min-w-10 rounded-md border bg-background px-3 py-1.5 text-sm transition",
                     active ? "border-primary bg-primary text-primary-foreground" : "hover:border-foreground",
                     soldOut && !active && "text-muted-foreground line-through decoration-muted-foreground/60",
                   )}
@@ -119,14 +119,21 @@ export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) 
 
       <div className="flex items-center gap-3">
         <QuantityStepper value={qty} onChange={setQty} max={maxQty} />
-        <span className="text-sm text-muted-foreground">
-          {!variant
-            ? t("selectOption", { option: product.options[0]?.name ?? "" })
-            : available
-              ? variant.trackInventory && variant.stockQty <= 5 && !variant.allowBackorder
-                ? t("lowStock", { count: variant.stockQty })
-                : t("inStock")
-              : t("outOfStock")}
+        <span className="flex min-w-0 flex-col gap-0.5 text-sm text-muted-foreground">
+          <span>
+            {!variant
+              ? t("selectOption", { option: product.options[0]?.name ?? "" })
+              : available
+                ? variant.trackInventory && variant.stockQty <= 5 && !variant.allowBackorder
+                  ? t("lowStock", { count: variant.stockQty })
+                  : t("inStock")
+                : t("outOfStock")}
+          </span>
+          {variant?.sku && (
+            <span className="truncate text-caption">
+              {t("sku")} <bdi dir="ltr">{variant.sku}</bdi>
+            </span>
+          )}
         </span>
       </div>
 

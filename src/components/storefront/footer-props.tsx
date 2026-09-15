@@ -35,6 +35,18 @@ interface Input {
   pages?: { content: Record<string, Record<string, string>>; locale: string; fallback: string };
 }
 
+type FooterT = Awaited<ReturnType<typeof getTranslations<"footer">>>;
+
+/** The trust promises as shown: null when the strip is off, the four message defaults when the owner wrote none. */
+export function resolveTrustItems(resolved: ResolvedFooter, tf: FooterT): { icon: TrustIcon; title: string; text: string }[] | null {
+  const defaults = DEFAULT_TRUST.map((d) => ({ icon: d.icon, title: tf(`trust.${d.key}.title`), text: tf(`trust.${d.key}.text`) }));
+  return resolved.trustItems === null
+    ? null
+    : resolved.trustItems.length === 0
+      ? defaults
+      : resolved.trustItems.map((item, i) => ({ icon: item.icon, title: item.title ?? defaults[i]?.title ?? "", text: item.text ?? "" }));
+}
+
 /** One place that turns store data + settings into the footer contract, for the live chrome and the previews alike. */
 export async function buildFooterProps(input: Input): Promise<FooterProps> {
   const [tn, tf] = await Promise.all([getTranslations("nav"), getTranslations("footer")]);
@@ -44,13 +56,7 @@ export async function buildFooterProps(input: Input): Promise<FooterProps> {
     const { content, locale, fallback } = input.pages;
     return Boolean((content[key]?.[locale] ?? content[key]?.[fallback] ?? "").trim());
   };
-  const defaults = DEFAULT_TRUST.map((d) => ({ icon: d.icon, title: tf(`trust.${d.key}.title`), text: tf(`trust.${d.key}.text`) }));
-  const trustItems =
-    resolved.trustItems === null
-      ? null
-      : resolved.trustItems.length === 0
-        ? defaults
-        : resolved.trustItems.map((item, i) => ({ icon: item.icon, title: item.title ?? defaults[i]?.title ?? "", text: item.text ?? "" }));
+  const trustItems = resolveTrustItems(resolved, tf);
 
   return {
     storeName: input.storeName,

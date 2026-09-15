@@ -13,8 +13,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { listBrandOptions } from "@/lib/admin/brands/queries";
 import { requireAdminPage } from "@/lib/admin/context";
 import { getProductForEdit, listCategoryOptions } from "@/lib/admin/products/queries";
+import { variantLabels } from "@/lib/admin/products/variant-labels";
 import { can } from "@/lib/auth/permissions";
-import { pickJson, pickTranslation } from "@/lib/catalog/types";
+import { pickTranslation } from "@/lib/catalog/types";
 
 type Props = PageProps<"/[locale]/admin/products/[id]">;
 
@@ -41,12 +42,7 @@ async function Content({ params }: { params: Props["params"] }) {
   if (!data) notFound();
   const canWrite = can(ctx.role, "products.write");
   const name = pickTranslation(data.translations, ctx.locale, fallback)?.name ?? data.product.slug;
-  const valueLabel = new Map<string, string>();
-  for (const o of data.options) for (const v of o.values) valueLabel.set(v.id, pickJson(v.value, ctx.locale, fallback));
-  const variantOptions = data.variants.map((v) => {
-    const parts = v.optionValueIds.map((vid) => valueLabel.get(vid)).filter(Boolean);
-    return { value: v.id, label: parts.length ? parts.join(" · ") : (v.sku ?? t("products.variant.defaultLabel")) };
-  });
+  const variantOptions = variantLabels(data, ctx.locale, fallback, t("products.variant.defaultLabel"));
 
   return (
     <>

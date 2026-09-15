@@ -96,6 +96,8 @@
     "noReviewsTitle": "İlk değerlendirmeyi siz yazın",
     "addedToCart": "Sepete eklendi",
     "viewCart": "Sepeti gör",
+    "related": "Bunlar da ilginizi çekebilir",
+    "reviewCount": "{count} değerlendirme",
     "errors": {
       "invalid": "Bu bilgiler geçerli değil.",
       "auth": "Lütfen önce giriş yapın.",
@@ -893,7 +895,16 @@
       "allBrands": "Tüm markalar",
       "filterBrand": "Markaya göre filtrele",
       "bestseller": "Çok satan",
-      "bestsellerHint": "Gerçek satışlar öne geçene kadar ana sayfadaki “Çok satanlar” bölümünde gösterilir."
+      "bestsellerHint": "Gerçek satışlar öne geçene kadar ana sayfadaki “Çok satanlar” bölümünde gösterilir.",
+      "storefrontEdit": {
+        "button": "Ürünü düzenle",
+        "openInAdmin": "Yönetim panelinde aç",
+        "tabs": {
+          "details": "Ayrıntılar",
+          "pricing": "Fiyat ve stok",
+          "photos": "Fotoğraflar"
+        }
+      }
     },
     "categories": {
       "title": "Kategoriler",
@@ -1794,12 +1805,12 @@
     "price": "Fiyat",
     "priceMin": "En az",
     "priceMax": "En çok",
-    "apply": "Uygula",
     "under": "{amount} altı",
     "over": "{amount} üstü",
     "priceRange": "{min} – {max}",
     "inStockOnly": "Sadece stoktakiler",
     "onSaleOnly": "İndirimdekiler",
+    "availability": "Stok durumu",
     "searchChip": "Arama: {q}",
     "pagination": "Sayfalar",
     "pageOf": "Sayfa {page} / {total}",

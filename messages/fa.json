@@ -96,6 +96,8 @@
     "noReviewsTitle": "اولین نظر را شما بنویسید",
     "addedToCart": "به سبد اضافه شد",
     "viewCart": "دیدن سبد",
+    "related": "شاید این‌ها را هم بخواهید",
+    "reviewCount": "{count} نظر",
     "errors": {
       "invalid": "اطلاعات درست نیست.",
       "auth": "اول وارد شوید.",
@@ -893,7 +895,16 @@
       "allBrands": "همهٔ برندها",
       "filterBrand": "فیلتر بر اساس برند",
       "bestseller": "پرفروش",
-      "bestsellerHint": "تا وقتی فروش واقعی نداریم، در بخش «پرفروش‌ها» صفحهٔ اول نشان داده می‌شود."
+      "bestsellerHint": "تا وقتی فروش واقعی نداریم، در بخش «پرفروش‌ها» صفحهٔ اول نشان داده می‌شود.",
+      "storefrontEdit": {
+        "button": "ویرایش محصول",
+        "openInAdmin": "باز کردن در پنل مدیریت",
+        "tabs": {
+          "details": "مشخصات",
+          "pricing": "قیمت و موجودی",
+          "photos": "عکس‌ها"
+        }
+      }
     },
     "categories": {
       "title": "دسته‌بندی‌ها",
@@ -1794,12 +1805,12 @@
     "price": "قیمت",
     "priceMin": "از",
     "priceMax": "تا",
-    "apply": "اعمال",
     "under": "کمتر از {amount}",
     "over": "بیشتر از {amount}",
     "priceRange": "{min} تا {max}",
     "inStockOnly": "فقط موجود",
     "onSaleOnly": "فقط تخفیف‌دار",
+    "availability": "موجودی",
     "searchChip": "جستجو: {q}",
     "pagination": "صفحه‌ها",
     "pageOf": "صفحهٔ {page} از {total}",

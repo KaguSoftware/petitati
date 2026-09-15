@@ -11,6 +11,11 @@ const ICONS: Record<TrustIcon, LucideIcon> = {
   gift: Gift,
 };
 
+/** The glyph for a trust promise (a truck for anything unknown). */
+export function trustIcon(icon: TrustIcon): LucideIcon {
+  return ICONS[icon] ?? Truck;
+}
+
 export type TrustTone = "line" | "dark" | "hairline" | "cards";
 
 interface Props {

@@ -96,6 +96,8 @@
     "noReviewsTitle": "Be the first to review",
     "addedToCart": "Added to cart",
     "viewCart": "View cart",
+    "related": "You may also like",
+    "reviewCount": "{count} reviews",
     "errors": {
       "invalid": "Those details aren't valid.",
       "auth": "Please sign in first.",
@@ -893,7 +895,16 @@
       "allBrands": "All brands",
       "filterBrand": "Filter by brand",
       "bestseller": "Best seller",
-      "bestsellerHint": "Shown under “Best sellers” on the home page until real sales take over."
+      "bestsellerHint": "Shown under “Best sellers” on the home page until real sales take over.",
+      "storefrontEdit": {
+        "button": "Edit product",
+        "openInAdmin": "Open in admin",
+        "tabs": {
+          "details": "Details",
+          "pricing": "Prices & stock",
+          "photos": "Photos"
+        }
+      }
     },
     "categories": {
       "title": "Categories",
@@ -1794,12 +1805,12 @@
     "price": "Price",
     "priceMin": "Min",
     "priceMax": "Max",
-    "apply": "Apply",
     "under": "Under {amount}",
     "over": "Over {amount}",
     "priceRange": "{min} – {max}",
     "inStockOnly": "In stock only",
     "onSaleOnly": "On sale",
+    "availability": "Availability",
     "searchChip": "Search: {q}",
     "pagination": "Pagination",
     "pageOf": "Page {page} of {total}",

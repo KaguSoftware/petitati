@@ -16,7 +16,7 @@ export interface CategoryNav {
 
 /**
  * "Categories" at the top of the filter sidebar: where the subcategory tiles used to be (owner,
- * 2026-09-15). Links, not checkboxes — a category is a page. The current filters (search, price,
+ * 2026-09-15). The enclosing FilterSection draws the title. Links, not checkboxes — a category is a page. The current filters (search, price,
  * stock…) travel with the link so narrowing down never resets what the shopper set.
  */
 export function CategoryFilter({ nav }: { nav: CategoryNav }) {
@@ -28,8 +28,7 @@ export function CategoryFilter({ nav }: { nav: CategoryNav }) {
   if (nav.items.length === 0 && !nav.parent) return null;
 
   return (
-    <nav aria-label={tn("categories")} className="flex flex-col gap-2">
-      <p className="text-sm font-semibold">{tn("categories")}</p>
+    <nav aria-label={tn("categories")} className="flex flex-col gap-1">
       {nav.parent && (
         <Link href={listingHref(nav.parent.href, keep)} className="flex min-h-9 items-center gap-1 text-sm text-primary transition-colors hover:text-foreground focus-ring">
           <ChevronLeft aria-hidden className="size-4 rtl:-scale-x-100" />

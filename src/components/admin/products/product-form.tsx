@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,16 @@ interface Props {
   product?: ProductEditData | null;
   categories: CategoryOption[];
   brands: BrandOption[];
+  /** Replaces the admin page's sticky bar (a drawer supplies Cancel as its own close control). */
+  footer?: (ctx: { pending: boolean; submitLabel: string }) => ReactNode;
+  /** After a successful save of an existing product. */
+  onSaved?: () => void;
+  /**
+   * Storefront host of the form: `/<locale>/p/`. Sent to the action, which then redirects a slug
+   * change to the new address and a status change away from active to the admin editor, because
+   * the storefront page it came from would 404 on refresh.
+   */
+  returnBase?: string;
 }
 
 const NO_BRAND = "__none";
@@ -58,9 +68,9 @@ export function useProductFieldErrors(raw: Record<string, string> | undefined) {
   }, [raw, t]);
 }
 
-export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, product, categories, brands }: Props) {
+export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, product, categories, brands, footer, onSaved, returnBase }: Props) {
   const t = useTranslations("admin");
-  const [state, action, pending] = useActionToast(saveProductAction, { errorNamespace: "admin.products" });
+  const [state, action, pending] = useActionToast(saveProductAction, { errorNamespace: "admin.products", onSuccess: () => onSaved?.() });
   const errors = useProductFieldErrors(state.fieldErrors);
 
   const [translations, setTranslations] = useState<Partial<Record<Locale, ProductTranslationInput>>>(() => {
@@ -101,6 +111,7 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
     if (field === "name" && activeLocale === defaultLocale && !slugTouched) setSlug(slugify(value));
   }
 
+  const submitLabel = pending ? t("common.saving") : product ? t("common.save") : t("common.create");
   const nameError = errors?.name && (state.fieldErrors?.translations ?? defaultLocale) === activeLocale ? { name: errors.name } : undefined;
 
   return (
@@ -110,6 +121,12 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
       <input type="hidden" name="productId" value={product?.product.id ?? ""} />
       <input type="hidden" name="translations" value={JSON.stringify(translations)} />
       <input type="hidden" name="brand_id" value={brandId === NO_BRAND ? "" : brandId} />
+      {returnBase && product && (
+        <>
+          <input type="hidden" name="returnBase" value={returnBase} />
+          <input type="hidden" name="originalSlug" value={product.product.slug} />
+        </>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <section className="flex flex-col gap-4 rounded-xl border bg-card p-4">
@@ -225,14 +242,18 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
         </aside>
       </div>
 
-      <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t bg-background/95 px-4 py-3 backdrop-blur md:-mx-6 md:px-6">
-        <Link href="/admin/products" className={buttonVariants({ variant: "ghost" })}>
-          {t("common.cancel")}
-        </Link>
-        <Button type="submit" disabled={pending}>
-          {pending ? t("common.saving") : product ? t("common.save") : t("common.create")}
-        </Button>
-      </div>
+      {footer ? (
+        footer({ pending, submitLabel })
+      ) : (
+        <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t bg-background/95 px-4 py-3 backdrop-blur md:-mx-6 md:px-6">
+          <Link href="/admin/products" className={buttonVariants({ variant: "ghost" })}>
+            {t("common.cancel")}
+          </Link>
+          <Button type="submit" disabled={pending}>
+            {submitLabel}
+          </Button>
+        </div>
+      )}
     </form>
   );
 }

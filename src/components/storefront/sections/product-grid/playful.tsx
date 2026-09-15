@@ -18,7 +18,7 @@ export async function ProductGridPlayful({ title, products, currency, locale, ca
     ) : bare ? (
       // Listing pages (shop, category, brand, wishlist) are browsed page by page: a carousel hides all but
       // three products, so they get a plain grid. The sideways row stays for home-page sections.
-      <ul className="grid grid-cols-2 gap-x-3 gap-y-7 @tablet:grid-cols-3 @tablet:gap-x-5 @desktop:grid-cols-4 @desktop:gap-x-6 @desktop:gap-y-9">
+      <ul className="grid grid-cols-2 gap-3 @tablet:grid-cols-3 @tablet:gap-4 @desktop:grid-cols-4 @desktop:gap-5">
         {products.map((p) => (
           <li key={p.id} className="min-w-0">
             {renderSection("productCard", cardVariant, { product: p, currency, locale, labels, wishlistSlot: wishlistSlots?.[p.id] })}

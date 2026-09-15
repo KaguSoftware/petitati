@@ -8,7 +8,7 @@ export function FilterSidebar(props: FilterPanelProps) {
   const t = useTranslations("shop");
   return (
     <aside aria-label={t("filters")} className="hidden @desktop:block">
-      <FilterPanel {...props} />
+      <FilterPanel {...props} variant="sidebar" />
     </aside>
   );
 }

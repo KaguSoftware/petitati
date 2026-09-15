@@ -1,14 +1,24 @@
 import { Slider as SliderPrimitive } from "@base-ui/react/slider"
 import { cn } from "cn"
 
+type ThumbAria = Pick<SliderPrimitive.Thumb.Props, "getAriaLabel" | "getAriaValueText">
+
 function Slider({
   className,
+  trackClassName,
+  thumbClassName,
+  thumbProps,
   defaultValue,
   value,
   min = 0,
   max = 100,
   ...props
-}: SliderPrimitive.Root.Props) {
+}: SliderPrimitive.Root.Props & {
+  trackClassName?: string
+  thumbClassName?: string
+  /** aria label / value text per thumb (index 0 = the lower thumb of a range) */
+  thumbProps?: ThumbAria
+}) {
   const _values = Array.isArray(value)
     ? value
     : Array.isArray(defaultValue)
@@ -29,7 +39,10 @@ function Slider({
       <SliderPrimitive.Control className="relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col">
         <SliderPrimitive.Track
           data-slot="slider-track"
-          className="relative grow overflow-hidden rounded-full bg-muted select-none data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
+          className={cn(
+            "relative grow overflow-hidden rounded-full bg-muted select-none data-horizontal:h-1.5 data-horizontal:w-full data-vertical:h-full data-vertical:w-1.5",
+            trackClassName
+          )}
         >
           <SliderPrimitive.Indicator
             data-slot="slider-range"
@@ -40,7 +53,12 @@ function Slider({
           <SliderPrimitive.Thumb
             data-slot="slider-thumb"
             key={index}
-            className="relative block size-3 shrink-0 rounded-full border border-ring bg-background ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3 disabled:pointer-events-none disabled:opacity-50"
+            index={index}
+            {...thumbProps}
+            className={cn(
+              "relative block size-5 shrink-0 rounded-full border-2 border-primary bg-card shadow-md ring-primary/25 transition-[box-shadow] select-none after:absolute after:-inset-2 hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden active:ring-4 disabled:pointer-events-none disabled:opacity-50",
+              thumbClassName
+            )}
           />
         ))}
       </SliderPrimitive.Control>
