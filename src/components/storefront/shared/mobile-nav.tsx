@@ -21,9 +21,14 @@ interface Props {
   footer: ReactNode;
 }
 
-const bar = "h-0.5 w-5 rounded-full bg-current transition-all duration-300 ease-out motion-reduce:transition-none";
-const drawerLink = "stagger-in flex min-h-11 items-center rounded-lg px-3 py-2.5 text-body transition-colors hover:bg-muted focus-visible:bg-muted focus-ring";
-const childLink = "flex min-h-11 items-center py-2 text-label text-foreground/75 hover:text-foreground focus-visible:text-foreground";
+const bar =
+  "h-0.5 w-5 rounded-full bg-current transition-all duration-300 ease-out motion-reduce:transition-none";
+// Phone rows are thumb-sized: 48 px at 16 px for the main links, 44 px at 16 px for category children
+// (the owner found 14 px children too small to hit and to read).
+const drawerLink =
+  "stagger-in flex min-h-12 items-center rounded-lg px-3 py-2.5 text-base transition-colors hover:bg-muted focus-visible:bg-muted focus-ring";
+const childLink =
+  "flex min-h-11 items-center py-2 text-base text-foreground/80 hover:text-foreground focus-visible:text-foreground";
 
 /**
  * Hamburger + full-height drawer from the inline-start edge (mirrors under RTL). Links close the
@@ -49,7 +54,9 @@ export function MobileNav({ labels, brand, primary, categories, footer }: Props)
     <div key={item.href} className="flex flex-col gap-0.5">
       {renderLink(item, row++)}
       {item.children && item.children.length > 0 && (
-        <div className="ms-5 flex flex-col gap-0.5 border-s-2 border-foreground/15 ps-2">{item.children.map((child) => renderLink(child, row++, true))}</div>
+        <div className="border-foreground/15 ms-5 flex flex-col gap-0.5 border-s-2 ps-2">
+          {item.children.map((child) => renderLink(child, row++, true))}
+        </div>
       )}
     </div>
   );
@@ -57,19 +64,34 @@ export function MobileNav({ labels, brand, primary, categories, footer }: Props)
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        render={<Button variant="ghost" size="icon-lg" className="group/burger @tablet:hidden" aria-label={open ? labels.closeMenu : labels.menu} />}
+        render={
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="group/burger @tablet:hidden"
+            aria-label={open ? labels.closeMenu : labels.menu}
+          />
+        }
       >
         <span aria-hidden className="flex flex-col items-center justify-center gap-[5px]">
-          <span className={`${bar} group-data-[popup-open]/burger:translate-y-[7px] group-data-[popup-open]/burger:rotate-45`} />
-          <span className={`${bar} group-data-[popup-open]/burger:scale-x-0 group-data-[popup-open]/burger:opacity-0`} />
-          <span className={`${bar} group-data-[popup-open]/burger:-translate-y-[7px] group-data-[popup-open]/burger:-rotate-45`} />
+          <span
+            className={`${bar} group-data-[popup-open]/burger:translate-y-[7px] group-data-[popup-open]/burger:rotate-45`}
+          />
+          <span
+            className={`${bar} group-data-[popup-open]/burger:scale-x-0 group-data-[popup-open]/burger:opacity-0`}
+          />
+          <span
+            className={`${bar} group-data-[popup-open]/burger:-translate-y-[7px] group-data-[popup-open]/burger:-rotate-45`}
+          />
         </span>
       </SheetTrigger>
 
       <SheetContent side="start" showCloseButton={false} className="gap-0 p-0">
         <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
           {brand}
-          <SheetClose render={<Button variant="ghost" size="icon-lg" aria-label={labels.closeMenu} />}>
+          <SheetClose
+            render={<Button variant="ghost" size="icon-lg" aria-label={labels.closeMenu} />}
+          >
             <XIcon />
           </SheetClose>
         </div>
@@ -84,7 +106,7 @@ export function MobileNav({ labels, brand, primary, categories, footer }: Props)
             {primary.map((item, i) => renderLink(item, i))}
             {categories.length > 0 && (
               <p
-                className="stagger-in mt-5 mb-2 px-3 text-xs font-medium tracking-wide text-muted-foreground uppercase"
+                className="stagger-in text-caption text-muted-foreground mt-5 mb-2 px-3 font-semibold tracking-wide uppercase"
                 style={{ "--stagger": primary.length } as CSSProperties}
               >
                 {labels.categories}
@@ -94,7 +116,9 @@ export function MobileNav({ labels, brand, primary, categories, footer }: Props)
           </nav>
         </OverlayScroll>
 
-        <div className="flex shrink-0 items-center justify-between gap-2 border-t p-3">{footer}</div>
+        <div className="flex shrink-0 items-center justify-between gap-2 border-t p-3">
+          {footer}
+        </div>
       </SheetContent>
     </Sheet>
   );

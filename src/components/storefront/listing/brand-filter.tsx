@@ -18,18 +18,29 @@ const SHOW = 8;
  * rows with counts. This is what the old 122-entry "All brands" select became. Ticked brands are
  * pinned to the top so they never scroll out of sight; the rest are cut at eight with a toggle.
  */
-export function BrandFilter({ brands: facetBrands, brandNames }: { brands: ListingFacets["brands"]; brandNames: Record<string, string> }) {
+export function BrandFilter({
+  brands: facetBrands,
+  brandNames,
+  size = "sm",
+}: {
+  brands: ListingFacets["brands"];
+  brandNames: Record<string, string>;
+  size?: "sm" | "lg";
+}) {
   const t = useTranslations("shop");
   const { params, set } = useListingParams();
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(false);
   const searchId = useId();
+  const lg = size === "lg";
   const selected = parseBrands(params.get("brand"));
   const selectedSet = new Set(selected);
   // A ticked brand that the price/stock filters emptied still needs a row, or it could never be unticked.
   const brands = [
     ...facetBrands,
-    ...selected.filter((slug) => !facetBrands.some((b) => b.slug === slug)).map((slug) => ({ id: slug, slug, name: brandNames[slug] ?? slug, count: 0 })),
+    ...selected
+      .filter((slug) => !facetBrands.some((b) => b.slug === slug))
+      .map((slug) => ({ id: slug, slug, name: brandNames[slug] ?? slug, count: 0 })),
   ];
 
   const needle = query.trim().toLowerCase();
@@ -49,7 +60,10 @@ export function BrandFilter({ brands: facetBrands, brandNames }: { brands: Listi
       <legend className="sr-only">{t("brands")}</legend>
       {brands.length > SHOW && (
         <div className="relative">
-          <Search aria-hidden className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Search
+            aria-hidden
+            className="text-muted-foreground pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2"
+          />
           <Input
             id={searchId}
             type="search"
@@ -58,24 +72,50 @@ export function BrandFilter({ brands: facetBrands, brandNames }: { brands: Listi
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchBrands")}
             aria-label={t("searchBrands")}
-            className="h-10! rounded-lg bg-background ps-9 [&::-webkit-search-cancel-button]:appearance-none"
+            className={cn(
+              "bg-background rounded-lg ps-9 [&::-webkit-search-cancel-button]:appearance-none",
+              lg ? "text-base! h-11!" : "h-10!",
+            )}
           />
         </div>
       )}
       {shown.length === 0 ? (
-        <p className="py-2 text-sm text-muted-foreground">{t("noBrandsFound")}</p>
+        <p className={cn("text-muted-foreground py-2", lg ? "text-base" : "text-sm")}>
+          {t("noBrandsFound")}
+        </p>
       ) : (
         <ul className="flex flex-col">
           {shown.map((b) => {
             const id = `${searchId}-${b.slug}`;
             const on = selectedSet.has(b.slug);
             return (
-              <li key={b.id} className="flex min-h-10 items-center gap-3">
-                <Checkbox id={id} checked={on} onCheckedChange={(checked) => toggle(b.slug, checked === true)} />
-                <Label htmlFor={id} className={cn("bidi-auto min-w-0 flex-1 cursor-pointer truncate font-normal", on && "font-medium")}>
+              <li
+                key={b.id}
+                className={cn("flex items-center gap-3", lg ? "min-h-12" : "min-h-10")}
+              >
+                <Checkbox
+                  id={id}
+                  checked={on}
+                  onCheckedChange={(checked) => toggle(b.slug, checked === true)}
+                  className={cn(lg && "size-5")}
+                />
+                <Label
+                  htmlFor={id}
+                  className={cn(
+                    "bidi-auto min-w-0 flex-1 cursor-pointer truncate font-normal",
+                    lg && "text-base",
+                    on && "font-medium",
+                  )}
+                >
                   {b.name}
                 </Label>
-                <span className="text-caption text-muted-foreground tabular-nums" dir="ltr">
+                <span
+                  className={cn(
+                    "text-muted-foreground tabular-nums",
+                    lg ? "text-label" : "text-caption",
+                  )}
+                  dir="ltr"
+                >
                   {b.count}
                 </span>
               </li>
@@ -88,7 +128,10 @@ export function BrandFilter({ brands: facetBrands, brandNames }: { brands: Listi
           type="button"
           aria-expanded={expanded}
           onClick={() => setExpanded((v) => !v)}
-          className="self-start py-1 text-sm font-medium text-primary underline-offset-4 hover:underline focus-ring"
+          className={cn(
+            "text-primary focus-ring self-start py-1 font-medium underline-offset-4 hover:underline",
+            lg ? "text-base min-h-11" : "text-sm",
+          )}
         >
           {expanded ? t("showFewer") : t("showAllBrands", { count: brands.length })}
         </button>

@@ -7,7 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { formatMoney, toMajor, toMinor } from "@/lib/money";
 import { cn } from "@/lib/utils";
-import { quickRanges, snapBounds, snapValue, type QuickRange, type SliderBounds } from "./price-ranges";
+import {
+  quickRanges,
+  snapBounds,
+  snapValue,
+  type QuickRange,
+  type SliderBounds,
+} from "./price-ranges";
 import { useListingParams } from "./use-listing-params";
 
 interface Props {
@@ -17,6 +23,8 @@ interface Props {
   quartiles: (number | null)[];
   currency: string;
   locale: string;
+  /** `lg` = phone sheet: taller inputs and chips */
+  size?: "sm" | "lg";
 }
 
 /** A price in major units as the shop shows it. */
@@ -24,10 +32,18 @@ function money(major: number, currency: string, locale: string) {
   return formatMoney(toMinor(major, currency), currency, locale);
 }
 
-export function rangeLabel(r: QuickRange, currency: string, locale: string, t: (key: string, values?: Record<string, string>) => string) {
+export function rangeLabel(
+  r: QuickRange,
+  currency: string,
+  locale: string,
+  t: (key: string, values?: Record<string, string>) => string,
+) {
   if (r.min == null && r.max != null) return t("under", { amount: money(r.max, currency, locale) });
   if (r.max == null && r.min != null) return t("over", { amount: money(r.min, currency, locale) });
-  return t("priceRange", { min: money(r.min ?? 0, currency, locale), max: money(r.max ?? 0, currency, locale) });
+  return t("priceRange", {
+    min: money(r.min ?? 0, currency, locale),
+    max: money(r.max ?? 0, currency, locale),
+  });
 }
 
 /**
@@ -36,11 +52,31 @@ export function rangeLabel(r: QuickRange, currency: string, locale: string, t: (
  * or "Clear all" resets what is dragged or typed (React 19 keeps local state across re-renders
  * otherwise). A thumb parked on the track's end means "no bound" and writes nothing to the URL.
  */
-export function PriceFilter({ priceMin, priceMax, quartiles, currency, locale }: Props) {
+export function PriceFilter({
+  priceMin,
+  priceMax,
+  quartiles,
+  currency,
+  locale,
+  size = "sm",
+}: Props) {
   const t = useTranslations("shop");
   const { params, set } = useListingParams();
   const key = `${params.get("min") ?? ""}|${params.get("max") ?? ""}`;
-  return <PriceForm key={key} priceMin={priceMin} priceMax={priceMax} quartiles={quartiles} currency={currency} locale={locale} t={t} params={params} set={set} />;
+  return (
+    <PriceForm
+      key={key}
+      priceMin={priceMin}
+      priceMax={priceMax}
+      quartiles={quartiles}
+      currency={currency}
+      locale={locale}
+      size={size}
+      t={t}
+      params={params}
+      set={set}
+    />
+  );
 }
 
 function parse(v: string): number | null {
@@ -54,12 +90,20 @@ function PriceForm({
   quartiles,
   currency,
   locale,
+  size,
   t,
   params,
   set,
-}: Props & { t: ReturnType<typeof useTranslations>; params: URLSearchParams; set: (patch: Record<string, string | null>) => void }) {
+}: Props & {
+  t: ReturnType<typeof useTranslations>;
+  params: URLSearchParams;
+  set: (patch: Record<string, string | null>) => void;
+}) {
   const minId = useId();
   const maxId = useId();
+  const lg = size === "lg";
+  const inputClass = cn("rounded-lg bg-background", lg ? "h-11! text-base!" : "h-10!");
+  const labelClass = cn("text-muted-foreground", lg ? "text-label" : "text-caption");
   const currentMin = params.get("min");
   const currentMax = params.get("max");
   const bounds = snapBounds(priceMin, priceMax, currency);
@@ -74,7 +118,9 @@ function PriceForm({
   const [values, setValues] = useState<[number, number]>(() => (bounds ? initial(bounds) : [0, 0]));
   const [text, setText] = useState<[string, string]>(() => [currentMin ?? "", currentMax ?? ""]);
   const ranges = quickRanges(quartiles, currency);
-  const isActive = (r: QuickRange) => (r.min != null ? String(r.min) : null) === currentMin && (r.max != null ? String(r.max) : null) === currentMax;
+  const isActive = (r: QuickRange) =>
+    (r.min != null ? String(r.min) : null) === currentMin &&
+    (r.max != null ? String(r.max) : null) === currentMax;
 
   /** Write a pair to the URL; an end sitting on the track's edge is "no bound". */
   const commit = (lo: number | null, hi: number | null) => {
@@ -99,7 +145,10 @@ function PriceForm({
   const onSlide = (v: number | readonly number[]) => {
     const [lo, hi] = v as readonly number[];
     setValues([lo, hi]);
-    setText([bounds && lo > bounds.lo ? String(lo) : "", bounds && hi < bounds.hi ? String(hi) : ""]);
+    setText([
+      bounds && lo > bounds.lo ? String(lo) : "",
+      bounds && hi < bounds.hi ? String(hi) : "",
+    ]);
   };
 
   return (
@@ -129,7 +178,7 @@ function PriceForm({
       )}
       <div className="flex items-end gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Label htmlFor={minId} className="text-caption text-muted-foreground">
+          <Label htmlFor={minId} className={labelClass}>
             {t("priceMin")}
           </Label>
           <Input
@@ -144,14 +193,14 @@ function PriceForm({
             onBlur={commitTyped}
             onKeyDown={onKey}
             placeholder={priceMin != null ? String(toMajor(priceMin, currency)) : "0"}
-            className="h-10! rounded-lg bg-background"
+            className={inputClass}
           />
         </div>
-        <span aria-hidden className="pb-3 text-muted-foreground">
+        <span aria-hidden className="text-muted-foreground pb-3">
           –
         </span>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Label htmlFor={maxId} className="text-caption text-muted-foreground">
+          <Label htmlFor={maxId} className={labelClass}>
             {t("priceMax")}
           </Label>
           <Input
@@ -166,7 +215,7 @@ function PriceForm({
             onBlur={commitTyped}
             onKeyDown={onKey}
             placeholder={priceMax != null ? String(toMajor(priceMax, currency)) : ""}
-            className="h-10! rounded-lg bg-background"
+            className={inputClass}
           />
         </div>
       </div>
@@ -179,9 +228,17 @@ function PriceForm({
                 <button
                   type="button"
                   aria-pressed={on}
-                  onClick={() => (on ? set({ min: null, max: null }) : set({ min: r.min != null ? String(r.min) : null, max: r.max != null ? String(r.max) : null }))}
+                  onClick={() =>
+                    on
+                      ? set({ min: null, max: null })
+                      : set({
+                          min: r.min != null ? String(r.min) : null,
+                          max: r.max != null ? String(r.max) : null,
+                        })
+                  }
                   className={cn(
-                    "inline-flex h-9 items-center rounded-full px-3.5 text-sm transition-colors focus-ring",
+                    "focus-ring inline-flex items-center rounded-full transition-colors",
+                    lg ? "text-base h-11 px-4" : "h-9 px-3.5 text-sm",
                     on ? "bg-primary text-primary-foreground" : "bg-muted/60 hover:bg-muted",
                   )}
                 >

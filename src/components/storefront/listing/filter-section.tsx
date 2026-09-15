@@ -11,28 +11,56 @@ interface Props {
   defaultOpen?: boolean;
   /** heading tag; the section's own heading is visible, so children should not repeat it */
   as?: "h2" | "h3";
+  /** `lg` = phone sheet: 16 px title, thumb-sized fold row */
+  size?: "sm" | "lg";
   children: ReactNode;
   className?: string;
 }
 
-const TITLE = "text-sm font-semibold";
-
 /** One block of the filter panel: a titled tile in the sidebar, a foldable block in the phone sheet. */
-export function FilterSection({ title, variant, collapsible, defaultOpen = true, as: Heading = "h3", children, className }: Props) {
+export function FilterSection({
+  title,
+  variant,
+  collapsible,
+  defaultOpen = true,
+  as: Heading = "h3",
+  size = "sm",
+  children,
+  className,
+}: Props) {
+  const titleClass = cn("font-semibold", size === "lg" ? "text-base" : "text-sm");
   if (variant === "sheet" && collapsible) {
     return (
-      <details open={defaultOpen} className={cn("group py-4", className)}>
-        <summary className="flex min-h-9 cursor-pointer list-none items-center justify-between gap-3 focus-ring [&::-webkit-details-marker]:hidden">
-          <Heading className={TITLE}>{title}</Heading>
-          <ChevronDown aria-hidden className="size-4 text-muted-foreground transition-transform group-open:rotate-180" />
+      <details open={defaultOpen} className={cn("group py-3", className)}>
+        <summary
+          className={cn(
+            "focus-ring flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden",
+            size === "lg" ? "min-h-12" : "min-h-9",
+          )}
+        >
+          <Heading className={titleClass}>{title}</Heading>
+          <ChevronDown
+            aria-hidden
+            className="text-muted-foreground size-5 transition-transform group-open:rotate-180"
+          />
         </summary>
-        <div className="pt-2">{children}</div>
+        <div className="pt-1 pb-2">{children}</div>
       </details>
     );
   }
   return (
-    <section className={cn("flex flex-col gap-3", variant === "sidebar" ? "rounded-2xl bg-card p-4 shadow-sm ring-1 ring-foreground/5" : "py-4", className)}>
-      <Heading className={TITLE}>{title}</Heading>
+    <section
+      className={cn(
+        "flex flex-col",
+        variant === "sidebar"
+          ? "bg-card ring-foreground/5 gap-3 rounded-2xl p-4 shadow-sm ring-1"
+          : "gap-2 py-4",
+        className,
+      )}
+    >
+      <Heading className={cn(titleClass, size === "lg" && "flex min-h-12 items-center")}>
+        {title}
+      </Heading>
       {children}
     </section>
   );
