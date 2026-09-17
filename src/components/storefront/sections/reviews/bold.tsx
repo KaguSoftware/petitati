@@ -12,7 +12,7 @@ export function ReviewsBold({ reviews, ratingAvg, ratingCount, locale, labels, f
         <h2 className="text-3xl font-extrabold tracking-tight uppercase @tablet:text-4xl">{labels.title}</h2>
         {ratingCount > 0 ? (
           <div className="flex items-center gap-5">
-            <span className="text-7xl leading-none font-extrabold tracking-tighter tabular-nums">{ratingAvg.toFixed(1)}</span>
+            <span className="font-heading text-7xl leading-none font-extrabold tracking-tighter tabular-nums">{ratingAvg.toFixed(1)}</span>
             <div className="flex flex-1 flex-col gap-2">
               <RatingStars value={ratingAvg} count={ratingCount} size={20} />
               <div className="h-3 w-full max-w-xs bg-muted" aria-hidden>
@@ -36,7 +36,7 @@ export function ReviewsBold({ reviews, ratingAvg, ratingCount, locale, labels, f
                   {dateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(r.createdAt))}
                 </time>
               </div>
-              {r.title && <p className="bidi-auto text-lg leading-tight font-extrabold tracking-tight">{r.title}</p>}
+              {r.title && <p className="bidi-auto font-heading text-lg leading-tight font-extrabold tracking-tight">{r.title}</p>}
               {r.body && <p className="bidi-auto text-sm text-muted-foreground">{r.body}</p>}
               <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
                 <span className="text-sm font-extrabold tracking-wide uppercase">{r.authorName}</span>

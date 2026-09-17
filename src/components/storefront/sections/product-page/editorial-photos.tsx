@@ -19,7 +19,7 @@ export function EditorialPhotos({ images: allImages, name, wishlistSlot }: Props
         <li key={img.url} className="relative">
           <ProductImage src={img.url} alt={img.alt} className="aspect-[4/5] rounded-none" sizes="(min-width: 1024px) 58vw, 100vw" priority={i === 0} />
           {i === 0 && wishlistSlot && <div className="absolute end-3 top-3">{wishlistSlot}</div>}
-          <span aria-hidden className="mt-2 block font-mono text-micro tracking-[0.2em] text-muted-foreground">
+          <span aria-hidden className="mt-2 block text-micro tracking-[0.2em] text-muted-foreground">
             {String(i + 1).padStart(2, "0")}
           </span>
         </li>

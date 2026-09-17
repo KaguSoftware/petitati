@@ -24,9 +24,9 @@ export function ProductPageEditorial({ product, breadcrumb, labels, purchasePane
                 )}
               </p>
             )}
-            <h1 className="bidi-auto font-serif text-3xl font-medium tracking-tight text-balance @tablet:text-4xl">{product.name}</h1>
+            <h1 className="bidi-auto font-heading text-3xl font-medium tracking-tight text-balance @tablet:text-4xl">{product.name}</h1>
             {product.ratingCount > 0 && <RatingStars value={product.ratingAvg} count={product.ratingCount} size={16} className="opacity-70" />}
-            {product.shortDescription && <p className="bidi-auto max-w-prose font-serif text-lg italic text-muted-foreground">{product.shortDescription}</p>}
+            {product.shortDescription && <p className="bidi-auto max-w-prose font-heading text-lg italic text-muted-foreground">{product.shortDescription}</p>}
           </div>
           <div className="border border-foreground/15 p-5 @tablet:p-6">{purchasePanel}</div>
           {product.description && (

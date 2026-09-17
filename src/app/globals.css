@@ -191,12 +191,26 @@
   [data-storefront] :is(h1, h2, h3) {
     font-family: var(--heading-font, var(--font-sans));
   }
+  /* Portals render into <body>, outside [data-storefront]. `StoreFontVars` mirrors the store's fonts
+     onto <html> while a storefront page is mounted; elsewhere (admin) `--heading-font` is unset and
+     this resolves to the body font, i.e. no change. */
+  :is([data-slot="sheet-content"], [data-slot="dialog-content"], [data-slot="alert-dialog-content"], [data-slot="popover-content"], [data-slot="dropdown-menu-content"], [data-slot="combobox-content"], [data-slot="select-content"]) :is(h1, h2, h3) {
+    font-family: var(--heading-font, var(--font-sans));
+  }
   body {
     @apply bg-background text-foreground;
   }
   html {
     @apply font-sans;
   }
+}
+
+/* Sonner injects `[data-sonner-toaster] { font-family: ui-sans-serif, system-ui, … }` at runtime
+   (unlayered), so toasts ignored the app font entirely. Doubled attribute = higher specificity, so
+   this wins regardless of injection order; `--font-sans` is the store's body font on storefront
+   pages (StoreFontVars) and IBM Plex elsewhere. */
+[data-sonner-toaster][data-sonner-toaster] {
+  font-family: var(--font-sans);
 }
 
 /* ---- Store palette -----------------------------------------------------------------------------

@@ -26,7 +26,7 @@ export function EmptyState({ icon: Icon = PackageOpen, title, description, actio
         <Icon className="size-7" strokeWidth={1.75} />
       </span>
       <div className="flex flex-col gap-1.5">
-        <p className="bidi-auto text-lg font-semibold tracking-tight">{title}</p>
+        <p className="bidi-auto font-heading text-lg font-semibold tracking-tight">{title}</p>
         {description && <p className="bidi-auto max-w-sm text-sm text-muted-foreground">{description}</p>}
       </div>
       {action && <div className="mt-2">{action}</div>}

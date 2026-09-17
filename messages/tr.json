@@ -590,6 +590,30 @@
         "unverified": "Kodsuz kapatılan",
         "cashOpen": "Açık nakit",
         "allOrders": "Tüm siparişler"
+      },
+      "insights": {
+        "items": "Alınan ürün",
+        "distinctProducts": "{count} farklı ürün",
+        "deliveredOf": "{count} teslim edildi",
+        "plusOpen": "+ {amount} yolda",
+        "avgOrder": "Ortalama sipariş",
+        "daysAgo": "{count, plural, =0 {bugün} other {# gün önce}}",
+        "firstOrder": "İlk sipariş",
+        "everyDays": "her {count} günde bir sipariş",
+        "statusTitle": "Duruma göre siparişler",
+        "noOrders": "Henüz sipariş yok.",
+        "onTheWay": "Yolda",
+        "largestOrder": "En büyük sipariş",
+        "refunded": "İade edilen",
+        "cancelRate": "İptal oranı",
+        "monthlyTitle": "Son 12 ay harcama",
+        "ordersCount": "{count} sipariş",
+        "noSpendYear": "Son 12 ayda alışveriş yok.",
+        "productsTitle": "En çok alınanlar",
+        "noProducts": "Henüz alışveriş yok.",
+        "discounts": "Alınan indirim",
+        "coupons": "Kullanılan kuponlar",
+        "topCity": "Genelde şehir"
       }
     },
     "coupons": {
@@ -1011,7 +1035,9 @@
         "faviconHint": "En fazla 512 KB kare PNG veya ICO. Tarayıcı sekmesinde gösterilir.",
         "tooLarge": "Dosya çok büyük (en fazla {max} KB).",
         "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
-        "replace": "Değiştir"
+        "replace": "Değiştir",
+        "title": "Logo ve favicon",
+        "description": "Başlıktaki mağaza logonuz ve tarayıcı sekmesindeki küçük simge."
       },
       "colors": {
         "title": "Renkler",
@@ -1324,7 +1350,9 @@
         "maxSlides": "En fazla {max} slayt.",
         "empty": "Henüz slayt yok: ana sayfa varsayılan hero'yu gösterir.",
         "fallbackNote": "İlk slaytın boş alanları mağaza sloganına ve varsayılan metne döner."
-      }
+      },
+      "expandAll": "Tümünü aç",
+      "collapseAll": "Tümünü kapat"
     },
     "settings": {
       "description": "Mağaza kimliği, ticaret kuralları, içerik sayfaları, kargo ve altbilgi.",
@@ -1843,7 +1871,31 @@
     "deliveredTo": "{name} teslim aldı",
     "withCode": "kodunuzla doğrulandı",
     "withoutCode": "kurye tarafından kodsuz onaylandı",
-    "scheduled": "{date} için planlandı"
+    "scheduled": "{date} için planlandı",
+    "track": {
+      "current": "Yoldaki siparişler",
+      "all": "Tüm siparişler",
+      "view": "Siparişi gör",
+      "placed": "Alındı",
+      "confirmed": "Onaylandı",
+      "shipped": "Gönderildi",
+      "outForDelivery": "Dağıtımda",
+      "delivered": "Teslim edildi",
+      "cancelled": "İptal edildi",
+      "refunded": "İade edildi",
+      "failed": "Kurye teslim edemedi: {reason}.",
+      "retryOn": "Sonraki deneme: {date}.",
+      "now": {
+        "label": "şu an",
+        "placed": "Siparişinizi aldık, yakında onaylayacağız.",
+        "confirmed": "Siparişiniz onaylandı ve hazırlanıyor.",
+        "shipped": "Paketiniz mağazadan çıktı.",
+        "outForDelivery": "Kurye paketinizi getiriyor.",
+        "delivered": "Paketiniz teslim edildi.",
+        "cancelled": "Bu sipariş iptal edildi.",
+        "refunded": "Bu siparişin ücreti iade edildi."
+      }
+    }
   },
   "stores": {
     "title": "Mağazalar",

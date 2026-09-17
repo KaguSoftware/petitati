@@ -17,7 +17,7 @@ export function CartViewBold({ cart, totals, currency, locale, labels, lineContr
         <h1 className="mb-8 text-4xl font-extrabold tracking-tight uppercase @tablet:text-6xl">{labels.title}</h1>
         {cart.lines.length === 0 && (
           <div className="flex flex-col items-center gap-6 border-4 border-foreground px-4 py-20 text-center">
-            <p className="text-xl font-bold tracking-wide uppercase">{labels.empty}</p>
+            <p className="font-heading text-xl font-bold tracking-wide uppercase">{labels.empty}</p>
             <Link href={shopHref} className={cn(buttonVariants({ variant: "outline", size: "xl" }), bigButton, "border-2 border-foreground")}>
               {labels.continueShopping}
             </Link>
@@ -77,7 +77,7 @@ function Row({ label, value, strong, muted }: { label: string; value: string; st
   return (
     <div className={cn("flex justify-between gap-4", strong && "items-baseline text-base font-extrabold uppercase", muted && "text-inverse-foreground/70")}>
       <dt>{label}</dt>
-      <dd className={cn("text-end tabular-nums", strong && "text-4xl tracking-tight")}>{value}</dd>
+      <dd className={cn("text-end tabular-nums", strong && "font-heading text-4xl tracking-tight")}>{value}</dd>
     </div>
   );
 }

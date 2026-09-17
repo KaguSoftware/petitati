@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LogoUploader } from "@/components/admin/design/logo-uploader";
 import { ThemeEditor } from "@/components/admin/design/theme-editor";
+import { DesignCollapseAll } from "@/components/admin/design/design-sections";
 import { PageHeader } from "@/components/admin/shared/page-header";
 import { TableSkeleton } from "@/components/admin/shared/table-skeleton";
 import { requireAdminPage } from "@/lib/admin/context";
@@ -14,7 +15,7 @@ export default async function DesignPage({ params }: PageProps<"/[locale]/admin/
   const t = await getTranslations("admin");
   return (
     <>
-      <PageHeader title={t("nav.design")} description={t("design.description")} />
+      <PageHeader title={t("nav.design")} description={t("design.description")} actions={<DesignCollapseAll labels={{ expand: t("design.expandAll"), collapse: t("design.collapseAll") }} />} />
       <Suspense fallback={<TableSkeleton />}>
         <Content locale={locale} />
       </Suspense>

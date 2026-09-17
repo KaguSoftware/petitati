@@ -4,7 +4,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
 import { requireCompleteProfile } from "@/lib/auth/session";
 import { signOutAction } from "@/lib/auth/actions";
-import { getMyAddresses, getMyOrders, getMyWishlistProducts } from "@/lib/account/queries";
+import { getMyAddresses, getMyOrders, getMyWishlistProducts, getOrderTracking } from "@/lib/account/queries";
+import { isActiveOrder } from "@/lib/account/tracking";
 import { AccountPanels } from "@/components/storefront/account/account-panels";
 import { AddressesPanel, OrdersPanel, ProfilePanel, WishlistPanel } from "@/components/storefront/account/panels";
 import { Button } from "@/components/ui/button";
@@ -48,10 +49,11 @@ async function AccountContent({ params, children }: { params: LayoutProps<"/[loc
   const ctx = await storeContext(params);
   const { store, locale, fallback } = ctx;
   const user = await requireCompleteProfile(locale, `/${locale}/account`);
-  const [t, tn, orders, addresses, wishlist] = await Promise.all([
+  const [t, tn, [orders, tracking], addresses, wishlist] = await Promise.all([
     getTranslations("account"),
     getTranslations("nav"),
-    getMyOrders(store.id),
+    // Tracking only for orders still on their way; chained so it doesn't hold up the other panels.
+    getMyOrders(store.id).then(async (o) => [o, await getOrderTracking(store.id, o.filter((x) => isActiveOrder(x.status)).map((x) => x.id))] as const),
     getMyAddresses(store.id),
     getMyWishlistProducts(store.id, locale, fallback),
   ]);
@@ -89,7 +91,7 @@ async function AccountContent({ params, children }: { params: LayoutProps<"/[loc
         userCard={userCard}
         signOut={signOut}
         panels={{
-          orders: <OrdersPanel orders={orders} locale={locale} />,
+          orders: <OrdersPanel orders={orders} tracking={tracking} locale={locale} />,
           addresses: <AddressesPanel ctx={ctx} addresses={addresses} />,
           wishlist: <WishlistPanel ctx={ctx} products={wishlist} />,
           profile: <ProfilePanel user={user} locale={locale} />,

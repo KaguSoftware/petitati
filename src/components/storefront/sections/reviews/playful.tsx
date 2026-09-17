@@ -11,7 +11,7 @@ export function ReviewsPlayful({ reviews, ratingAvg, ratingCount, locale, labels
         <h2 className="text-2xl font-bold tracking-tight">{labels.title}</h2>
         {ratingCount > 0 && (
           <div className="flex items-center gap-3 rounded-full bg-accent/20 px-4 py-2 ring-1 ring-foreground/5">
-            <span className="text-2xl font-bold tabular-nums text-accent-foreground">{ratingAvg.toFixed(1)}</span>
+            <span className="font-heading text-2xl font-bold tabular-nums text-accent-foreground">{ratingAvg.toFixed(1)}</span>
             <RatingStars value={ratingAvg} count={ratingCount} size={16} />
           </div>
         )}

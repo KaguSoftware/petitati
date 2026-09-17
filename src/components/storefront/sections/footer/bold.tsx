@@ -28,7 +28,7 @@ export function FooterBold({ storeName, tagline, shopLinks, infoLinks, contact, 
     <footer className="overflow-hidden bg-inverse text-inverse-foreground">
       <TrustStrip items={trustItems} tone="dark" />
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-gutter pt-14 pb-8 @tablet:pt-20">
-        <p aria-hidden className="-mb-2 -ms-[0.05em] truncate text-[21cqw] leading-[0.8] font-extrabold tracking-tighter uppercase @tablet:text-[14cqw] @wide:text-[12rem]">
+        <p aria-hidden className="-mb-2 -ms-[0.05em] truncate font-heading text-[21cqw] leading-[0.8] font-extrabold tracking-tighter uppercase @tablet:text-[14cqw] @wide:text-[12rem]">
           {storeName}
         </p>
         {tagline && <p className="bidi-auto max-w-md text-sm font-medium text-inverse-foreground/70">{tagline}</p>}

@@ -18,8 +18,9 @@ interface Props<Row> {
   rowKey: (row: Row) => string;
   /** Shown instead of the table when `rows` is empty. */
   empty: ReactNode;
-  /** Optional per-row href-like click target is handled by callers via cells; this just styles. */
   className?: string;
+  /** Rows carry a stretched link (a cell link with `after:absolute after:inset-0`), so the whole row is clickable. */
+  linkedRows?: boolean;
 }
 
 const HIDE: Record<NonNullable<Column<unknown>["hideBelow"]>, string> = {
@@ -30,7 +31,7 @@ const HIDE: Record<NonNullable<Column<unknown>["hideBelow"]>, string> = {
 };
 
 /** Server-renderable table with responsive column hiding. Scrolls horizontally via ui/table. */
-export function DataTable<Row>({ columns, rows, rowKey, empty, className }: Props<Row>) {
+export function DataTable<Row>({ columns, rows, rowKey, empty, className, linkedRows }: Props<Row>) {
   if (rows.length === 0) return <>{empty}</>;
   return (
     <div className={cn("overflow-hidden rounded-xl border bg-card", className)}>
@@ -46,7 +47,7 @@ export function DataTable<Row>({ columns, rows, rowKey, empty, className }: Prop
         </TableHeader>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={rowKey(row)}>
+            <TableRow key={rowKey(row)} className={cn(linkedRows && "relative cursor-pointer")}>
               {columns.map((c) => (
                 <TableCell key={c.key} className={cn("py-2.5", c.className, c.hideBelow && HIDE[c.hideBelow])}>
                   {c.cell(row)}

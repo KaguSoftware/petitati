@@ -5,7 +5,8 @@ import { useTranslations } from "next-intl";
 import { startTransition, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CollapsibleCard } from "../shared/collapsible-card";
+import { DESIGN_GROUP } from "./design-sections";
 import { setBrandingAction } from "@/lib/admin/design/actions";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useActionToast } from "../shared/use-action-toast";
@@ -27,10 +28,10 @@ interface Props {
 export function LogoUploader({ storeId, logoUrl, faviconUrl }: Props) {
   const t = useTranslations("admin.design.branding");
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <CollapsibleCard group={DESIGN_GROUP} id="branding" title={t("title")} description={t("description")} contentClassName="grid gap-4 sm:grid-cols-2">
       <BrandingCard storeId={storeId} kind="logo" url={logoUrl} title={t("logo")} description={t("logoHint")} />
       <BrandingCard storeId={storeId} kind="favicon" url={faviconUrl} title={t("favicon")} description={t("faviconHint")} />
-    </div>
+    </CollapsibleCard>
   );
 }
 
@@ -75,12 +76,12 @@ function BrandingCard({ storeId, kind, url, title, description }: { storeId: str
 
   const busy = uploading || pending;
   return (
-    <Card size="sm">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex items-center gap-4">
+    <div className="flex flex-col gap-3 rounded-lg border p-3">
+      <div className="flex flex-col gap-0.5">
+        <h3 className="font-medium">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </div>
+      <div className="flex items-center gap-4">
         <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-lg border bg-[repeating-conic-gradient(var(--color-muted)_0%_25%,transparent_0%_50%)] bg-[length:12px_12px]">
           {url ? (
             // eslint-disable-next-line @next/next/no-img-element -- storage host varies per environment
@@ -109,7 +110,7 @@ function BrandingCard({ storeId, kind, url, title, description }: { storeId: str
             </p>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

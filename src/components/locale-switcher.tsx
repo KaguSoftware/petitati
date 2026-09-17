@@ -68,10 +68,10 @@ export function LocaleSwitcher({ enabled, variant = "full", notice, className }:
         {variant === "compact" ? (
           <>
             <Languages className="text-muted-foreground" />
-            <span className="hidden text-caption font-medium uppercase tracking-wide @tablet:inline">{locale}</span>
+            <span translate="no" className="notranslate hidden text-caption font-medium uppercase tracking-wide @tablet:inline">{locale}</span>
           </>
         ) : (
-          <SelectValue />
+          <SelectValue translate="no" className="notranslate" />
         )}
       </SelectTrigger>
       <SelectContent
@@ -88,7 +88,11 @@ export function LocaleSwitcher({ enabled, variant = "full", notice, className }:
       >
         {items.map((item) => (
           <SelectItem key={item.value} value={item.value}>
-            {item.label}
+            {/* Each name in its own language, kept out of browser page translation: a translated page
+                otherwise turns "Türkçe" into "English" and the menu shows English twice. */}
+            <span lang={item.value} translate="no" className="notranslate">
+              {item.label}
+            </span>
           </SelectItem>
         ))}
       </SelectContent>

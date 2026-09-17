@@ -2,11 +2,12 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { renderSection } from "@/lib/theme/registry";
 import { getTranslations } from "next-intl/server";
+import { ProductCarousel } from "@/components/storefront/shared/product-carousel";
 import type { ProductGridProps } from "../types";
 
-/** Carousel: one row that scrolls sideways and snaps to each card (home sections); a plain grid on listing pages. */
+/** Carousel: a page of cards (one on phones, two, then three) with an arrow on each side (home sections); a plain grid on listing pages. */
 export async function ProductGridPlayful({ title, products, currency, locale, cardVariant, emptyLabel, emptyAction, wishlistSlots, viewAllHref, viewAllLabel, bare }: ProductGridProps) {
-  const t = await getTranslations("product");
+  const [t, th] = await Promise.all([getTranslations("product"), getTranslations("home")]);
   const labels = { new: t("new"), outOfStock: t("outOfStock"), from: t("priceFrom") };
   if (products.length === 0 && !emptyLabel) return null;
   const body =
@@ -26,13 +27,13 @@ export async function ProductGridPlayful({ title, products, currency, locale, ca
         ))}
       </ul>
     ) : (
-      <ul className="bleed-gutter flex snap-x snap-mandatory gap-4 overflow-x-auto pt-2 pb-6 contain-inline-size [scrollbar-width:thin] [mask-image:linear-gradient(to_right,black_92%,transparent)] rtl:[mask-image:linear-gradient(to_left,black_92%,transparent)]">
-        {products.map((p) => (
-          <li key={p.id} className="w-[82%] shrink-0 snap-start @phablet:w-[46%] @desktop:w-[31.5%]">
-            {renderSection("productCard", cardVariant, { product: p, currency, locale, labels, wishlistSlot: wishlistSlots?.[p.id] })}
-          </li>
-        ))}
-      </ul>
+      <ProductCarousel
+        labels={{ previous: th("previousSlide"), next: th("nextSlide"), slideOf: th.raw("slideOf") as string }}
+        items={products.map((p) => ({
+          key: p.id,
+          node: renderSection("productCard", cardVariant, { product: p, currency, locale, labels, wishlistSlot: wishlistSlots?.[p.id] }),
+        }))}
+      />
     );
   if (bare) return body;
   return (

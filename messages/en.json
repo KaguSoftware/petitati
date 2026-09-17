@@ -590,6 +590,30 @@
         "unverified": "Closed without a code",
         "cashOpen": "Cash open",
         "allOrders": "All orders"
+      },
+      "insights": {
+        "items": "Items bought",
+        "distinctProducts": "{count, plural, one {# product} other {# different products}}",
+        "deliveredOf": "{count} delivered",
+        "plusOpen": "+ {amount} on the way",
+        "avgOrder": "Average order",
+        "daysAgo": "{count, plural, =0 {today} one {# day ago} other {# days ago}}",
+        "firstOrder": "First order",
+        "everyDays": "orders every {count, plural, one {day} other {# days}}",
+        "statusTitle": "Orders by status",
+        "noOrders": "No orders yet.",
+        "onTheWay": "On the way",
+        "largestOrder": "Largest order",
+        "refunded": "Refunded",
+        "cancelRate": "Cancelled",
+        "monthlyTitle": "Spend, last 12 months",
+        "ordersCount": "{count, plural, one {# order} other {# orders}}",
+        "noSpendYear": "Nothing bought in the last 12 months.",
+        "productsTitle": "Most bought",
+        "noProducts": "Nothing bought yet.",
+        "discounts": "Discounts received",
+        "coupons": "Coupons used",
+        "topCity": "Usual city"
       }
     },
     "coupons": {
@@ -1011,7 +1035,9 @@
         "faviconHint": "Square PNG or ICO up to 512 KB. Shown in the browser tab.",
         "tooLarge": "File is too large (max {max} KB).",
         "uploadFailed": "Upload failed. Please try again.",
-        "replace": "Replace"
+        "replace": "Replace",
+        "title": "Logo & favicon",
+        "description": "Your store's logo in the header and the little icon in the browser tab."
       },
       "colors": {
         "title": "Colours",
@@ -1324,7 +1350,9 @@
         "maxSlides": "Up to {max} slides.",
         "empty": "No slides yet: the home page shows the default hero.",
         "fallbackNote": "Empty fields on the first slide fall back to the store tagline and the default wording."
-      }
+      },
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all"
     },
     "settings": {
       "description": "Store identity, commerce rules, content pages, shipping and the footer.",
@@ -1843,7 +1871,31 @@
     "deliveredTo": "Handed to {name}",
     "withCode": "confirmed with your code",
     "withoutCode": "confirmed by the courier without a code",
-    "scheduled": "Scheduled for {date}"
+    "scheduled": "Scheduled for {date}",
+    "track": {
+      "current": "Orders on their way",
+      "all": "All orders",
+      "view": "View order",
+      "placed": "Placed",
+      "confirmed": "Confirmed",
+      "shipped": "Shipped",
+      "outForDelivery": "Out for delivery",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded",
+      "failed": "The courier couldn't deliver: {reason}.",
+      "retryOn": "Next try: {date}.",
+      "now": {
+        "label": "now",
+        "placed": "We've got your order and will confirm it soon.",
+        "confirmed": "Your order is confirmed and being packed.",
+        "shipped": "Your parcel has left the shop.",
+        "outForDelivery": "A courier is bringing your parcel.",
+        "delivered": "Your parcel was delivered.",
+        "cancelled": "This order was cancelled.",
+        "refunded": "This order was refunded."
+      }
+    }
   },
   "stores": {
     "title": "Stores",

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { fontStack } from "./fonts";
+import { DEFAULT_FONT, fontStack } from "./fonts";
 
 /** Every storefront section that has four interchangeable variants. */
 export const SECTION_KEYS = [
@@ -65,7 +65,7 @@ export const DEFAULT_THEME: StoreTheme = {
     muted: "#f5f5f4",
     mutedForeground: "#57534e",
   },
-  fonts: { heading: "IBM Plex Sans Arabic", body: "IBM Plex Sans Arabic" },
+  fonts: { heading: DEFAULT_FONT, body: DEFAULT_FONT },
   radius: "0.75rem",
   announcement: {},
 };

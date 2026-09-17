@@ -21,8 +21,8 @@ export function FooterEditorial({ storeName, tagline, shopLinks, infoLinks, cont
       <TrustStrip items={trustItems} tone="hairline" />
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-8 px-gutter py-14 text-center @tablet:py-20">
         <div className="flex flex-col items-center gap-3">
-          <p className="font-serif text-4xl font-medium tracking-tight @tablet:text-5xl">{storeName}</p>
-          {tagline && <p className="bidi-auto max-w-md font-serif text-base italic text-muted-foreground">{tagline}</p>}
+          <p className="font-heading text-4xl font-medium tracking-tight @tablet:text-5xl">{storeName}</p>
+          {tagline && <p className="bidi-auto max-w-md font-heading text-base italic text-muted-foreground">{tagline}</p>}
         </div>
         <nav aria-label={labels.shop} className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
           {items.map((item, i) => (
@@ -61,7 +61,7 @@ export function FooterEditorial({ storeName, tagline, shopLinks, infoLinks, cont
               <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
                 <span className="text-xs uppercase tracking-[0.18em]">{labels.hours}</span>
                 <Dot />
-                <span className="bidi-auto font-serif italic">{contact.hours.split(/\r?\n/).join(" · ")}</span>
+                <span className="bidi-auto font-heading italic">{contact.hours.split(/\r?\n/).join(" · ")}</span>
               </p>
             )}
           </div>

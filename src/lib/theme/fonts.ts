@@ -58,13 +58,16 @@ export const FONTS: Record<FontOption, FontMeta> = {
   "Markazi Text": { cssVar: "--font-markazi", generic: "serif", arabic: true, latinPair: "Playfair Display" },
 };
 
+/** The default theme font, and the fallback for a stored name that is no longer offered. */
+export const DEFAULT_FONT: FontOption = "IBM Plex Sans Arabic";
+
 export function isFontOption(name: string): name is FontOption {
   return (FONT_OPTIONS as readonly string[]).includes(name);
 }
 
 /** `font-family` value for the font itself (used by the editor's preview). */
 export function fontFamily(name: string): string {
-  const key = isFontOption(name) ? name : "Inter";
+  const key = isFontOption(name) ? name : DEFAULT_FONT;
   return `var(${FONTS[key].cssVar}), ${FONTS[key].generic}`;
 }
 
@@ -78,7 +81,7 @@ const ARABIC_SCRIPT_LOCALES: readonly string[] = ["fa", "ar", "ur"];
  * fallback, then the generic family.
  */
 export function fontStack(name: string, locale = "en"): string {
-  const key = isFontOption(name) ? name : "Inter";
+  const key = isFontOption(name) ? name : DEFAULT_FONT;
   const meta = FONTS[key];
   const arabicLocale = ARABIC_SCRIPT_LOCALES.includes(locale);
   const chain: FontOption[] = meta.arabic && !arabicLocale && meta.latinPair ? [meta.latinPair, key] : [key];

@@ -11,7 +11,7 @@ export function ReviewsMinimal({ reviews, ratingAvg, ratingCount, locale, labels
         <h2 className="text-2xl font-semibold tracking-tight">{labels.title}</h2>
         {ratingCount > 0 && (
           <div className="flex items-center gap-3">
-            <span className="text-4xl font-semibold tabular-nums">{ratingAvg.toFixed(1)}</span>
+            <span className="font-heading text-4xl font-semibold tabular-nums">{ratingAvg.toFixed(1)}</span>
             <RatingStars value={ratingAvg} count={ratingCount} size={18} />
           </div>
         )}

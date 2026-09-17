@@ -4,7 +4,6 @@ import { ExternalLink, Monitor, RotateCcw, Smartphone } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { OverlayScroll } from "@/components/ui/overlay-scroll";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -23,7 +22,9 @@ import { composeHome, gridCombo, type SectionPreviews } from "@/lib/theme/previe
 import { PREVIEW_STORE_SLUG } from "@/lib/theme/preview-slug";
 import { type SectionKey, type StoreTheme, type VariantKey } from "@/lib/theme/types";
 import { cn } from "@/lib/utils";
+import { CollapsibleCard } from "../shared/collapsible-card";
 import { useActionToast } from "../shared/use-action-toast";
+import { DESIGN_GROUP } from "./design-sections";
 import { ColorField } from "@/components/admin/color-field";
 import { HeroCard } from "./hero-card";
 import { PreviewFrame, type PreviewDevice } from "./preview-frame";
@@ -137,12 +138,7 @@ export function ThemeEditor({ storeId, storeName, currency, locale, theme, hero,
             <HeroCard storeId={storeId} locale={locale} locales={textLocales} hero={draft.hero} onChange={(h) => setDraft((d) => ({ ...d, hero: h }))} />
 
             {/* Colours */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("colors.title")}</CardTitle>
-                <CardDescription>{t("colors.description")}</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4 sm:grid-cols-2">
+            <CollapsibleCard group={DESIGN_GROUP} id="colors" title={t("colors.title")} description={t("colors.description")} contentClassName="grid gap-4 sm:grid-cols-2">
                 {THEME_COLOR_KEYS.map((key) => (
                   <ColorField
                     key={key}
@@ -154,16 +150,10 @@ export function ThemeEditor({ storeId, storeName, currency, locale, theme, hero,
                     onChange={(hex) => patch({ colors: { ...draft.theme.colors, [key]: hex } })}
                   />
                 ))}
-              </CardContent>
-            </Card>
+            </CollapsibleCard>
 
             {/* Radius + fonts */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("shape.title")}</CardTitle>
-                <CardDescription>{t("shape.description")}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-5">
+            <CollapsibleCard group={DESIGN_GROUP} id="shape" title={t("shape.title")} description={t("shape.description")} contentClassName="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
                   <Label>{t("shape.radius")}</Label>
                   <RadioGroup value={draft.theme.radius} onValueChange={(v) => patch({ radius: String(v) })} className="grid-cols-2 sm:grid-cols-4">
@@ -202,16 +192,10 @@ export function ThemeEditor({ storeId, storeName, currency, locale, theme, hero,
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground">{t("shape.fontNote")}</p>
-              </CardContent>
-            </Card>
+            </CollapsibleCard>
 
             {/* Announcement */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("announcement.title")}</CardTitle>
-                <CardDescription>{t("announcement.description")}</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <CollapsibleCard group={DESIGN_GROUP} id="announcement" title={t("announcement.title")} description={t("announcement.description")}>
                 <Tabs defaultValue={textLocales.includes(locale) ? locale : textLocales[0]}>
                   <TabsList>
                     {textLocales.map((l) => (
@@ -239,22 +223,12 @@ export function ThemeEditor({ storeId, storeName, currency, locale, theme, hero,
                     </TabsContent>
                   ))}
                 </Tabs>
-              </CardContent>
-            </Card>
+            </CollapsibleCard>
 
             {/* Section layouts */}
-            <Card>
-              <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <CardTitle>{t("sections.title")}</CardTitle>
-                  <CardDescription>{t("sections.description")}</CardDescription>
-                </div>
-                {deviceToggle}
-              </CardHeader>
-              <CardContent>
+            <CollapsibleCard group={DESIGN_GROUP} id="sections" title={t("sections.title")} description={t("sections.description")} headerExtra={deviceToggle}>
                 <SectionPicker theme={draft.theme} dir={dir} locale={locale} device={device} onPick={pick} nodeFor={nodeFor} />
-              </CardContent>
-            </Card>
+            </CollapsibleCard>
           </div>
 
           {/* Live preview: the home page assembled from the chosen layouts */}

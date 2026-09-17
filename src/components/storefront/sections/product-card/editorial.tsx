@@ -23,7 +23,7 @@ export function ProductCardEditorial({ product, currency, locale, labels, wishli
           {eyebrow && product.brand && <span aria-hidden>·</span>}
           {product.brand && <span className="truncate">{product.brand}</span>}
         </p>
-        <Link href={`/p/${product.slug}`} className="line-clamp-2 bidi-auto font-serif text-base font-medium leading-snug transition-colors hover:text-primary @tablet:text-lg">
+        <Link href={`/p/${product.slug}`} className="line-clamp-2 bidi-auto font-heading text-base font-medium leading-snug transition-colors hover:text-primary @tablet:text-lg">
           {product.name}
         </Link>
         <div className="min-h-5">{product.ratingCount > 0 && <RatingStars value={product.ratingAvg} count={product.ratingCount} className="opacity-70" />}</div>

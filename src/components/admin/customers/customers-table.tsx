@@ -27,7 +27,7 @@ export async function CustomersTable({ rows, locale, currency, sort, query }: Pr
       header: t("name"),
       cell: (r) => (
         <div className="flex min-w-0 flex-col">
-          <Link href={`/admin/customers/${r.id}`} className="truncate font-medium hover:underline">
+          <Link href={`/admin/customers/${r.id}`} className="truncate font-medium outline-none after:absolute after:inset-0 hover:underline focus-visible:after:rounded-md focus-visible:after:ring-3 focus-visible:after:ring-ring/50">
             {r.full_name ?? r.email}
           </Link>
           <span className="truncate text-xs text-muted-foreground" dir="ltr">
@@ -80,5 +80,5 @@ export async function CustomersTable({ rows, locale, currency, sort, query }: Pr
     },
   ];
   const tc = await getTranslations("admin.common");
-  return <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} empty={<EmptyState title={tc("noResults")} description={tc("noResultsHint")} />} />;
+  return <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} linkedRows empty={<EmptyState title={tc("noResults")} description={tc("noResultsHint")} />} />;
 }

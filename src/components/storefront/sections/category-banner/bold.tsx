@@ -29,7 +29,7 @@ export function CategoryBannerBold({ title, categories }: CategoryBannerProps) {
                   sizes="(min-width: 768px) 50vw, 100vw"
                 />
                 <div className="flex items-center gap-4 px-5 py-6 @tablet:px-10">
-                  <span className="text-3xl leading-none font-extrabold tracking-tight uppercase @tablet:text-5xl @desktop:text-6xl">{c.name}</span>
+                  <span className="font-heading text-3xl leading-none font-extrabold tracking-tight uppercase @tablet:text-5xl @desktop:text-6xl">{c.name}</span>
                   <ArrowRight aria-hidden className="size-8 shrink-0 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1 @tablet:size-10" />
                 </div>
               </Link>

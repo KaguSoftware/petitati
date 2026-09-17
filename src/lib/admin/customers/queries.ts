@@ -3,7 +3,7 @@ import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { ListParams } from "@/lib/admin/list-params";
 import type { AddressRow } from "@/lib/db/types";
-import type { CustomerDetail, CustomerSort, CustomerStatsRow, MarketingFilter } from "./types";
+import type { CustomerDetail, CustomerInsights, CustomerSort, CustomerStatsRow, MarketingFilter } from "./types";
 
 /** Strip characters that would break a PostgREST `or()` filter. */
 function safeLike(q: string) {
@@ -81,4 +81,15 @@ export async function getCustomer(storeId: string, id: string): Promise<Customer
     .returns<AddressRow[]>();
   if (addrError) throw addrError;
   return { ...data, addresses: addresses ?? [] };
+}
+
+/** The customer page's tracker numbers. Null when the database function is unavailable, so the page still renders. */
+export async function getCustomerInsights(storeId: string, customerId: string): Promise<CustomerInsights | null> {
+  const db = createSupabaseAdminClient();
+  const { data, error } = await db.rpc("customer_insights", { p_store_id: storeId, p_customer_id: customerId });
+  if (error) {
+    console.error("customer_insights", error.message);
+    return null;
+  }
+  return data as CustomerInsights;
 }

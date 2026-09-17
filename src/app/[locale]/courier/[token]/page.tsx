@@ -5,6 +5,8 @@ import { isLocale } from "@/i18n/config";
 import { courierContext, getCourierStops } from "@/lib/courier/context";
 import { deliveryFromSettings } from "@/lib/delivery/settings";
 import { themeToCssVars } from "@/lib/theme/types";
+import { fontStack } from "@/lib/theme/fonts";
+import { StoreFontVars } from "@/components/storefront/store-font-vars";
 import { formatMoney } from "@/lib/money";
 import { StopList } from "@/components/courier/stop-list";
 import { StartRunButton } from "@/components/courier/start-run-button";
@@ -38,12 +40,13 @@ async function Content({ params }: { params: Props["params"] }) {
   const canStart = open.some((s) => s.state === "assigned");
 
   return (
-    <main data-store-theme style={themeToCssVars(ctx.store.theme, locale) as React.CSSProperties} className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4 pb-16">
+    <main data-store-theme style={themeToCssVars(ctx.store.theme, locale) as React.CSSProperties} className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4 pb-16 font-sans">
+      <StoreFontVars body={fontStack(ctx.store.theme.fonts.body, locale)} heading={fontStack(ctx.store.theme.fonts.heading, locale)} />
       <header className="flex flex-col gap-3 rounded-xl border bg-card p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate text-sm text-muted-foreground">{ctx.store.name}</p>
-            <h1 className="truncate text-xl font-semibold tracking-tight">{ctx.courier.name}</h1>
+            <h1 className="truncate font-heading text-xl font-semibold tracking-tight">{ctx.courier.name}</h1>
           </div>
           <p className="shrink-0 text-sm text-muted-foreground tabular-nums">
             {dateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short" }).format(new Date())}

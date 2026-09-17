@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { storeContext, type StoreContext } from "@/lib/tenant/context";
-import { getOrderForViewer } from "@/lib/account/queries";
+import { getOrderForViewer, getOrderTracking } from "@/lib/account/queries";
+import { trackOrder } from "@/lib/account/tracking";
+import { OrderTracker } from "@/components/storefront/shared/order-tracker";
 import { getOrderDeliveries } from "@/lib/account/delivery";
 import { DeliveryProgress } from "@/components/storefront/shared/delivery-progress";
 import { formatMoney } from "@/lib/money";
@@ -33,12 +35,13 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/[l
 
 async function OrderContent({ ctx, id, searchParams }: { ctx: StoreContext; id: string; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { store, locale, fallback } = ctx;
-  const [t, ts, tc, order, deliveries, sp] = await Promise.all([
+  const [t, ts, tc, order, deliveries, tracking, sp] = await Promise.all([
     getTranslations("order"),
     getTranslations("orderStatus"),
     getTranslations("cart"),
     getOrderForViewer(store.id, id),
     getOrderDeliveries(store.id, id),
+    getOrderTracking(store.id, [id]),
     searchParams,
   ]);
   if (!order) notFound();
@@ -79,6 +82,10 @@ async function OrderContent({ ctx, id, searchParams }: { ctx: StoreContext; id: 
           <p className="text-sm text-muted-foreground">{t("deliveryCodeHint")}</p>
         </section>
       )}
+
+      <section className="rounded-xl border p-4">
+        <OrderTracker tracking={trackOrder(order, tracking[id])} locale={locale} />
+      </section>
 
       <DeliveryProgress attempts={deliveries} locale={locale} />
 

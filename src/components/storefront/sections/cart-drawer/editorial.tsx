@@ -12,10 +12,10 @@ export function CartViewEditorial({ cart, totals, currency, locale, labels, line
   const money = (n: number) => formatMoney(n, currency, locale);
   return (
     <main className="mx-auto max-w-2xl px-gutter py-12 @tablet:py-16">
-      <h1 className="mb-8 border-b border-foreground/15 pb-4 text-center font-serif text-4xl font-medium tracking-tight @tablet:text-5xl">{labels.title}</h1>
+      <h1 className="mb-8 border-b border-foreground/15 pb-4 text-center font-heading text-4xl font-medium tracking-tight @tablet:text-5xl">{labels.title}</h1>
       {cart.lines.length === 0 ? (
         <div className="flex flex-col items-center gap-5 py-20 text-center">
-          <p className="font-serif text-lg italic text-muted-foreground">{labels.empty}</p>
+          <p className="font-heading text-lg italic text-muted-foreground">{labels.empty}</p>
           <Link href={shopHref} className={cn(textLink, "border-b border-foreground pb-1 text-foreground hover:border-primary hover:text-primary")}>
             {labels.continueShopping}
           </Link>
@@ -30,11 +30,11 @@ export function CartViewEditorial({ cart, totals, currency, locale, labels, line
                 </Link>
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <div className="flex items-baseline gap-2">
-                    <Link href={`/p/${l.productSlug}`} className="font-serif text-lg font-medium leading-snug transition-colors hover:text-primary">
+                    <Link href={`/p/${l.productSlug}`} className="font-heading text-lg font-medium leading-snug transition-colors hover:text-primary">
                       {l.name}
                     </Link>
                     <span aria-hidden className="mb-1 flex-1 border-b border-dotted border-foreground/30" />
-                    <span className="font-mono text-sm tabular-nums">{money(l.lineTotal)}</span>
+                    <span className="text-sm tabular-nums">{money(l.lineTotal)}</span>
                   </div>
                   {l.variantLabel && <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">{l.variantLabel}</p>}
                   <div className="pt-2">{lineControls[l.id]}</div>
@@ -43,11 +43,11 @@ export function CartViewEditorial({ cart, totals, currency, locale, labels, line
             ))}
           </ul>
           <div className="border-y border-foreground/15 py-5">{couponSlot}</div>
-          <dl className="flex flex-col gap-2 font-mono text-sm">
+          <dl className="flex flex-col gap-2 text-sm">
             <Row label={labels.subtotal} value={money(totals.subtotal)} />
             {totals.discount > 0 && <Row label={labels.discount} value={`−${money(totals.discount)}`} />}
             <Row label={labels.shipping} value={totals.shipping === 0 ? labels.freeShipping : money(totals.shipping)} />
-            {labels.shippingNote && <p className="font-sans text-xs text-muted-foreground">{labels.shippingNote}</p>}
+            {labels.shippingNote && <p className="text-xs text-muted-foreground">{labels.shippingNote}</p>}
             {totals.tax > 0 && <Row label={labels.tax} value={money(totals.tax)} muted />}
             <Row label={labels.total} value={money(totals.total)} strong />
           </dl>
@@ -68,9 +68,9 @@ export function CartViewEditorial({ cart, totals, currency, locale, labels, line
 function Row({ label, value, strong, muted }: { label: string; value: string; strong?: boolean; muted?: boolean }) {
   return (
     <div className={cn("flex items-baseline gap-2", muted && "text-muted-foreground", strong && "mt-2 border-t border-foreground pt-3 text-base")}>
-      <dt className={cn("font-sans text-xs uppercase tracking-[0.15em]", strong ? "text-foreground" : "text-muted-foreground")}>{label}</dt>
+      <dt className={cn("text-xs uppercase tracking-[0.15em]", strong ? "text-foreground" : "text-muted-foreground")}>{label}</dt>
       <span aria-hidden className="mb-1 flex-1 border-b border-dotted border-foreground/30" />
-      <dd className={cn("text-end tabular-nums", strong && "font-serif text-2xl font-medium")}>{value}</dd>
+      <dd className={cn("text-end tabular-nums", strong && "font-heading text-2xl font-medium")}>{value}</dd>
     </div>
   );
 }

@@ -11,7 +11,7 @@ export async function ProductGridBold({ title, products, currency, locale, cardV
   const body =
     products.length === 0 ? (
       <div className="flex flex-col items-center gap-4 border-4 border-foreground py-16 text-center">
-        <p className="text-lg font-bold tracking-wide uppercase">{emptyLabel}</p>
+        <p className="font-heading text-lg font-bold tracking-wide uppercase">{emptyLabel}</p>
         {emptyAction}
       </div>
     ) : (

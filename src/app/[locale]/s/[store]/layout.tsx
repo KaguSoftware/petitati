@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { NAVBAR_VARS, themeToCssVars } from "@/lib/theme/types";
+import { fontStack } from "@/lib/theme/fonts";
 import { storeContext } from "@/lib/tenant/context";
 import { StoreProvider } from "@/components/storefront/store-provider";
 import { StoreChrome } from "@/components/storefront/store-chrome";
+import { StoreFontVars } from "@/components/storefront/store-font-vars";
 import { cn } from "@/lib/utils";
 
 /**
@@ -30,6 +32,8 @@ export default async function StoreLayout({ children, params }: LayoutProps<"/[l
         className={cn("flex min-h-screen flex-col bg-background font-sans text-foreground *:w-full", NAVBAR_VARS[store.theme.sections.navbar])}
         style={themeToCssVars(store.theme, locale) as React.CSSProperties}
       >
+        {/* Portals (sheets, dialogs, menus, toasts) render outside this div: mirror the fonts onto <html>. */}
+        <StoreFontVars body={fontStack(store.theme.fonts.body, locale)} heading={fontStack(store.theme.fonts.heading, locale)} />
         <StoreProvider
         value={{
           id: store.id,

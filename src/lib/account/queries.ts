@@ -4,7 +4,8 @@ import { cache } from "react";
 import type { Locale } from "@/i18n/config";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getSessionUser } from "@/lib/auth/session";
-import type { AddressRow, OrderItemRow, OrderRow, PaymentRow } from "@/lib/db/types";
+import type { AddressRow, DeliveryFailure, DeliveryState, OrderItemRow, OrderRow, PaymentRow } from "@/lib/db/types";
+import type { TrackingData } from "./tracking";
 import { getProducts } from "@/lib/catalog/queries";
 import type { ProductCardData } from "@/lib/catalog/types";
 
@@ -39,6 +40,40 @@ export const getOrderForViewer = cache(async (storeId: string, orderId: string):
   const user = await getSessionUser();
   if (data.user_id && user?.id !== data.user_id) return null;
   return data;
+});
+
+/**
+ * What the order tracker needs beyond the order rows, for several orders in two queries: each
+ * order's delivery attempts and the moment staff confirmed it. Callers pass ids they may already see.
+ */
+export const getOrderTracking = cache(async (storeId: string, orderIds: string[]): Promise<Record<string, TrackingData>> => {
+  const out: Record<string, TrackingData> = Object.fromEntries(orderIds.map((id) => [id, { attempts: [], confirmedAt: null }]));
+  if (orderIds.length === 0) return out;
+  const db = createSupabaseAdminClient();
+  const [deliveries, events] = await Promise.all([
+    db
+      .from("deliveries")
+      .select("order_id, attempt_no, state, dispatched_at, completed_at, scheduled_for, failure_reason")
+      .eq("store_id", storeId)
+      .in("order_id", orderIds)
+      .order("attempt_no", { ascending: true })
+      .returns<{ order_id: string; attempt_no: number; state: DeliveryState; dispatched_at: string | null; completed_at: string | null; scheduled_for: string | null; failure_reason: DeliveryFailure | null }[]>(),
+    db
+      .from("order_events")
+      .select("order_id, data, created_at")
+      .eq("type", "status_changed")
+      .in("order_id", orderIds)
+      .order("created_at", { ascending: true })
+      .returns<{ order_id: string; data: { to?: string }; created_at: string }[]>(),
+  ]);
+  for (const d of deliveries.data ?? []) {
+    out[d.order_id]?.attempts.push({ state: d.state, dispatchedAt: d.dispatched_at, completedAt: d.completed_at, scheduledFor: d.scheduled_for, failureReason: d.failure_reason });
+  }
+  for (const e of events.data ?? []) {
+    const t = out[e.order_id];
+    if (t && !t.confirmedAt && (e.data?.to === "processing" || e.data?.to === "paid")) t.confirmedAt = e.created_at;
+  }
+  return out;
 });
 
 export const getMyAddresses = cache(async (storeId: string): Promise<AddressRow[]> => {

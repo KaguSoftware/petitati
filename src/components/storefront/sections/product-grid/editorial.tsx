@@ -13,7 +13,7 @@ export async function ProductGridEditorial({ title, products, currency, locale, 
   const body =
     products.length === 0 ? (
       <div className="flex flex-col items-center gap-4 py-12 text-center">
-        <p className="font-serif text-lg italic text-muted-foreground">{emptyLabel}</p>
+        <p className="font-heading text-lg italic text-muted-foreground">{emptyLabel}</p>
         {emptyAction}
       </div>
     ) : (
@@ -30,7 +30,7 @@ export async function ProductGridEditorial({ title, products, currency, locale, 
     <section className="mx-auto max-w-7xl px-gutter py-12 @tablet:py-16">
       {(title || viewAllHref) && (
         <div className="mb-10 flex items-end justify-between gap-6 border-b border-foreground/15 pb-4">
-          {title && <h2 className="font-serif text-3xl font-medium tracking-tight @tablet:text-4xl">{title}</h2>}
+          {title && <h2 className="font-heading text-3xl font-medium tracking-tight @tablet:text-4xl">{title}</h2>}
           {viewAllHref && (
             <Link href={viewAllHref} className="inline-flex shrink-0 items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground">
               {viewAllLabel}

@@ -24,7 +24,7 @@ export function NavbarEditorial({ storeName, logoUrl, categories, labels, cartSl
     { href: "/brands", label: labels.brands },
   ];
   const categoryTree = categoryNavItems(categories);
-  const brand = <StoreLogo storeName={storeName} logoUrl={logoUrl} className="font-serif" wordmarkClassName="text-xl font-medium tracking-normal @tablet:text-2xl" />;
+  const brand = <StoreLogo storeName={storeName} logoUrl={logoUrl} wordmarkClassName="text-xl font-medium tracking-normal @tablet:text-2xl" />;
 
   return (
     <header className="sticky top-0 z-40 border-b border-foreground/15 bg-background">

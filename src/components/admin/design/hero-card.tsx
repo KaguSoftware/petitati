@@ -3,7 +3,6 @@
 import { ArrowDown, ArrowUp, ImageIcon, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,7 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { dirFor, localeNames, type Locale } from "@/i18n/config";
 import { EMPTY_SLIDE, heroLinkSchema, MAX_HERO_SLIDES, type HeroContent, type HeroSlide } from "@/lib/theme/hero";
 import { cn } from "@/lib/utils";
+import { CollapsibleCard } from "../shared/collapsible-card";
 import { ImageUploader } from "../shared/image-uploader";
+import { DESIGN_GROUP } from "./design-sections";
 
 interface Props {
   storeId: string;
@@ -46,12 +47,7 @@ export function HeroCard({ storeId, locale, locales, hero, onChange }: Props) {
   const add = () => slides.length < MAX_HERO_SLIDES && setSlides([...slides, { ...EMPTY_SLIDE }]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>{t("description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-5">
+    <CollapsibleCard group={DESIGN_GROUP} id="hero" title={t("title")} description={t("description")} contentClassName="flex flex-col gap-5">
         {slides.length === 0 && <p className="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">{t("empty")}</p>}
         <ol className="flex flex-col gap-4">
           {slides.map((slide, i) => {
@@ -155,7 +151,6 @@ export function HeroCard({ storeId, locale, locales, hero, onChange }: Props) {
           <p className="text-xs text-muted-foreground">{t("maxSlides", { max: MAX_HERO_SLIDES })}</p>
         </div>
         <p className="text-xs text-muted-foreground">{t("fallbackNote")}</p>
-      </CardContent>
-    </Card>
+    </CollapsibleCard>
   );
 }
