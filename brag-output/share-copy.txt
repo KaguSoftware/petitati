@@ -1,0 +1,2 @@
+Petitati is live: a pet shop that speaks English, Türkçe and فارسی, and runs from its own admin for orders, delivery and design.
+One codebase. Every store. petitati.vercel.app

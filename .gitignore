@@ -49,3 +49,6 @@ next-env.d.ts
 
 # supplier import cache (scripts/zoo): crawled pages, groupings, translations
 /.data/
+
+# hyperframes snapshot output (regenerated on demand)
+brag-*/composition/snapshots/
