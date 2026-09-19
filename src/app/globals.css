@@ -365,6 +365,11 @@ html[dir="rtl"] input[aria-hidden="true"][tabindex="-1"][style*="clip-path"] {
 }
 
 /* ---- Storefront gutters: one horizontal inset for every section/page container ------------- */
+/* Floating things at the bottom of the screen stack above the dock (storefront/shared/dock.ts). */
+@utility bottom-dock {
+  bottom: calc(1rem + var(--dock-h, 0px) + env(safe-area-inset-bottom, 0px));
+}
+
 @utility px-gutter {
   --gutter: 1rem;
   padding-inline: var(--gutter);
@@ -483,4 +488,9 @@ html[dir="rtl"] input[aria-hidden="true"][tabindex="-1"][style*="clip-path"] {
   [dir="rtl"] & {
     line-height: 2;
   }
+}
+
+/* Keep the end of the page reachable while the phone's sticky buy bar covers the bottom. */
+[data-storefront] {
+  padding-bottom: var(--dock-h, 0px);
 }

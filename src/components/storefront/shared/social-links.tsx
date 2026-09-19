@@ -3,7 +3,7 @@ import type { SocialKey } from "@/lib/theme/footer";
 import { cn } from "@/lib/utils";
 
 /** Brand glyphs (lucide ships no brand icons): currentColor, 24-unit box. */
-function Glyph({ name, className }: { name: SocialKey; className?: string }) {
+export function Glyph({ name, className }: { name: SocialKey; className?: string }) {
   const common = { className, viewBox: "0 0 24 24", "aria-hidden": true, focusable: false } as const;
   switch (name) {
     case "instagram":

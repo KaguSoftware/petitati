@@ -17,10 +17,12 @@ interface Props {
   storeSlug: string;
   currency: string;
   locale: string;
+  /** Lets controls outside the panel (the phone's sticky buy bar) submit it through `form=`. */
+  formId?: string;
 }
 
 /** Option pickers → resolved variant → quantity → add. Shared by every product-page variant. */
-export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) {
+export function AddToCartPanel({ product, storeSlug, currency, locale, formId }: Props) {
   const t = useTranslations("product");
   const router = useRouter();
   const defaultVariant = product.variants.find((v) => v.isDefault) ?? product.variants[0];
@@ -45,6 +47,7 @@ export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) 
 
   const selection = useVariantSelection();
   const setSelectedVariant = selection?.setVariantId;
+  const setSharedPending = selection?.setPending;
   useEffect(() => setSelectedVariant?.(variant?.id ?? null), [variant, setSelectedVariant]);
 
   /** The variant this value leads to: same choices elsewhere if that combination exists, else any with the value. */
@@ -78,8 +81,10 @@ export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) 
     {} as CartActionState,
   );
 
+  useEffect(() => setSharedPending?.(pending), [pending, setSharedPending]);
+
   return (
-    <form action={action} className="flex flex-col gap-5">
+    <form id={formId} action={action} className="flex flex-col gap-5">
       <input type="hidden" name="storeSlug" value={storeSlug} />
       {variant && <input type="hidden" name="variantId" value={variant.id} />}
       <input type="hidden" name="quantity" value={qty} />
@@ -137,7 +142,7 @@ export function AddToCartPanel({ product, storeSlug, currency, locale }: Props) 
         </span>
       </div>
 
-      <Button type="submit" size="xl" disabled={!variant || !available || pending} className="w-full">
+      <Button type="submit" size="xl" data-atc-submit disabled={!variant || !available || pending} className="w-full">
         {available ? t("addToCart") : t("outOfStock")}
       </Button>
       {state.error && state.error !== "out_of_stock" && (

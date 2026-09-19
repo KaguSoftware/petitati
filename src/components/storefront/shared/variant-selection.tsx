@@ -4,13 +4,23 @@ import { createContext, useContext, useMemo, useState, type ReactNode } from "re
 
 /**
  * The variant chosen in the purchase panel, shared with the photo gallery that themes render as a
- * sibling. Outside a provider (previews, other pages) nothing is selected and galleries show every photo.
+ * sibling, and with the phone's sticky buy bar (which also mirrors the panel's pending state so a
+ * second tap can't add twice). Outside a provider (previews, other pages) nothing is selected and
+ * galleries show every photo.
  */
-const VariantSelectionContext = createContext<{ variantId: string | null; setVariantId: (id: string | null) => void } | null>(null);
+interface VariantSelection {
+  variantId: string | null;
+  setVariantId: (id: string | null) => void;
+  pending: boolean;
+  setPending: (pending: boolean) => void;
+}
+
+const VariantSelectionContext = createContext<VariantSelection | null>(null);
 
 export function VariantSelectionProvider({ children }: { children: ReactNode }) {
   const [variantId, setVariantId] = useState<string | null>(null);
-  const value = useMemo(() => ({ variantId, setVariantId }), [variantId]);
+  const [pending, setPending] = useState(false);
+  const value = useMemo(() => ({ variantId, setVariantId, pending, setPending }), [variantId, pending]);
   return <VariantSelectionContext.Provider value={value}>{children}</VariantSelectionContext.Provider>;
 }
 

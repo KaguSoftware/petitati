@@ -52,7 +52,8 @@
     "brands": "Markalar",
     "call": "Bizi arayın",
     "translationNotice": "Bu mağaza Türkçedir. Diğer diller otomatik çeviridir ve hata olabilir.",
-    "viewAll": "Tümünü gör"
+    "viewAll": "Tümünü gör",
+    "whatsappChat": "WhatsApp'tan yazın"
   },
   "home": {
     "heroTitle": "Evcil dostunuzun sevdiği her şey",
@@ -106,7 +107,8 @@
     },
     "decreaseQty": "Adedi azalt",
     "increaseQty": "Adedi artır",
-    "rateStars": "5 üzerinden {count} ver"
+    "rateStars": "5 üzerinden {count} ver",
+    "chooseOptions": "Seçenek belirleyin"
   },
   "cart": {
     "title": "Sepetiniz",

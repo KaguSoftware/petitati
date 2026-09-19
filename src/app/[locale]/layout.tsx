@@ -39,6 +39,8 @@ export const metadata: Metadata = {
   title: { default: "Petitati", template: "%s · Petitati" },
 };
 
+const toastBottom = (base: string) => `calc(${base} + var(--dock-h, 0px) + var(--fab-h, 0px) + env(safe-area-inset-bottom, 0px))`;
+
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
@@ -72,7 +74,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <ThemeProvider>
           <AppIntlProvider locale={locale} dir={dir} messages={messages}>
             <Suspense fallback={null}>{children}</Suspense>
-            <Toaster position={dir === "rtl" ? "bottom-left" : "bottom-right"} />
+            {/* Toasts rise above the storefront's bottom dock (sticky buy bar, WhatsApp bubble): see storefront/shared/dock.ts. */}
+            <Toaster position={dir === "rtl" ? "bottom-left" : "bottom-right"} offset={{ bottom: toastBottom("24px") }} mobileOffset={{ bottom: toastBottom("16px") }} />
           </AppIntlProvider>
         </ThemeProvider>
       </body>

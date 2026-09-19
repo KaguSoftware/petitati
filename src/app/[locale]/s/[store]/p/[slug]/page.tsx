@@ -14,6 +14,7 @@ import { ProductGridWithWishlist } from "@/components/storefront/product-grid-wi
 import { ProductEditSlot } from "@/components/storefront/admin/product-edit-slot";
 import { AddToCartPanel } from "@/components/storefront/shared/add-to-cart-panel";
 import { ReviewForm } from "@/components/storefront/shared/review-form";
+import { StickyBuyBar } from "@/components/storefront/shared/sticky-buy-bar";
 import { VariantSelectionProvider } from "@/components/storefront/shared/variant-selection";
 import { GuestWishlistButton, WishlistButton } from "@/components/storefront/shared/wishlist-button";
 
@@ -59,6 +60,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
   const reviews = rawReviews.map((r) => ({ ...r, authorName: r.authorName ?? tc("customer") }));
   const promises = (resolveTrustItems(resolveFooter(store.footer, locale, fallback), tf) ?? []).slice(0, MAX_PROMISES).map((p) => ({ icon: p.icon, title: p.title }));
   const leaf = deepest.at(-1)?.slug;
+  const formId = `atc-${product.id}`;
   // The provider lets the theme's gallery follow the size/colour picked in the purchase panel.
   const page = renderSection("productPage", store.theme.sections.productPage, {
     product,
@@ -78,7 +80,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
       imageOf: t.raw("imageOf") as string,
     },
     promises,
-    purchasePanel: <AddToCartPanel product={product} storeSlug={store.slug} currency={store.currency} locale={locale} />,
+    purchasePanel: <AddToCartPanel product={product} storeSlug={store.slug} currency={store.currency} locale={locale} formId={formId} />,
     wishlistSlot: (
       <Suspense>
         <ProductWishlist storeId={store.id} storeSlug={store.slug} productId={product.id} />
@@ -105,6 +107,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
   return (
     <VariantSelectionProvider>
       {page}
+      <StickyBuyBar product={product} currency={store.currency} locale={locale} formId={formId} />
       {/* Staff see a floating "Edit product" bar; everyone else gets nothing (the slot reads the session). */}
       <Suspense>
         <ProductEditSlot store={store} locale={locale} productId={product.id} />

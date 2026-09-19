@@ -9,6 +9,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { buildFooterProps } from "./footer-props";
 import { AccountMenuFallback, AccountMenuSlot } from "./shared/account-button";
 import { CartButton, CartButtonFallback } from "./shared/cart-button";
+import { ContactBubble } from "./shared/contact-bubble";
 
 /** Footer copyright year. Cached so Cache Components can prerender the chrome; refreshes daily. */
 async function copyrightYear(): Promise<number> {
@@ -74,6 +75,7 @@ export async function StoreChrome({ ctx, children }: { ctx: StoreContext; childr
       </div>
       <div className="flex flex-1 flex-col *:w-full">{children}</div>
       <div className="contents print:hidden">{renderSection("footer", store.theme.sections.footer, footerProps)}</div>
+      {store.footer.social.whatsapp && <ContactBubble href={store.footer.social.whatsapp} label={t("whatsappChat")} />}
     </>
   );
 }

@@ -62,7 +62,7 @@ export function ProductEditDrawer({
     <Sheet open={open} onOpenChange={setOpen}>
       {/* `contents`: the storefront root stretches its direct children (`*:w-full`), and this bar is one. */}
       <div className="contents">
-        <div className="bg-inverse text-inverse-foreground fixed end-4 bottom-4 z-40 flex items-center gap-1 rounded-full p-1.5 shadow-lg ring-1 ring-black/10 print:hidden">
+        <div className="bg-inverse text-inverse-foreground bottom-dock fixed start-4 z-40 flex items-center gap-1 rounded-full p-1.5 shadow-lg ring-1 ring-black/10 print:hidden">
           <SheetTrigger
             render={
               <Button

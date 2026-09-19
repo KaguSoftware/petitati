@@ -52,7 +52,8 @@
     "brands": "Brands",
     "call": "Call us",
     "translationNotice": "This shop is Turkish. Pages are translated automatically and may contain mistakes.",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "whatsappChat": "Chat with us on WhatsApp"
   },
   "home": {
     "heroTitle": "Everything your pet loves",
@@ -106,7 +107,8 @@
     },
     "decreaseQty": "Decrease quantity",
     "increaseQty": "Increase quantity",
-    "rateStars": "Rate {count} out of 5"
+    "rateStars": "Rate {count} out of 5",
+    "chooseOptions": "Choose options"
   },
   "cart": {
     "title": "Your cart",
