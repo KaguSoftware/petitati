@@ -4,6 +4,15 @@ import { storeContext, type StoreContext } from "@/lib/tenant/context";
 import { PageShell } from "@/components/storefront/shared/page-shell";
 import { DeliverForm } from "@/components/storefront/deliver-form";
 import { PageSkeleton } from "@/components/storefront/shared/skeletons";
+import type { Metadata } from "next";
+import { NOINDEX } from "@/lib/seo/urls";
+
+/** One shopper's page: named in the tab, kept out of search. */
+export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]/deliver">): Promise<Metadata> {
+  await storeContext(params);
+  const t = await getTranslations("deliver");
+  return { title: t("title"), robots: NOINDEX };
+}
 
 /**
  * Delivery confirmation for whoever hands the parcel over — reachable without an account at

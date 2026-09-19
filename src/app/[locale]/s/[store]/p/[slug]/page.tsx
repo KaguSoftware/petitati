@@ -1,5 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { pageAlternates, storeUrl } from "@/lib/seo/urls";
+import { breadcrumbLd, JsonLd } from "@/components/storefront/shared/json-ld";
+import { productLd } from "@/lib/seo/product-ld";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { storeContext, type StoreContext } from "@/lib/tenant/context";
@@ -30,10 +33,12 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store
   const { slug } = await params;
   const product = await getProductBySlug(ctx.store.id, slug, ctx.locale, ctx.fallback);
   if (!product) return {};
+  const images = product.images.length ? product.images.map((i) => i.url) : product.imageUrl ? [product.imageUrl] : undefined;
   return {
     title: product.seoTitle ?? product.name,
     description: product.seoDescription ?? product.shortDescription ?? undefined,
-    openGraph: product.imageUrl ? { images: [product.imageUrl] } : undefined,
+    alternates: pageAlternates(ctx.store, ctx.locale, `/p/${product.slug}`),
+    openGraph: { title: product.name, siteName: ctx.store.name, images },
   };
 }
 
@@ -112,6 +117,8 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
   });
   return (
     <VariantSelectionProvider>
+      <JsonLd data={productLd(product, store, locale)} />
+      <JsonLd data={breadcrumbLd([...breadcrumb.map((c) => ({ name: c.label, url: storeUrl(store, locale, c.href) })), { name: product.name, url: storeUrl(store, locale, `/p/${product.slug}`) }])} />
       {page}
       <StickyBuyBar product={product} currency={store.currency} locale={locale} formId={formId} />
       {/* Staff see a floating "Edit product" bar; everyone else gets nothing (the slot reads the session). */}

@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { pageAlternates, storeUrl } from "@/lib/seo/urls";
+import { breadcrumbLd, JsonLd } from "@/components/storefront/shared/json-ld";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
@@ -15,7 +17,13 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store
   const ctx = await storeContext(params);
   const { slug } = await params;
   const category = (await getCategories(ctx.store.id, ctx.locale, ctx.fallback)).find((c) => c.slug === slug);
-  return category ? { title: category.name, description: category.description ?? undefined } : {};
+  if (!category) return {};
+  return {
+    title: category.name,
+    description: category.description ?? undefined,
+    alternates: pageAlternates(ctx.store, ctx.locale, `/c/${category.slug}`),
+    openGraph: { siteName: ctx.store.name, images: category.imageUrl ? [category.imageUrl] : ctx.store.logo_url ? [ctx.store.logo_url] : undefined },
+  };
 }
 
 /**
@@ -31,8 +39,12 @@ export default async function CategoryPage({ params, searchParams }: PageProps<"
   const category = chain.at(-1);
   if (!category) notFound();
 
+  const { store, locale } = ctx;
+  const crumbs = [{ name: tn("shop"), url: storeUrl(store, locale, "/shop") }, ...chain.map((c) => ({ name: c.name, url: storeUrl(store, locale, `/c/${c.slug}`) }))];
+
   return (
     <main>
+      <JsonLd data={breadcrumbLd(crumbs)} />
       <CategoryHero
         title={category.name}
         description={category.description}

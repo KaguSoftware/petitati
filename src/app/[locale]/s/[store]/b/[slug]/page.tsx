@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { pageAlternates } from "@/lib/seo/urls";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
@@ -15,7 +16,12 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store
   const ctx = await storeContext(params);
   const { slug } = await params;
   const brand = (await getBrands(ctx.store.id)).find((b) => b.slug === slug);
-  return brand ? { title: brand.name } : {};
+  if (!brand) return {};
+  return {
+    title: brand.name,
+    alternates: pageAlternates(ctx.store, ctx.locale, `/b/${brand.slug}`),
+    openGraph: { siteName: ctx.store.name, images: brand.logoUrl ? [brand.logoUrl] : ctx.store.logo_url ? [ctx.store.logo_url] : undefined },
+  };
 }
 
 /** Brand listing: every active product of one brand, with the filters minus the brand section. */

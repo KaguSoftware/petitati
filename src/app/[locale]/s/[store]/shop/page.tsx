@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { pageAlternates } from "@/lib/seo/urls";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
 import { PageShell } from "@/components/storefront/shared/page-shell";
@@ -7,9 +8,10 @@ import { ResultsSkeleton } from "@/components/storefront/shared/skeletons";
 import { ProductResults } from "@/components/storefront/listing/product-results";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]/shop">): Promise<Metadata> {
-  await storeContext(params);
+  const { store, locale } = await storeContext(params);
   const t = await getTranslations("shop");
-  return { title: t("title") };
+  // Filters, sort and page live in the query string; the canonical is the bare listing.
+  return { title: t("title"), alternates: pageAlternates(store, locale, "/shop") };
 }
 
 /** The whole catalog; the top-level categories sit in the filter sidebar with counts. */

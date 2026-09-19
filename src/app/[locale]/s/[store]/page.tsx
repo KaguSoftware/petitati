@@ -1,4 +1,7 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
+import { pageAlternates, storeOrigin, storeUrl } from "@/lib/seo/urls";
+import { JsonLd } from "@/components/storefront/shared/json-ld";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
 import { getBestSellers, getBrands, getCategories, getProducts } from "@/lib/catalog/queries";
@@ -11,6 +14,12 @@ import { NewsletterForm } from "@/components/storefront/shared/newsletter-form";
 
 /** One or two cards in a "Best sellers" band read as a broken page; below this the band stays hidden. */
 const MIN_BEST_SELLERS = 4;
+
+export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]">): Promise<Metadata> {
+  const { store, locale } = await storeContext(params);
+  // The layout's title default (the store name) is the home page's title.
+  return { alternates: pageAlternates(store, locale, "/") };
+}
 
 export default async function StoreHome({ params }: PageProps<"/[locale]/s/[store]">) {
   const ctx = await storeContext(params);
@@ -43,8 +52,21 @@ export default async function StoreHome({ params }: PageProps<"/[locale]/s/[stor
     imageUrl: s.imageUrl ?? (i === 0 ? borrowed : null),
   }));
 
+  const sameAs = Object.values(store.footer.social).filter(Boolean);
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: store.name,
+    url: storeUrl(store, locale, "/"),
+    logo: store.logo_url ? new URL(store.logo_url, storeOrigin(store.slug)).href : undefined,
+    email: store.contact_email ?? undefined,
+    telephone: store.contact_phone ?? undefined,
+    sameAs: sameAs.length ? sameAs : undefined,
+  };
+
   return (
     <main>
+      <JsonLd data={organization} />
       {renderSection("hero", store.theme.sections.hero, {
         slides,
         labels: { previous: t("previousSlide"), next: t("nextSlide"), slideOf: t.raw("slideOf") as string, secondary: tn("brands") },

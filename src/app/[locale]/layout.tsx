@@ -35,8 +35,10 @@ const amiri = Amiri({ subsets: ["arabic", "latin"], weight: ["400", "700"], vari
 const markazi = Markazi_Text({ subsets: ["arabic", "latin"], variable: "--font-markazi", preload: false });
 const themeFontClasses = [manrope, dmSans, playfair, notoSansArabic, notoNaskhArabic, cairo, amiri, markazi].map((f) => f.variable).join(" ");
 
+// No brand here: each route group names its own tabs (the storefront uses the store's name, see
+// s/[store]/layout.tsx), so a second tenant never inherits this platform's name.
 export const metadata: Metadata = {
-  title: { default: "Petitati", template: "%s · Petitati" },
+  title: "Petitati",
 };
 
 const toastBottom = (base: string) => `calc(${base} + var(--dock-h, 0px) + var(--fab-h, 0px) + env(safe-area-inset-bottom, 0px))`;

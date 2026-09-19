@@ -9,6 +9,15 @@ import { formatMoney } from "@/lib/money";
 import { CartLineControls } from "@/components/storefront/shared/cart-line-controls";
 import { CouponForm } from "@/components/storefront/shared/coupon-form";
 import { CartSkeleton } from "@/components/storefront/shared/skeletons";
+import type { Metadata } from "next";
+import { NOINDEX } from "@/lib/seo/urls";
+
+/** One shopper's page: named in the tab, kept out of search. */
+export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]/cart">): Promise<Metadata> {
+  await storeContext(params);
+  const t = await getTranslations("cart");
+  return { title: t("title"), robots: NOINDEX };
+}
 
 export default async function CartPage({ params }: PageProps<"/[locale]/s/[store]/cart">) {
   const ctx = await storeContext(params);

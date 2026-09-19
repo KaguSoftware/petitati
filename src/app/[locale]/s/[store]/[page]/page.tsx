@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { pageAlternates } from "@/lib/seo/urls";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
 import { PageShell } from "@/components/storefront/shared/page-shell";
 
 const PAGES = ["privacy", "terms", "about"] as const;
+
+export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]/[page]">): Promise<Metadata> {
+  const { store, locale } = await storeContext(params);
+  const { page } = await params;
+  if (!(PAGES as readonly string[]).includes(page)) return {};
+  const t = await getTranslations("footer");
+  return { title: t(page as (typeof PAGES)[number]), alternates: pageAlternates(store, locale, `/${page}`) };
+}
 
 /**
  * Simple content pages read from store.settings.pages.<key>.<locale> (markdown-ish plain text).

@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { storeOrigin } from "@/lib/seo/urls";
 import { NAVBAR_VARS, themeToCssVars } from "@/lib/theme/types";
 import { fontStack } from "@/lib/theme/fonts";
 import { storeContext } from "@/lib/tenant/context";
@@ -14,10 +15,35 @@ import { MessagesProvider } from "@/components/intl-provider";
  * scheme as CSS variables so every shadcn token inside is re-skinned, exposes store basics to
  * client components via context, and wraps pages in the store's chosen chrome.
  */
-/** Tab icon = the store's favicon when it has one (admin → Design → Branding); otherwise the app icon. */
+/**
+ * Every storefront tab reads "<page> · <store name>" (the root layout carries no brand, so a
+ * second tenant never shows the first one's). Tab icon = the store's favicon when it has one
+ * (admin → Design → Branding), otherwise the app icon. Link previews fall back to the store logo.
+ */
 export async function generateMetadata({ params }: LayoutProps<"/[locale]/s/[store]">): Promise<Metadata> {
   const { store } = await storeContext(params);
-  return store.favicon_url ? { icons: { icon: store.favicon_url } } : {};
+  return {
+    metadataBase: new URL(storeOrigin(store.slug)),
+    title: { default: store.name, template: `%s · ${store.name}` },
+    description: store.tagline ?? undefined,
+    applicationName: store.name,
+    icons: store.favicon_url ? { icon: store.favicon_url } : undefined,
+    openGraph: { siteName: store.name, type: "website", images: store.logo_url ? [store.logo_url] : undefined },
+    twitter: { card: "summary_large_image" },
+  };
+}
+
+/** Phone browser bar in the store's page colour; `viewportFit: cover` makes the safe-area insets real (bottom dock). */
+export async function generateViewport({ params }: LayoutProps<"/[locale]/s/[store]">): Promise<Viewport> {
+  const { store } = await storeContext(params);
+  return {
+    viewportFit: "cover",
+    themeColor: [
+      { media: "(prefers-color-scheme: light)", color: store.theme.colors.background },
+      // Approximates the derived dark ground (globals.css, `.dark [data-store-theme]`), which is a near-black of the brand hue.
+      { media: "(prefers-color-scheme: dark)", color: "#15191c" },
+    ],
+  };
 }
 
 export default async function StoreLayout({ children, params }: LayoutProps<"/[locale]/s/[store]">) {

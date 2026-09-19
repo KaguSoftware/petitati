@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageAlternates } from "@/lib/seo/urls";
 import { Tags } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
@@ -11,9 +12,9 @@ import { EmptyState } from "@/components/storefront/shared/empty-state";
 import { PageShell } from "@/components/storefront/shared/page-shell";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]/brands">): Promise<Metadata> {
-  await storeContext(params);
+  const { store, locale } = await storeContext(params);
   const t = await getTranslations("brands");
-  return { title: t("title") };
+  return { title: t("title"), alternates: pageAlternates(store, locale, "/brands") };
 }
 
 /** Brand index: a tile per brand worth showing (≥ MIN_BRAND_PRODUCTS active products), biggest first, linking to /b/<slug>. */

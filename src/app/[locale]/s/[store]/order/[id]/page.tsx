@@ -19,9 +19,18 @@ import type { OrderStatus } from "@/lib/db/types";
 import { dateTimeFormat } from "@/lib/number";
 import { OrderSkeleton } from "@/components/storefront/shared/skeletons";
 import { cn } from "@/lib/utils";
+import type { Metadata } from "next";
+import { NOINDEX } from "@/lib/seo/urls";
 
 /** Statuses where the delivery code is still worth something to the customer. */
 const DELIVERY_CODE_VISIBLE: OrderStatus[] = ["paid", "processing", "shipped"];
+
+/** One shopper's page: named in the tab, kept out of search. */
+export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]/order/[id]">): Promise<Metadata> {
+  await storeContext(params);
+  const t = await getTranslations("order");
+  return { title: t("title"), robots: NOINDEX };
+}
 
 export default async function OrderPage({ params, searchParams }: PageProps<"/[locale]/s/[store]/order/[id]">) {
   const ctx = await storeContext(params);

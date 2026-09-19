@@ -11,6 +11,15 @@ import { pickJson } from "@/lib/catalog/types";
 import { CheckoutProvider, CheckoutSummary } from "@/components/storefront/checkout/checkout-client";
 import { CheckoutFormConnected } from "@/components/storefront/checkout/checkout-form-connected";
 import { CheckoutSkeleton } from "@/components/storefront/shared/skeletons";
+import type { Metadata } from "next";
+import { NOINDEX } from "@/lib/seo/urls";
+
+/** One shopper's page: named in the tab, kept out of search. */
+export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store]/checkout">): Promise<Metadata> {
+  await storeContext(params);
+  const t = await getTranslations("checkout");
+  return { title: t("title"), robots: NOINDEX };
+}
 
 export default async function CheckoutPage({ params }: PageProps<"/[locale]/s/[store]/checkout">) {
   const ctx = await storeContext(params);

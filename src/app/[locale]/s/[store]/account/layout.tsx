@@ -10,6 +10,15 @@ import { AccountPanels } from "@/components/storefront/account/account-panels";
 import { AddressesPanel, OrdersPanel, ProfilePanel, WishlistPanel } from "@/components/storefront/account/panels";
 import { Button } from "@/components/ui/button";
 import { PageShell } from "@/components/storefront/shared/page-shell";
+import type { Metadata } from "next";
+import { NOINDEX } from "@/lib/seo/urls";
+
+/** One shopper's page: named in the tab, kept out of search. */
+export async function generateMetadata({ params }: LayoutProps<"/[locale]/s/[store]/account">): Promise<Metadata> {
+  await storeContext(params);
+  const t = await getTranslations("account");
+  return { title: t("title"), robots: NOINDEX };
+}
 
 /**
  * Account shell. Loads every section's data in ONE query wave and renders all four panels; the
