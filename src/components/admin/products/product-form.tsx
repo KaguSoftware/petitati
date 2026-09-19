@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useState, type ReactNode } from "react";
+import { UnsavedChangesGuard, useFormDirty } from "@/components/admin/shared/unsaved-changes";
+import { useMemo, useState, type ReactNode, useEffect, useRef } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -70,7 +71,15 @@ export function useProductFieldErrors(raw: Record<string, string> | undefined) {
 
 export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, product, categories, brands, footer, onSaved, returnBase }: Props) {
   const t = useTranslations("admin");
-  const [state, action, pending] = useActionToast(saveProductAction, { errorNamespace: "admin.products", onSuccess: () => onSaved?.() });
+  const { dirty: touched, reset: resetTouched, track } = useFormDirty();
+  const [state, action, pending] = useActionToast(saveProductAction, {
+    errorNamespace: "admin.products",
+    onSuccess: () => {
+      resetTouched();
+      setBaseline(snapshotRef.current);
+      onSaved?.();
+    },
+  });
   const errors = useProductFieldErrors(state.fieldErrors);
 
   const [translations, setTranslations] = useState<Partial<Record<Locale, ProductTranslationInput>>>(() => {
@@ -100,6 +109,15 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
   const [slugTouched, setSlugTouched] = useState(!!product);
   const [status, setStatus] = useState<ProductStatus>(product?.product.status ?? "draft");
 
+  // Controlled fields are compared with what was last saved; checkboxes and variant-free inputs mark `touched`.
+  const snapshot = JSON.stringify({ translations, slug, brandId, tags, featured, bestseller, status });
+  const snapshotRef = useRef(snapshot);
+  useEffect(() => {
+    snapshotRef.current = snapshot;
+  });
+  const [baseline, setBaseline] = useState(snapshot);
+  const dirty = touched || snapshot !== baseline;
+
   const current = translations[activeLocale] ?? EMPTY;
   const missing = enabledLocales.filter((l) => !translations[l]?.name?.trim());
   const statusItems = PRODUCT_STATUSES.map((s) => ({ value: s, label: t(`status.product.${s}`) }));
@@ -115,7 +133,8 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
   const nameError = errors?.name && (state.fieldErrors?.translations ?? defaultLocale) === activeLocale ? { name: errors.name } : undefined;
 
   return (
-    <form action={action} className="flex flex-col gap-6">
+    <form action={action} {...track} className="flex flex-col gap-6">
+      <UnsavedChangesGuard dirty={dirty && !pending} />
       <input type="hidden" name="storeId" value={storeId} />
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="productId" value={product?.product.id ?? ""} />
@@ -245,7 +264,12 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
       {footer ? (
         footer({ pending, submitLabel })
       ) : (
-        <div className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t bg-background/95 px-4 py-3 backdrop-blur md:-mx-6 md:px-6">
+        // An existing product shows its save bar only while there is something to save (like Design);
+        // a new one always does, since Create is the point of the page.
+        <div
+          hidden={!!product && !dirty && !pending}
+          className="sticky bottom-0 -mx-4 flex items-center justify-end gap-2 border-t bg-background/95 px-4 py-3 backdrop-blur md:-mx-6 md:px-6"
+        >
           <Link href="/admin/products" className={buttonVariants({ variant: "ghost" })}>
             {t("common.cancel")}
           </Link>

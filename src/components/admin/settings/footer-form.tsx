@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp, BadgePercent, Gift, Headset, Plus, RotateCcw, ShieldCheck, Trash2, Truck, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { UnsavedChangesGuard } from "@/components/admin/shared/unsaved-changes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -273,6 +274,7 @@ export function FooterForm({ storeId, locale, enabledLocales, footer }: Props) {
           </div>
         </CardContent>
         <CardFooter className="justify-end gap-2">
+          <UnsavedChangesGuard dirty={dirty && !pending} />
           <Button type="button" variant="ghost" disabled={!dirty || pending} onClick={() => setDraft(JSON.parse(saved) as FooterContent)}>
             {tc("cancel")}
           </Button>

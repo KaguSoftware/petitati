@@ -374,7 +374,11 @@
       },
       "selected": "Seçili",
       "selectAll": "Tümünü seç",
-      "selectRow": "Satırı seç"
+      "selectRow": "Satırı seç",
+      "unsavedTitle": "Kaydetmeden çıkılsın mı?",
+      "unsavedBody": "Bu sayfadaki değişiklikleriniz henüz kaydedilmedi. Şimdi çıkarsanız kaybolur.",
+      "unsavedStay": "Kal ve düzenlemeye devam et",
+      "unsavedLeave": "Kaydetmeden çık"
     },
     "roles": {
       "owner": "Sahip",

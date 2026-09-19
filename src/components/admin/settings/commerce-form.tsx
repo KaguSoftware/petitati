@@ -12,13 +12,15 @@ import type { StoreRow } from "@/lib/db/types";
 import { FormField } from "../shared/form-field";
 import { NumberInput } from "../shared/number-input";
 import { useActionToast } from "../shared/use-action-toast";
+import { UnsavedChangesGuard, useFormDirty } from "@/components/admin/shared/unsaved-changes";
 
 type StoreCommerce = Pick<StoreRow, "id" | "currency" | "tax_rate_bp" | "prices_include_tax" | "low_stock_threshold">;
 
 export function CommerceForm({ store, locale }: { store: StoreCommerce; locale: string }) {
   const t = useTranslations("admin.settings.commerce");
   const tc = useTranslations("admin.common");
-  const [state, action, pending] = useActionToast(updateStoreCommerceAction, { errorNamespace: "admin.settings" });
+  const { dirty, reset: resetDirty, track } = useFormDirty();
+  const [state, action, pending] = useActionToast(updateStoreCommerceAction, { errorNamespace: "admin.settings", onSuccess: () => resetDirty() });
   const errors = state.fieldErrors;
   const currencyName = (code: string) => {
     try {
@@ -29,7 +31,8 @@ export function CommerceForm({ store, locale }: { store: StoreCommerce; locale: 
   };
 
   return (
-    <form action={action} className="flex flex-col gap-6">
+    <form action={action} {...track} className="flex flex-col gap-6">
+      <UnsavedChangesGuard dirty={dirty && !pending} />
       <input type="hidden" name="storeId" value={store.id} />
       <Card>
         <CardHeader>

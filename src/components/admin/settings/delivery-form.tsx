@@ -14,6 +14,7 @@ import { updateDeliverySettingsAction } from "@/lib/admin/settings/actions";
 import { MAX_SLOTS, type DeliverySettings, type DeliverySlot } from "@/lib/delivery/settings";
 import type { Locale } from "@/i18n/config";
 import { useActionToast } from "../shared/use-action-toast";
+import { UnsavedChangesGuard, useFormDirty } from "@/components/admin/shared/unsaved-changes";
 
 interface Props {
   storeId: string;
@@ -26,7 +27,8 @@ export function DeliveryForm({ storeId, settings, locale }: Props) {
   const t = useTranslations("admin.settings.delivery");
   const tc = useTranslations("admin.common");
   const [slots, setSlots] = useState<DeliverySlot[]>(settings.slots);
-  const [state, action, pending] = useActionToast(updateDeliverySettingsAction, { errorNamespace: "admin.settings", successMessage: tc("saved") });
+  const { dirty, reset: resetDirty, track } = useFormDirty();
+  const [state, action, pending] = useActionToast(updateDeliverySettingsAction, { errorNamespace: "admin.settings", successMessage: tc("saved"), onSuccess: () => resetDirty() });
   const [attemptLimit, setAttemptLimit] = useState(String(settings.attemptLimit));
   const [leadDays, setLeadDays] = useState(String(settings.leadDays));
   const [cod, setCod] = useState(settings.codEnabled);
@@ -43,7 +45,8 @@ export function DeliveryForm({ storeId, settings, locale }: Props) {
   }
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} {...track} className="flex flex-col gap-4">
+      <UnsavedChangesGuard dirty={dirty && !pending} />
       <input type="hidden" name="storeId" value={storeId} />
       <input type="hidden" name="delivery" value={payload} />
 

@@ -3,6 +3,7 @@
 import { ExternalLink, Monitor, RotateCcw, Smartphone } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
+import { UnsavedChangesGuard } from "@/components/admin/shared/unsaved-changes";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { OverlayScroll } from "@/components/ui/overlay-scroll";
@@ -258,6 +259,7 @@ export function ThemeEditor({ storeId, storeName, currency, locale, theme, hero,
           </div>
         </div>
 
+        <UnsavedChangesGuard dirty={dirty && !pending} />
         {/* Sticky save bar: only while there is something to save, so it never covers the picker while browsing. */}
         <div
           hidden={!dirty && !pending}

@@ -374,7 +374,11 @@
       },
       "selected": "Selected",
       "selectAll": "Select all",
-      "selectRow": "Select row"
+      "selectRow": "Select row",
+      "unsavedTitle": "Leave without saving?",
+      "unsavedBody": "Your changes on this page have not been saved yet. If you leave now, they are lost.",
+      "unsavedStay": "Stay and keep editing",
+      "unsavedLeave": "Leave without saving"
     },
     "roles": {
       "owner": "Owner",

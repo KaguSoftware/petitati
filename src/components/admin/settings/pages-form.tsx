@@ -10,6 +10,7 @@ import { updatePagesAction } from "@/lib/admin/settings/actions";
 import { CONTENT_PAGES } from "@/lib/admin/settings/constants";
 import { FormField } from "../shared/form-field";
 import { useActionToast } from "../shared/use-action-toast";
+import { UnsavedChangesGuard, useFormDirty } from "@/components/admin/shared/unsaved-changes";
 
 interface Props {
   storeId: string;
@@ -26,12 +27,14 @@ interface Props {
 export function PagesForm({ storeId, locale, enabledLocales, pages }: Props) {
   const t = useTranslations("admin.settings.pages");
   const tc = useTranslations("admin.common");
-  const [state, action, pending] = useActionToast(updatePagesAction, { errorNamespace: "admin.settings" });
+  const { dirty, reset: resetDirty, track } = useFormDirty();
+  const [state, action, pending] = useActionToast(updatePagesAction, { errorNamespace: "admin.settings", onSuccess: () => resetDirty() });
   const localeTabs = enabledLocales.length ? enabledLocales : [locale];
   const initialLocale = localeTabs.includes(locale) ? locale : localeTabs[0];
 
   return (
-    <form action={action} className="flex flex-col gap-6">
+    <form action={action} {...track} className="flex flex-col gap-6">
+      <UnsavedChangesGuard dirty={dirty && !pending} />
       <input type="hidden" name="storeId" value={storeId} />
       <Card>
         <CardHeader>
