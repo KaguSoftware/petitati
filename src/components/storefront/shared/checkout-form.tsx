@@ -1,6 +1,6 @@
 "use client";
 
-import { cloneElement, isValidElement, useActionState, useEffect, useRef, useState, type ReactElement } from "react";
+import { cloneElement, isValidElement, startTransition, useActionState, useEffect, useRef, useState, type ReactElement } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -82,7 +82,17 @@ export function CheckoutForm({ storeSlug, locale, currency, email, phone, addres
   }, [state]);
 
   return (
-    <form ref={formRef} action={action} className="flex flex-col gap-8">
+    <form
+      ref={formRef}
+      // Submitted by hand rather than through `action=`: React 19 resets a form after its action runs,
+      // which wiped every field the shopper had typed whenever the server rejected one of them.
+      onSubmit={(e) => {
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
+        startTransition(() => action(fd));
+      }}
+      className="flex flex-col gap-8"
+    >
       <p className="-mb-4 text-sm text-muted-foreground">
         <span aria-hidden className="text-destructive">
           *
