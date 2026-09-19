@@ -7,6 +7,8 @@ import { buildSectionPreviews, PREVIEW_STORE_SLUG } from "@/lib/theme/preview";
 import { fixtureHeroSlides } from "@/lib/theme/fixtures";
 import { gridCombo } from "@/lib/theme/preview-compose";
 import { StoreProvider } from "@/components/storefront/store-provider";
+import { MessagesProvider } from "@/components/intl-provider";
+import { clientMessages, STOREFRONT_STAFF_NAMESPACES } from "@/i18n/namespaces";
 
 /**
  * Dev-only visual harness: every section of one variant rendered with fixture data, no database.
@@ -25,8 +27,11 @@ export default async function PreviewPage({ params }: PageProps<"/[locale]/previ
 
   const currency = "TRY";
   const storeName = "Petitati";
-  const [ta, p] = await Promise.all([
+  // Outside `s/[store]`, so it does not inherit the storefront message set; the harness renders
+  // the real sections (plus admin-labelled chrome), so it needs both.
+  const [ta, messages, p] = await Promise.all([
     getTranslations("admin"),
+    clientMessages(locale, STOREFRONT_STAFF_NAMESPACES),
     buildSectionPreviews({ locale, storeName, logoUrl: null, currency, announcement: "Free shipping on orders over ₺2.000", heroSlides: fixtureHeroSlides, gridSize: 8 }),
   ]);
   const store = { id: PREVIEW_STORE_SLUG, slug: PREVIEW_STORE_SLUG, name: storeName, currency, locale, enabledLocales: ["en", "tr", "fa"], logoUrl: null };
@@ -34,6 +39,7 @@ export default async function PreviewPage({ params }: PageProps<"/[locale]/previ
   return (
     <div className="@container">
       <div data-storefront data-store-theme className={cn("flex min-h-screen flex-col bg-background font-sans text-foreground *:w-full", NAVBAR_VARS[v])} style={themeToCssVars(DEFAULT_THEME, locale) as React.CSSProperties}>
+        <MessagesProvider locale={locale} messages={messages}>
         <StoreProvider value={store}>
         {p.announcementBar[v]}
         {p.navbar[v]}
@@ -53,6 +59,7 @@ export default async function PreviewPage({ params }: PageProps<"/[locale]/previ
           {p.newsletter[v]}
           {p.footer[v]}
         </StoreProvider>
+        </MessagesProvider>
       </div>
     </div>
   );

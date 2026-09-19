@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { routing } from "@/i18n/routing";
+import { clientMessages, ROOT_NAMESPACES } from "@/i18n/namespaces";
 import { dirFor, locales, type Locale } from "@/i18n/config";
 import { Toaster } from "@/components/ui/sonner";
 import { AppIntlProvider } from "@/components/intl-provider";
@@ -53,7 +54,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   // controls. IBM Plex Sans Arabic has centred Latin metrics, so neither problem remains.
   const fontFamily = "var(--font-ibm-plex-arabic)";
   // Passed explicitly so the provider never touches request-scoped APIs (keeps the shell static).
-  const messages = (await import(`../../../messages/${locale}.json`)).default;
+  // Only the root set: each route group re-provides its own with `MessagesProvider`, so the public
+  // storefront no longer serializes the admin catalogue into every page. See i18n/namespaces.ts.
+  const messages = await clientMessages(locale, ROOT_NAMESPACES);
 
   return (
     <html

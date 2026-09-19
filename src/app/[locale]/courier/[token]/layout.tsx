@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { clientMessages, COURIER_NAMESPACES } from "@/i18n/namespaces";
+import { MessagesProvider } from "@/components/intl-provider";
 
 /**
  * The courier app's own shell. It sits outside `s/[store]` on purpose: everything under that folder
@@ -13,6 +15,12 @@ export const metadata: Metadata = {
   referrer: "no-referrer",
 };
 
-export default function CourierLayout({ children }: LayoutProps<"/[locale]/courier/[token]">) {
-  return <div className="min-h-screen bg-muted/40 font-sans text-foreground">{children}</div>;
+export default async function CourierLayout({ children, params }: LayoutProps<"/[locale]/courier/[token]">) {
+  const { locale } = await params;
+  const messages = await clientMessages(locale, COURIER_NAMESPACES);
+  return (
+    <MessagesProvider locale={locale} messages={messages}>
+      <div className="min-h-screen bg-muted/40 font-sans text-foreground">{children}</div>
+    </MessagesProvider>
+  );
 }

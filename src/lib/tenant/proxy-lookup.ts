@@ -5,6 +5,7 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
+import { DB_TIMEOUT_MS, withTimeout } from "@/lib/http/timeout-fetch";
 
 const TTL_MS = 60_000;
 const cache = new Map<string, { value: string | null; expires: number }>();
@@ -17,6 +18,7 @@ function remember(key: string, value: string | null) {
 function client() {
   return createClient(env.supabaseUrl(), env.supabaseServiceRoleKey(), {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: withTimeout(DB_TIMEOUT_MS) },
   });
 }
 

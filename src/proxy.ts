@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { env } from "@/lib/env";
+import { DB_TIMEOUT_MS, withTimeout } from "@/lib/http/timeout-fetch";
 import { storeFromPath, tenantHintFromHost } from "@/lib/tenant/resolve";
 import { lookupDefaultLocale, lookupSlugByHostname } from "@/lib/tenant/proxy-lookup";
 
@@ -83,6 +84,7 @@ function rewriteToStore(url: URL, locale: string, slug: string, rest: string, he
 
 async function refreshSession(request: NextRequest, response: NextResponse) {
   const supabase = createServerClient(env.supabaseUrl(), env.supabaseAnonKey(), {
+    global: { fetch: withTimeout(DB_TIMEOUT_MS) },
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (cookiesToSet) => {

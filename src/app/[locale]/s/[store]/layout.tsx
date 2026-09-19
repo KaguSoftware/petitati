@@ -6,6 +6,8 @@ import { StoreProvider } from "@/components/storefront/store-provider";
 import { StoreChrome } from "@/components/storefront/store-chrome";
 import { StoreFontVars } from "@/components/storefront/store-font-vars";
 import { cn } from "@/lib/utils";
+import { clientMessages, STOREFRONT_NAMESPACES } from "@/i18n/namespaces";
+import { MessagesProvider } from "@/components/intl-provider";
 
 /**
  * Storefront root. Resolves the tenant from the (rewritten) path, injects the store's colour
@@ -21,6 +23,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]/s/[sto
 export default async function StoreLayout({ children, params }: LayoutProps<"/[locale]/s/[store]">) {
   const ctx = await storeContext(params);
   const { store, locale } = ctx;
+  // Shop strings only. The staff edit drawer adds `admin` for itself, for staff only.
+  const messages = await clientMessages(locale, STOREFRONT_NAMESPACES);
 
   // `@container` lives on an outer box: a container query never matches the element that declares
   // it, so the navbar's `@tablet:` variables must sit on a descendant of the container.
@@ -45,7 +49,9 @@ export default async function StoreLayout({ children, params }: LayoutProps<"/[l
           logoUrl: store.logo_url,
         }}
       >
-          <StoreChrome ctx={ctx}>{children}</StoreChrome>
+          <MessagesProvider locale={locale} messages={messages}>
+            <StoreChrome ctx={ctx}>{children}</StoreChrome>
+          </MessagesProvider>
         </StoreProvider>
       </div>
     </div>

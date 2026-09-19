@@ -8,7 +8,7 @@ import { dateField, moneyField, multi, optionalMoneyField, optionalText, parseFo
 import type { CourierRow, DeliveryRow, DeliveryState, OrderRow } from "@/lib/db/types";
 import { markDelivered } from "@/lib/delivery/confirm";
 import { markOrderPaid } from "@/lib/orders/pay";
-import { markShipped } from "@/lib/orders/ship";
+import { markShippedBulk } from "@/lib/orders/ship";
 import { lookupDelivery, type LookupMatch } from "./queries";
 import { deliveryFromSettings } from "@/lib/delivery/settings";
 import { env } from "@/lib/env";
@@ -150,12 +150,18 @@ export async function dispatchDeliveriesAction(_prev: ActionState, formData: For
     const byId = new Map((orders ?? []).map((o) => [o.id, o]));
     const now = new Date().toISOString();
 
-    await db.from("deliveries").update({ state: "out_for_delivery", dispatched_at: now }).in("id", rows.map((d) => d.id));
-    for (const d of rows) {
-      await logDelivery(db, storeId, d.id, "dispatched", user.id, { courier_id: d.courier_id });
-      const order = byId.get(d.order_id);
-      if (order) await markShipped(db, order, user.id, { event: { delivery_id: d.id, courier_id: d.courier_id } });
-    }
+    // One update, one multi-row event insert, one bulk ship — instead of three writes per stop.
+    const stopFor = new Map(rows.filter((d) => byId.has(d.order_id)).map((d) => [d.order_id, d]));
+    await Promise.all([
+      db.from("deliveries").update({ state: "out_for_delivery", dispatched_at: now }).in("id", rows.map((d) => d.id)),
+      db.from("delivery_events").insert(
+        rows.map((d) => ({ store_id: storeId, delivery_id: d.id, type: "dispatched", actor_id: user.id, courier_id: null, data: { courier_id: d.courier_id } })),
+      ),
+    ]);
+    await markShippedBulk(db, [...stopFor.keys()].map((id) => byId.get(id)!), user.id, (o) => {
+      const d = stopFor.get(o.id)!;
+      return { delivery_id: d.id, courier_id: d.courier_id };
+    });
     refresh();
     return { ok: true, changed: rows.length, skipped: deliveryIds.length - rows.length };
   } catch (err) {

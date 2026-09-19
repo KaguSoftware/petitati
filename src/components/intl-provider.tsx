@@ -10,6 +10,9 @@ import { IntlProvider, type AbstractIntlMessages } from "use-intl";
  *
  * `DirectionProvider` tells Base UI (Select, Combobox, Slider, popups…) which way is "start" so
  * keyboard navigation and inline-start/end positioning mirror correctly under `fa`.
+ *
+ * The root gets only the namespaces the error boundaries need; each route group re-provides its own
+ * set with `MessagesProvider`. See src/i18n/namespaces.ts for why.
  */
 export function AppIntlProvider({
   locale,
@@ -25,6 +28,29 @@ export function AppIntlProvider({
   return (
     <IntlProvider locale={locale} messages={messages} timeZone="Europe/Istanbul">
       <DirectionProvider direction={dir}>{children}</DirectionProvider>
+    </IntlProvider>
+  );
+}
+
+/**
+ * Swaps the message set for one subtree. Direction is inherited from `AppIntlProvider` above, so
+ * this deliberately does NOT re-declare `DirectionProvider`.
+ *
+ * A nested `IntlProvider` REPLACES its parent's messages rather than merging them, so whatever is
+ * passed here must cover the whole subtree.
+ */
+export function MessagesProvider({
+  locale,
+  messages,
+  children,
+}: {
+  locale: string;
+  messages: AbstractIntlMessages;
+  children: React.ReactNode;
+}) {
+  return (
+    <IntlProvider locale={locale} messages={messages} timeZone="Europe/Istanbul">
+      {children}
     </IntlProvider>
   );
 }

@@ -13,7 +13,7 @@ import { getShippingRates, salesTag } from "@/lib/catalog/queries";
 import { updateTag } from "next/cache";
 import { computeTotals } from "./totals";
 import { getPaymentProvider } from "@/lib/payments";
-import { sendEmail } from "@/lib/email/send";
+import { queueEmail } from "@/lib/email/send";
 import { OrderConfirmationEmail } from "@/emails/order-confirmation";
 import type { OrderRow } from "@/lib/db/types";
 import { env } from "@/lib/env";
@@ -203,8 +203,10 @@ export async function placeOrderAction(_prev: CheckoutState, formData: FormData)
   await db.from("carts").delete().eq("id", cart.id);
   (await cookies()).delete(cartCookieName(store.slug));
 
+  // Queued, not awaited: the confirmation mail used to sit between the cart delete and the
+  // payment redirect, so the shopper paid for a Resend round trip before they could check out.
   const orderUrl = `${env.appUrl()}/${locale}/order/${order.id}`;
-  await sendEmail({
+  queueEmail({
     to: order.email,
     from: store.email_from,
     subject: `${store.name}: ${order.number}`,

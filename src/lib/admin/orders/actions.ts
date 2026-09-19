@@ -11,7 +11,7 @@ import { confirmDeliveryWithCode, markDelivered } from "@/lib/delivery/confirm";
 import { getProviderByKey } from "@/lib/payments";
 import { notifyCustomer } from "@/lib/orders/notify";
 import { markOrderPaid } from "@/lib/orders/pay";
-import { markShipped } from "@/lib/orders/ship";
+import { markShipped, markShippedBulk } from "@/lib/orders/ship";
 import { canTransition, ORDER_STATUSES, REFUNDABLE, RESTOCK_ON_CANCEL } from "./transitions";
 
 /** Most a single bulk call may touch: one page of the list, with room to spare. */
@@ -248,7 +248,8 @@ export async function bulkUpdateOrderStatusAction(_prev: ActionState, formData: 
     const ids = eligible.map((o) => o.id);
     const now = new Date().toISOString();
     if (status === "shipped") {
-      for (const order of eligible) await markShipped(db, order, user.id, { event: { bulk: true } });
+      // Two writes for the whole selection, not two per order.
+      await markShippedBulk(db, eligible, user.id, () => ({ bulk: true }));
     } else if (status === "delivered") {
       await db.from("orders").update({ status, delivered_at: now, delivered_by: "manual", delivery_attempts: 0 }).in("id", ids);
       await db.from("order_events").insert(eligible.map((o) => ({ order_id: o.id, actor_id: user.id, type: "status_changed", data: { from: o.status, to: status, method: "manual" } })));

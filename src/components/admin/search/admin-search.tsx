@@ -64,6 +64,16 @@ export function AdminSearch({ storeId, locale, canConfirm }: Props) {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
+  // The debounce timer outlives the component otherwise: unmounting the admin shell with a pending
+  // keystroke left a timer that fired globalSearchAction and set state on a gone tree.
+  // Same shape as shared/table-toolbar.tsx.
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
   function search(q: string) {
     if (timer.current) clearTimeout(timer.current);
     if (q.trim().length < 2) {
