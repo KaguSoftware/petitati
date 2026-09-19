@@ -192,6 +192,16 @@ Done (build, typecheck, lint, 25 pgTAP tests green; every flow below verified wi
   | storefront `/s/` segments (180) | 7,528.9 KB -> 1,346.9 KB (-82.1%) | 1,893.5 KB -> 324.3 KB (-82.9%) | 90 -> **0** |
   | courier app (11) | 415.5 KB -> 64.9 KB (-84.4%) | 106.0 KB -> 19.0 KB (-82.1%) | 5 -> **0** |
   | all prerender artifacts (266) | 8,734.1 KB -> 1,733.0 KB (-80.2%) | 2,219.2 KB -> 443.7 KB (-80.0%) | 102 -> **0** |
+  **And measured on the deployed site, before vs after** (`node scripts/perf-probe.mjs`, warm edge cache, wire = brotli as served):
+  | Route | wire before -> after | raw before -> after |
+  |---|---|---|
+  | `/en` | 46.0 -> **28.6 KB** (-37.8%) | 383.7 -> 328.4 KB |
+  | `/en/shop` | 52.2 -> **35.1 KB** (-32.8%) | 442.7 -> 387.5 KB |
+  | `/en/shop?page=2&sort=price_desc` | 53.0 -> **35.7 KB** (-32.6%) | 445.5 -> 390.3 KB |
+  | `/fa` | 50.3 -> **30.4 KB** (-39.6%) | 413.6 -> 337.3 KB |
+  | `/en/brands` | 38.0 -> **20.8 KB** (-45.3%) | 214.0 -> 158.7 KB |
+  i18n reaching the client on `/en`: **68.0 KB -> 11.2 KB**, off-limits namespaces **56.8 KB -> 0**. First-load JS unchanged at 322.7 KB wire, as expected.
+  **Runtime check after deploy** (`node scripts/i18n-split-check.mjs`, Playwright on the msedge channel): guest home/shop/brands/cart/product in en+fa = 0 raw keys, 0 MISSING_MESSAGE, 0 console errors; guest correctly sees no staff pill; testuser signs in, the "Edit product" pill renders, and the drawer's three admin tab labels resolve in BOTH en and fa — which is the check that matters, since that drawer is the one place `admin` strings are needed on a storefront page.
   One storefront route end to end (`/en/s/[store]/account/addresses`, 5 artifacts): **149.2 KB -> 30.6 KB raw, 40.2 KB -> 8.0 KB brotli**. Client JS is **unchanged** (911.0 KB brotli before and after, +0.1 KB noise) — this payload is RSC data, not bundle, so anyone expecting a smaller bundle will not find one. Re-run with `node scripts/perf-probe.mjs` against a deployment; it exits non-zero while any admin/stores/courier string still reaches the storefront.
   **Verified**: `npx tsc --noEmit` 0 errors, `npx eslint src` clean, `next build` compiles and typechecks. **The build's static-generation phase cannot finish on machine 1** — `.env.local` points at `127.0.0.1:54321` and there is no Docker; confirmed identical failure on the unchanged tree by stashing. So nothing has RENDERED here: the byte numbers above come from build artifacts, and a runtime smoke test (storefront in en+fa as guest AND as testuser, checking the staff edit drawer still shows real strings) is owner-side after deploy. Still unmeasured everywhere: Lighthouse / Core Web Vitals (no LCP, CLS or INP number exists for this shop).
   **Deliberately not done** (see the audit at `C:UsersMnS.claudeplanscurried-giggling-liskov.md` for triggers): materializing `v_catalog_products`/`v_customer_stats` (both scan wide but sit behind an hour-long cache; revisit past ~10k rows or a second tenant), a trigram/tsvector index for the `ilike '%…%'` searches, trimming `CARD_SELECT`, rate limiting, RUM, CI budgets, and dropping overlayscrollbars (~28 KB brotli on every public page — a deliberate design call, flagged not argued).
