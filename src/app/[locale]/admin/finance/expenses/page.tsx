@@ -66,7 +66,7 @@ async function Content({ locale, searchParams }: { locale: string; searchParams:
           )}
         </ExpensesFilters>
         <ExpensesTable rows={rows} locale={ctx.locale} currency={currency} storeId={ctx.store.id} categories={categories} sort={{ sort: list.sort, dir: list.dir }} query={query} canWrite={canWrite} />
-        <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/finance/expenses" query={query} labels={{ prev: tc("previous"), next: tc("next") }} />
+        <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/finance/expenses" query={query} labels={{ prev: tc("previous"), next: tc("next"), range: tc.raw("range") as string }} />
       </div>
       {canWrite && <ExpenseCategories storeId={ctx.store.id} categories={categories} />}
     </div>

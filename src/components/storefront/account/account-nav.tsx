@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Heart, MapPin, Package, User } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
@@ -42,6 +43,8 @@ const ITEMS: { key: AccountSection; Icon: typeof Package }[] = [
  * `onSelect`, which swaps the pre-rendered panel locally instead of navigating.
  */
 export function AccountNav({ labels, active, onSelect, signOut }: { labels: Labels; active: AccountSection; onSelect: (section: AccountSection) => void; signOut?: ReactNode }) {
+  // The menu is named "My account", not after its first item.
+  const t = useTranslations("account");
   const handle = (section: AccountSection) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
@@ -51,7 +54,7 @@ export function AccountNav({ labels, active, onSelect, signOut }: { labels: Labe
   return (
     <>
       {/* Phone / tablet */}
-      <nav aria-label={labels.orders} className="-mx-1 overflow-x-auto px-1 pb-1 @tablet:hidden [scrollbar-width:none]">
+      <nav aria-label={t("title")} className="-mx-1 overflow-x-auto px-1 pb-1 @tablet:hidden [scrollbar-width:none]">
         <div className="inline-flex w-max min-w-full items-center gap-1 rounded-xl bg-muted/70 p-1">
           {ITEMS.map(({ key, Icon }) => {
             const isActive = active === key;
@@ -76,7 +79,7 @@ export function AccountNav({ labels, active, onSelect, signOut }: { labels: Labe
       </nav>
 
       {/* Desktop */}
-      <nav aria-label={labels.orders} className="hidden flex-col gap-0.5 @tablet:flex">
+      <nav aria-label={t("title")} className="hidden flex-col gap-0.5 @tablet:flex">
         {ITEMS.map(({ key, Icon }) => {
           const isActive = active === key;
           return (

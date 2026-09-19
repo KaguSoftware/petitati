@@ -10,7 +10,8 @@ const squareBadge = "px-2 py-1 text-micro font-extrabold tracking-widest upperca
 export function ProductCardBold({ product, currency, locale, labels, wishlistSlot }: ProductCardProps) {
   return (
     <article className="group relative flex h-full flex-col border-2 border-foreground bg-background">
-      <Link href={`/p/${product.slug}`} className="relative block overflow-hidden border-b-2 border-foreground">
+      {/* The photo repeats the title link below: one tab stop per card, and screen readers hear the name once. */}
+      <Link tabIndex={-1} aria-hidden href={`/p/${product.slug}`} className="relative block overflow-hidden border-b-2 border-foreground">
         <ProductImage
           src={product.imageUrl}
           alt={product.imageAlt}

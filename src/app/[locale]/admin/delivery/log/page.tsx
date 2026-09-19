@@ -49,7 +49,7 @@ async function Log({ locale, searchParams }: { locale: string; searchParams: Pro
     <>
       <DeliveryLogFilters couriers={couriers.map((c) => ({ id: c.id, name: c.name }))} courierId={courierId} type={type} order={order.data ?? undefined} />
       <DeliveryLogTable rows={rows} locale={ctx.locale} />
-      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/delivery/log" query={query} labels={{ prev: tc("previous"), next: tc("next") }} />
+      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/delivery/log" query={query} labels={{ prev: tc("previous"), next: tc("next"), range: tc.raw("range") as string }} />
     </>
   );
 }

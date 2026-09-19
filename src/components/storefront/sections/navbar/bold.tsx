@@ -1,4 +1,4 @@
-import { Link } from "@/i18n/navigation";
+import { NavLink } from "@/components/storefront/shared/nav-link";
 import { CategoryMenu } from "@/components/storefront/shared/category-menu";
 import { categoryNavItems } from "@/components/storefront/shared/category-nav";
 import { MobileNav } from "@/components/storefront/shared/mobile-nav";
@@ -8,7 +8,7 @@ import { Phone } from "lucide-react";
 import type { NavbarProps } from "../types";
 
 const navLink =
-  "inline-flex shrink-0 items-center border-b-2 border-transparent px-1 py-2 text-xs font-bold tracking-widest whitespace-nowrap uppercase text-inverse-foreground/80 transition-colors hover:border-inverse-foreground hover:text-inverse-foreground focus-visible:border-inverse-foreground focus-visible:text-inverse-foreground focus-ring";
+  "inline-flex shrink-0 items-center border-b-2 border-transparent px-1 py-2 text-xs font-bold tracking-widest whitespace-nowrap uppercase text-inverse-foreground/80 transition-colors hover:border-inverse-foreground hover:text-inverse-foreground focus-visible:border-inverse-foreground focus-visible:text-inverse-foreground focus-ring aria-[current=page]:text-foreground aria-[current=page]:font-medium";
 
 /** Department-store header: search / big centred logo / icons on the first row, a dark full-width bar below with Shop · Categories (mega-menu) · Brands. */
 export function NavbarBold({ storeName, logoUrl, categories, labels, contactPhone, cartSlot, accountSlot, localeSlot }: NavbarProps) {
@@ -53,13 +53,13 @@ export function NavbarBold({ storeName, logoUrl, categories, labels, contactPhon
       </div>
       <nav aria-label={labels.menu} className="hidden bg-inverse text-inverse-foreground @tablet:block">
         <div className="mx-auto flex h-11 max-w-7xl items-center justify-center gap-5 overflow-hidden px-gutter @desktop:gap-8">
-          <Link href="/shop" className={navLink}>
+          <NavLink href="/shop" className={navLink}>
             {labels.shop}
-          </Link>
+          </NavLink>
           <CategoryMenu items={categoryTree} labels={{ categories: labels.categories, viewAll: labels.viewAll }} triggerClassName={navLink} />
-          <Link href="/brands" className={navLink}>
+          <NavLink href="/brands" className={navLink}>
             {labels.brands}
-          </Link>
+          </NavLink>
         </div>
       </nav>
     </header>

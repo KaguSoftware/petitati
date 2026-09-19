@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { NavLink } from "@/components/storefront/shared/nav-link";
 import { CategoryMenu } from "@/components/storefront/shared/category-menu";
 import { categoryNavItems } from "@/components/storefront/shared/category-nav";
 import { MobileNav } from "@/components/storefront/shared/mobile-nav";
@@ -10,7 +11,7 @@ import { cn } from "@/lib/utils";
 import type { NavbarProps } from "../types";
 
 const navLink =
-  "inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all hover:bg-background hover:text-foreground hover:shadow-sm focus-visible:bg-background focus-visible:text-foreground focus-visible:shadow-sm focus-ring";
+  "inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all hover:bg-background hover:text-foreground hover:shadow-sm focus-visible:bg-background focus-visible:text-foreground focus-visible:shadow-sm focus-ring aria-[current=page]:text-foreground aria-[current=page]:font-medium";
 
 /** A floating capsule: the whole header lives in a rounded pill that hovers over the page, with a pill nav (Shop · Categories mega-menu · Brands) inside; icon-only search at @tablet, the field from @desktop. */
 export function NavbarPlayful({ storeName, logoUrl, categories, labels, cartSlot, accountSlot, localeSlot }: NavbarProps) {
@@ -43,13 +44,13 @@ export function NavbarPlayful({ storeName, logoUrl, categories, labels, cartSlot
           className="hidden min-w-0 flex-1 items-center justify-center @tablet:flex @desktop:absolute @desktop:start-1/2 @desktop:flex-none @desktop:-translate-x-1/2 rtl:@desktop:translate-x-1/2"
         >
           <div className="flex min-w-0 items-center gap-1 overflow-hidden rounded-full bg-muted/70 p-1 ring-1 ring-foreground/5">
-            <Link href="/shop" className={navLink}>
+            <NavLink href="/shop" className={navLink}>
               {labels.shop}
-            </Link>
+            </NavLink>
             <CategoryMenu items={categoryTree} labels={{ categories: labels.categories, viewAll: labels.viewAll }} triggerClassName={navLink} />
-            <Link href="/brands" className={navLink}>
+            <NavLink href="/brands" className={navLink}>
               {labels.brands}
-            </Link>
+            </NavLink>
           </div>
         </nav>
         <div className="ms-auto flex items-center gap-0.5 @tablet:gap-1">

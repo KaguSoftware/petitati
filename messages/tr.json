@@ -42,7 +42,8 @@
     "showPassword": "Şifreyi göster",
     "hidePassword": "Şifreyi gizle",
     "capsLockOn": "Caps Lock açık",
-    "clearSearch": "Aramayı temizle"
+    "clearSearch": "Aramayı temizle",
+    "range": "{from}–{to} / {total}"
   },
   "nav": {
     "home": "Ana sayfa",
@@ -60,7 +61,8 @@
     "call": "Bizi arayın",
     "translationNotice": "Bu mağaza Türkçedir. Diğer diller otomatik çeviridir ve hata olabilir.",
     "viewAll": "Tümünü gör",
-    "whatsappChat": "WhatsApp'tan yazın"
+    "whatsappChat": "WhatsApp'tan yazın",
+    "skipToContent": "İçeriğe geç"
   },
   "home": {
     "heroTitle": "Evcil dostunuzun sevdiği her şey",
@@ -117,7 +119,8 @@
     "rateStars": "5 üzerinden {count} ver",
     "chooseOptions": "Seçenek belirleyin",
     "zoomImage": "Fotoğrafı tam ekran gör",
-    "closeImage": "Fotoğrafı kapat"
+    "closeImage": "Fotoğrafı kapat",
+    "saveToWishlist": "İstek listesine kaydet"
   },
   "cart": {
     "title": "Sepetiniz",
@@ -378,7 +381,14 @@
       "unsavedTitle": "Kaydetmeden çıkılsın mı?",
       "unsavedBody": "Bu sayfadaki değişiklikleriniz henüz kaydedilmedi. Şimdi çıkarsanız kaybolur.",
       "unsavedStay": "Kal ve düzenlemeye devam et",
-      "unsavedLeave": "Kaydetmeden çık"
+      "unsavedLeave": "Kaydetmeden çık",
+      "notFoundTitle": "Bulunamadı",
+      "notFoundBody": "Bu sayfa, sipariş ya da ürün yok veya silinmiş.",
+      "backToDashboard": "Panele dön",
+      "crashTitle": "Bu sayfa yüklenemedi",
+      "crashBody": "Bizim tarafımızda bir sorun oldu. Tekrar deneyin; yönetim panelinin geri kalanı çalışıyor.",
+      "retry": "Tekrar dene",
+      "errorRef": "Referans"
     },
     "roles": {
       "owner": "Sahip",
@@ -1984,7 +1994,8 @@
       "verified": "Doğrulandı",
       "unverified": "DNS bekleniyor",
       "makePrimary": "Birincil alan adı olarak kullan",
-      "dns": "{hostname} için {target} adresine bir CNAME kaydı ekleyin."
+      "dns": "{hostname} için {target} adresine bir CNAME kaydı ekleyin.",
+      "removeConfirm": "{hostname} kaldırılsın mı?"
     },
     "errors": {
       "defaultStore": "Varsayılan mağaza bu şekilde değiştirilemez.",
@@ -2247,6 +2258,10 @@
       "failed": "Bir şeyler ters gitti. Tekrar deneyin."
     },
     "find": "Durak bul: sipariş no, ad, sokak…",
-    "noMatch": "Eşleşen durak yok."
+    "noMatch": "Eşleşen durak yok.",
+    "startRunConfirm": {
+      "title": "Dağıtıma başlansın mı?",
+      "body": "{count, plural, one {# paket} other {# paket}} kargoya verildi olarak işaretlenir ve müşterilere yolda olduğu bildirilir."
+    }
   }
 }

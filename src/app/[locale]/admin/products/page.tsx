@@ -73,7 +73,7 @@ async function ProductsList({ locale, searchParams }: { locale: string; searchPa
     getTranslations("admin"),
     ...(plain ? BUCKETS.map((b) => listProducts(ctx.store.id, { ...list, status: b === "all" ? undefined : b, locale: ctx.locale, fallback })) : []),
   ]);
-  const labels = { prev: t("previous"), next: t("next") };
+  const labels = { prev: t("previous"), next: t("next"), range: t.raw("range") as string };
 
   if (plain) {
     const panels = BUCKETS.map((b, i) => {

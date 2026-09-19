@@ -50,7 +50,7 @@ export function HeroCarousel({ slides, labels, autoplay = true, tone = "photo", 
       onClick={dir === "prev" ? prev : next}
       aria-label={dir === "prev" ? labels.previous : labels.next}
       className={cn(
-        "z-10 grid shrink-0 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
+        "z-10 grid shrink-0 place-items-center rounded-full transition-[color,background-color,scale] active:scale-95 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
         ARROW[tone],
         extra,
       )}
@@ -67,16 +67,17 @@ export function HeroCarousel({ slides, labels, autoplay = true, tone = "photo", 
           onClick={() => go(i)}
           aria-label={ofLabel(labels.slideOf, i + 1, count)}
           aria-current={i === active ? "true" : undefined}
-          className={cn("h-2.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", i === active ? cn("w-7", DOT[tone].active) : cn("w-2.5", DOT[tone].idle))}
+          // The dot stays 10 px; the pseudo-element gives a 24 px tap target around it.
+          className={cn("relative h-2.5 rounded-full transition-all before:absolute before:-inset-x-1 before:-inset-y-[7px] before:content-[''] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", i === active ? cn("w-7", DOT[tone].active) : cn("w-2.5", DOT[tone].idle))}
         />
       ))}
     </div>
   );
   const bar = many && (
     <div className={cn("flex items-center justify-center gap-3", controls === "bar" ? "absolute inset-x-0 bottom-4 z-10" : "mt-5", barClassName)}>
-      {arrow("prev", "size-8")}
+      {arrow("prev", "size-10")}
       {dots}
-      {arrow("next", "size-8")}
+      {arrow("next", "size-10")}
     </div>
   );
 

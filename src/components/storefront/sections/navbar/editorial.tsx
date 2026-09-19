@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { NavLink } from "@/components/storefront/shared/nav-link";
 import { CategoryMenu } from "@/components/storefront/shared/category-menu";
 import { categoryNavItems } from "@/components/storefront/shared/category-nav";
 import { MobileNav } from "@/components/storefront/shared/mobile-nav";
@@ -10,7 +11,7 @@ import { cn } from "@/lib/utils";
 import type { NavbarProps } from "../types";
 
 const navLink =
-  "inline-flex shrink-0 items-center px-2.5 py-1.5 text-micro uppercase tracking-[0.18em] whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:underline focus-visible:underline-offset-4 focus-ring";
+  "inline-flex shrink-0 items-center px-2.5 py-1.5 text-micro uppercase tracking-[0.18em] whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:underline focus-visible:underline-offset-4 focus-ring aria-[current=page]:text-foreground aria-[current=page]:font-medium";
 
 /**
  * Split header: Shop · Categories (mega-menu) · Brands on the start side, a centred serif wordmark, the icons on
@@ -43,13 +44,13 @@ export function NavbarEditorial({ storeName, logoUrl, categories, labels, cartSl
             }
           />
           <nav aria-label={labels.menu} className="hidden items-center @tablet:flex">
-            <Link href="/shop" className={navLink}>
+            <NavLink href="/shop" className={navLink}>
               {labels.shop}
-            </Link>
+            </NavLink>
             <CategoryMenu items={categoryTree} labels={{ categories: labels.categories, viewAll: labels.viewAll }} triggerClassName={navLink} />
-            <Link href="/brands" className={navLink}>
+            <NavLink href="/brands" className={navLink}>
               {labels.brands}
-            </Link>
+            </NavLink>
           </nav>
         </div>
         <div className="justify-self-center">{brand}</div>

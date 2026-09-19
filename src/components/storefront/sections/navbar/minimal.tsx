@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { NavLink } from "@/components/storefront/shared/nav-link";
 import { CategoryMenu } from "@/components/storefront/shared/category-menu";
 import { categoryNavItems } from "@/components/storefront/shared/category-nav";
 import { MobileNav } from "@/components/storefront/shared/mobile-nav";
@@ -10,7 +11,7 @@ import { buttonVariants } from "@/components/ui/button";
 import type { NavbarProps } from "../types";
 
 const navLink =
-  "inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground focus-ring";
+  "inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground focus-ring aria-[current=page]:text-foreground aria-[current=page]:font-medium";
 
 /** Classic bar: Shop · Categories (mega-menu with the whole tree) · Brands on the page centre; the search field never truncates its placeholder. */
 export function NavbarMinimal({ storeName, logoUrl, categories, labels, cartSlot, accountSlot, localeSlot }: NavbarProps) {
@@ -44,13 +45,13 @@ export function NavbarMinimal({ storeName, logoUrl, categories, labels, cartSlot
 
         {/* The grid's centre cell, so these sit on the page centre and can never overlap the ends. */}
         <nav aria-label={labels.menu} className="hidden items-center justify-center gap-1 @tablet:flex @desktop:gap-2">
-          <Link href="/shop" className={navLink}>
+          <NavLink href="/shop" className={navLink}>
             {labels.shop}
-          </Link>
+          </NavLink>
           <CategoryMenu items={categoryTree} labels={{ categories: labels.categories, viewAll: labels.viewAll }} triggerClassName={navLink} />
-          <Link href="/brands" className={navLink}>
+          <NavLink href="/brands" className={navLink}>
             {labels.brands}
-          </Link>
+          </NavLink>
         </nav>
 
         <div className="flex shrink-0 items-center justify-end gap-0.5 @tablet:min-w-0 @tablet:gap-1">

@@ -9,7 +9,8 @@ interface Props {
   total: number;
   basePath: string;
   query: Record<string, string | undefined>;
-  labels: { prev: string; next: string; summary?: string };
+  /** `range`: a "{from}–{to} of {total}" template (admin tables) shown instead of "page / pages". */
+  labels: { prev: string; next: string; summary?: string; range?: string };
   className?: string;
 }
 
@@ -38,7 +39,7 @@ export function Pagination({ page, pageSize, total, basePath, query, labels, cla
           {labels.prev}
         </span>
       )}
-      <span className="text-muted-foreground tabular-nums">{labels.summary ?? `${page} / ${pages}`}</span>
+      <span className="text-muted-foreground tabular-nums">{labels.summary ?? (labels.range ? rangeText(labels.range, page, pageSize, total) : `${page} / ${pages}`)}</span>
       {page < pages ? (
         <Link href={href(page + 1)} rel="next" className={cls(false)}>
           {labels.next}
@@ -52,4 +53,11 @@ export function Pagination({ page, pageSize, total, basePath, query, labels, cla
       )}
     </nav>
   );
+}
+
+/** "21–40 of 340" from a template with {from}, {to} and {total}. */
+function rangeText(template: string, page: number, pageSize: number, total: number) {
+  const from = (page - 1) * pageSize + 1;
+  const to = Math.min(total, page * pageSize);
+  return template.replace("{from}", String(from)).replace("{to}", String(to)).replace("{total}", String(total));
 }

@@ -39,7 +39,7 @@ export function ReviewForm({ storeSlug, productId }: { storeSlug: string; produc
             aria-label={t("rateStars", { count: i })}
             aria-pressed={i === rating}
             onClick={() => setRating(i)}
-            className="grid size-11 place-items-center rounded-md transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="grid size-11 place-items-center rounded-md transition-[color,background-color,scale] hover:bg-muted active:scale-90 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Star className={cn("size-5", i <= rating ? "fill-accent text-accent" : "text-muted-foreground/40")} />
           </button>

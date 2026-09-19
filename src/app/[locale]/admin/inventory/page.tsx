@@ -66,7 +66,7 @@ async function StockList({ locale, searchParams }: { locale: string; searchParam
         query={query}
         lowOnly={lowOnly}
       />
-      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/inventory" query={query} labels={{ prev: t("previous"), next: t("next") }} />
+      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/inventory" query={query} labels={{ prev: t("previous"), next: t("next"), range: t.raw("range") as string }} />
     </>
   );
 }

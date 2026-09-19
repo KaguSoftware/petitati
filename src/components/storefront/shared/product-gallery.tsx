@@ -64,7 +64,7 @@ export function ProductGallery({ images: allImages, fallbackAlt, labels, stageCl
       onClick={dir === "prev" ? prev : next}
       aria-label={dir === "prev" ? labels.previous : labels.next}
       className={cn(
-        "absolute top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-card/90 text-foreground shadow-md ring-1 ring-foreground/10 transition-opacity hover:bg-card focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "absolute top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-card/90 text-foreground shadow-md ring-1 ring-foreground/10 transition-[opacity,scale] hover:bg-card active:scale-95 motion-reduce:transition-none focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "@desktop:opacity-0 @desktop:group-hover:opacity-100 @desktop:group-focus-within:opacity-100",
         dir === "prev" ? "start-3" : "end-3",
       )}

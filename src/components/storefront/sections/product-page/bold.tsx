@@ -50,7 +50,7 @@ export function ProductPageBold({ product, breadcrumb, labels, purchasePanel, re
             <div className="bidi-auto rich-text max-w-none whitespace-pre-line text-muted-foreground">{product.description}</div>
           </section>
         )}
-        <section className="border-t-4 border-foreground pt-10">{reviewsSection}</section>
+        <section id="reviews" className="scroll-mt-24 border-t-4 border-foreground pt-10">{reviewsSection}</section>
       </div>
     </main>
   );

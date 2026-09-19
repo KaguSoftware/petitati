@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { OverlayScroll } from "@/components/ui/overlay-scroll";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import type { NavItem } from "./category-nav";
 import { SearchForm } from "./search-form";
 
@@ -37,12 +37,14 @@ const childLink =
  */
 export function MobileNav({ labels, brand, primary, categories, footer }: Props) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isCurrent = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`));
   const renderLink = (item: NavItem, index: number, child = false) => (
     <SheetClose
       key={item.href}
       nativeButton={false}
-      render={<Link href={item.href} />}
-      className={cn(drawerLink, child && childLink)}
+      render={<Link href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined} />}
+      className={cn(drawerLink, child && childLink, "aria-[current=page]:font-semibold aria-[current=page]:text-primary")}
       style={{ "--stagger": index } as CSSProperties}
     >
       {item.label}

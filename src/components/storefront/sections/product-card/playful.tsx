@@ -9,7 +9,8 @@ export function ProductCardPlayful({ product, currency, locale, labels, wishlist
   const onSale = product.compareAtPrice !== null && product.compareAtPrice > product.price;
   return (
     <article className="group relative flex h-full gap-3 rounded-3xl bg-background p-3 shadow-lg shadow-primary/10 ring-1 ring-foreground/5 transition-transform duration-300 hover:-translate-y-1 motion-reduce:transition-none">
-      <Link href={`/p/${product.slug}`} className="relative block w-2/5 shrink-0 overflow-hidden rounded-2xl">
+      {/* The photo repeats the title link below: one tab stop per card, and screen readers hear the name once. */}
+      <Link tabIndex={-1} aria-hidden href={`/p/${product.slug}`} className="relative block w-2/5 shrink-0 overflow-hidden rounded-2xl">
         <ProductImage
           src={product.imageUrl}
           alt={product.imageAlt}

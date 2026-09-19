@@ -19,10 +19,12 @@ interface Props {
   locale: string;
   /** Lets controls outside the panel (the phone's sticky buy bar) submit it through `form=`. */
   formId?: string;
+  /** "Only n left" shows at or below this (the store's low-stock setting). */
+  lowStockThreshold?: number;
 }
 
 /** Option pickers → resolved variant → quantity → add. Shared by every product-page variant. */
-export function AddToCartPanel({ product, storeSlug, currency, locale, formId }: Props) {
+export function AddToCartPanel({ product, storeSlug, currency, locale, formId, lowStockThreshold = 5 }: Props) {
   const t = useTranslations("product");
   const router = useRouter();
   const defaultVariant = product.variants.find((v) => v.isDefault) ?? product.variants[0];
@@ -129,7 +131,7 @@ export function AddToCartPanel({ product, storeSlug, currency, locale, formId }:
             {!variant
               ? t("selectOption", { option: product.options[0]?.name ?? "" })
               : available
-                ? variant.trackInventory && variant.stockQty <= 5 && !variant.allowBackorder
+                ? variant.trackInventory && variant.stockQty <= lowStockThreshold && !variant.allowBackorder
                   ? t("lowStock", { count: variant.stockQty })
                   : t("inStock")
                 : t("outOfStock")}

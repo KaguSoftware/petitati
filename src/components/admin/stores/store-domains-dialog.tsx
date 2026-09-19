@@ -8,6 +8,7 @@ import { FormField } from "@/components/admin/shared/form-field";
 import { useActionToast } from "@/components/admin/shared/use-action-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/admin/shared/confirm-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -81,9 +82,17 @@ export function StoreDomainsDialog({ open, onOpenChange, store, rootDomain }: Pr
                     <Star />
                   </Button>
                 )}
-                <Button type="button" variant="ghost" size="icon-sm" aria-label={t("remove")} title={t("remove")} disabled={pending} className="text-destructive" onClick={() => run(() => removeStoreDomainAction(d.id))}>
-                  <Trash2 />
-                </Button>
+                <ConfirmDialog
+                  trigger={
+                    <Button type="button" variant="ghost" size="icon-sm" aria-label={t("remove")} title={t("remove")} disabled={pending} className="text-destructive">
+                      <Trash2 />
+                    </Button>
+                  }
+                  title={t("removeConfirm", { hostname: d.hostname })}
+                  confirmLabel={t("remove")}
+                  destructive
+                  action={() => removeStoreDomainAction(d.id)}
+                />
               </li>
             ))
           )}

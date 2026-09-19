@@ -421,7 +421,8 @@ html[dir="rtl"] input[aria-hidden="true"][tabindex="-1"][style*="clip-path"] {
 [data-slot="sheet-content"] [role="search"] [data-slot="input"] {
   height: 2.5rem;
   padding-inline: 2rem;
-  font-size: 0.9375rem;
+  /* 16px: anything smaller makes iOS Safari zoom the page when the field is tapped. */
+  font-size: 1rem;
 }
 [data-storefront] [data-slot="textarea"] {
   min-height: 6rem;
@@ -493,4 +494,10 @@ html[dir="rtl"] input[aria-hidden="true"][tabindex="-1"][style*="clip-path"] {
 /* Keep the end of the page reachable while the phone's sticky buy bar covers the bottom. */
 [data-storefront] {
   padding-bottom: var(--dock-h, 0px);
+}
+
+/* Selected text in the brand colour (storefront uses the store's primary through the token). */
+::selection {
+  background-color: color-mix(in oklab, var(--primary) 22%, transparent);
+  color: inherit;
 }

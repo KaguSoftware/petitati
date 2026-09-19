@@ -88,7 +88,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
       closeImage: t("closeImage"),
     },
     promises,
-    purchasePanel: <AddToCartPanel product={product} storeSlug={store.slug} currency={store.currency} locale={locale} formId={formId} />,
+    purchasePanel: <AddToCartPanel product={product} storeSlug={store.slug} currency={store.currency} locale={locale} formId={formId} lowStockThreshold={store.low_stock_threshold} />,
     wishlistSlot: (
       <div className="flex flex-col gap-2">
         <Suspense>

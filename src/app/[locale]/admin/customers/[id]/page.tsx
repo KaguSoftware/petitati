@@ -150,7 +150,7 @@ async function Content({ params, searchParams }: { params: Props["params"]; sear
       <section id="orders" className="flex scroll-mt-20 flex-col gap-3">
         <h2 className="text-sm font-medium text-muted-foreground">{t("customers.ordersTitle")}</h2>
         <OrdersTable rows={rows} locale={ctx.locale} sort={{ sort: list.sort, dir: list.dir }} query={query} basePath={basePath} hideCustomer />
-        <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath={basePath} query={query} labels={{ prev: tc("previous"), next: tc("next") }} />
+        <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath={basePath} query={query} labels={{ prev: tc("previous"), next: tc("next"), range: tc.raw("range") as string }} />
       </section>
       {/* SCOPE(customers): no delete/merge; GROWS LATER → GDPR export/delete */}
     </>

@@ -9,7 +9,8 @@ export function ProductCardEditorial({ product, currency, locale, labels, wishli
   const eyebrow = product.isNew ? labels.new : !product.inStock ? labels.outOfStock : null;
   return (
     <article className="group relative flex h-full flex-col gap-3">
-      <Link href={`/p/${product.slug}`} className="block">
+      {/* The photo repeats the title link below: one tab stop per card, and screen readers hear the name once. */}
+      <Link tabIndex={-1} aria-hidden href={`/p/${product.slug}`} className="block">
         <ProductImage
           src={product.imageUrl}
           alt={product.imageAlt}

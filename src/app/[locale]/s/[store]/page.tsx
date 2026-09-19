@@ -8,7 +8,7 @@ import { getBestSellers, getBrands, getCategories, getProducts } from "@/lib/cat
 import { featuredBrands } from "@/lib/catalog/brands";
 import { renderSection } from "@/lib/theme/registry";
 import { resolveHero } from "@/lib/theme/hero";
-import { ProductGridWithWishlist } from "@/components/storefront/product-grid-with-wishlist";
+import { ProductGridFallback, ProductGridWithWishlist } from "@/components/storefront/product-grid-with-wishlist";
 import { BrandRow } from "@/components/storefront/shared/brand-row";
 import { NewsletterForm } from "@/components/storefront/shared/newsletter-form";
 
@@ -75,14 +75,14 @@ export default async function StoreHome({ params }: PageProps<"/[locale]/s/[stor
         title: t("browseCategories"),
         categories: categories.filter((c) => !c.parentId),
       })}
-      <Suspense>
+      <Suspense fallback={<ProductGridFallback ctx={ctx} title={t("bestSellers")} products={bestSellers} emptyLabel="" />}>
         <ProductGridWithWishlist ctx={ctx} title={t("bestSellers")} products={bestSellers} emptyLabel="" />
       </Suspense>
-      <Suspense>
+      <Suspense fallback={<ProductGridFallback ctx={ctx} title={t("featured")} products={featured.items} emptyLabel="" viewAllHref="/shop" viewAllLabel={t("viewAll")} />}>
         <ProductGridWithWishlist ctx={ctx} title={t("featured")} products={featured.items} emptyLabel="" viewAllHref="/shop" viewAllLabel={t("viewAll")} />
       </Suspense>
       <BrandRow title={t("shopByBrand")} viewAllLabel={t("viewAll")} brands={featuredBrands(brands)} />
-      <Suspense>
+      <Suspense fallback={<ProductGridFallback ctx={ctx} title={t("newArrivals")} products={arrivals} emptyLabel="" viewAllHref="/shop?sort=newest" viewAllLabel={t("viewAll")} />}>
         <ProductGridWithWishlist ctx={ctx} title={t("newArrivals")} products={arrivals} emptyLabel="" viewAllHref="/shop?sort=newest" viewAllLabel={t("viewAll")} />
       </Suspense>
       {renderSection("newsletter", store.theme.sections.newsletter, {

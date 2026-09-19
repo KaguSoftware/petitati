@@ -53,7 +53,7 @@ export default async function StoreLayout({ children, params }: LayoutProps<"/[l
       <div
         data-storefront
         data-store-theme
-        className={cn("flex min-h-screen flex-col bg-background font-sans text-foreground *:w-full", NAVBAR_VARS[store.theme.sections.navbar])}
+        className={cn("flex min-h-dvh flex-col bg-background font-sans text-foreground *:w-full", NAVBAR_VARS[store.theme.sections.navbar])}
         style={themeToCssVars(store.theme, locale) as React.CSSProperties}
       >
         {/* Phone browser bar in the store's page colour (React hoists these into <head>). The dark value

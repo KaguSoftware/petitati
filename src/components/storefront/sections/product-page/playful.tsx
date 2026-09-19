@@ -57,7 +57,7 @@ export function ProductPagePlayful({ product, breadcrumb, labels, purchasePanel,
           )}
         </div>
       </div>
-      <section className="mt-14 rounded-3xl bg-muted/40 p-6 ring-1 ring-foreground/5 @tablet:p-8">{reviewsSection}</section>
+      <section id="reviews" className="scroll-mt-24 mt-14 rounded-3xl bg-muted/40 p-6 ring-1 ring-foreground/5 @tablet:p-8">{reviewsSection}</section>
     </main>
   );
 }

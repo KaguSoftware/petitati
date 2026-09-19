@@ -19,9 +19,19 @@ async function copyrightYear(): Promise<number> {
 }
 
 /** Announcement bar + navbar + footer around every storefront page, using the store's variants. */
-export async function StoreChrome({ ctx, children }: { ctx: StoreContext; children: React.ReactNode }) {
+export async function StoreChrome({
+  ctx,
+  children,
+}: {
+  ctx: StoreContext;
+  children: React.ReactNode;
+}) {
   const { store, locale, fallback } = ctx;
-  const [t, categories, year] = await Promise.all([getTranslations("nav"), getCategories(store.id, locale, fallback), copyrightYear()]);
+  const [t, categories, year] = await Promise.all([
+    getTranslations("nav"),
+    getCategories(store.id, locale, fallback),
+    copyrightYear(),
+  ]);
   const topLevel = categories.filter((c) => !c.parentId);
   const footerProps = await buildFooterProps({
     storeName: store.name,
@@ -33,49 +43,74 @@ export async function StoreChrome({ ctx, children }: { ctx: StoreContext; childr
     resolved: resolveFooter(store.footer, locale, fallback),
     localeSlot: <LocaleSwitcher enabled={store.enabled_locales} notice={t("translationNotice")} />,
     year,
-    pages: { content: (store.settings.pages ?? {}) as Record<string, Record<string, string>>, locale, fallback },
+    pages: {
+      content: (store.settings.pages ?? {}) as Record<string, Record<string, string>>,
+      locale,
+      fallback,
+    },
   });
 
   return (
     // Chrome is wrapped rather than variant-patched so `print:hidden` covers all four layouts at
     // once: a printed order receipt is the page, not the shop around it.
     <>
-      <div className="contents print:hidden">
-      {renderSection("announcementBar", store.theme.sections.announcementBar, {
-        text: store.theme.announcement[locale] ?? store.theme.announcement[fallback] ?? "",
-      })}
-      {renderSection("navbar", store.theme.sections.navbar, {
-        storeName: store.name,
-        logoUrl: store.logo_url,
-        categories,
-        labels: {
-          home: t("home"),
-          shop: t("shop"),
-          brands: t("brands"),
-          search: t("search"),
-          menu: t("menu"),
-          closeMenu: t("closeMenu"),
-          categories: t("categories"),
-          call: t("call"),
-          viewAll: t("viewAll"),
-        },
-        contactPhone: store.contact_phone,
-        localeSlot: <LocaleSwitcher enabled={store.enabled_locales} variant="compact" notice={t("translationNotice")} />,
-        accountSlot: (
-          <Suspense fallback={<AccountMenuFallback />}>
-            <AccountMenuSlot />
-          </Suspense>
-        ),
-        cartSlot: (
-          <Suspense fallback={<CartButtonFallback />}>
-            <CartButton store={store} locale={locale} />
-          </Suspense>
-        ),
-      })}
+      {/* First Tab stop on every page: jumps past the bar and navbar to the page content. */}
+      <div className="contents">
+        <a
+          href="#main"
+          className="bg-primary text-primary-foreground focus:ring-ring/50 sr-only z-50 rounded-md px-4 py-2 font-medium focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:ring-4 focus:outline-none"
+        >
+          {t("skipToContent")}
+        </a>
       </div>
-      <div className="flex flex-1 flex-col *:w-full">{children}</div>
-      <div className="contents print:hidden">{renderSection("footer", store.theme.sections.footer, footerProps)}</div>
-      {store.footer.social.whatsapp && <ContactBubble href={store.footer.social.whatsapp} label={t("whatsappChat")} />}
+      <div className="contents print:hidden">
+        {renderSection("announcementBar", store.theme.sections.announcementBar, {
+          text: store.theme.announcement[locale] ?? store.theme.announcement[fallback] ?? "",
+        })}
+        {renderSection("navbar", store.theme.sections.navbar, {
+          storeName: store.name,
+          logoUrl: store.logo_url,
+          categories,
+          labels: {
+            home: t("home"),
+            shop: t("shop"),
+            brands: t("brands"),
+            search: t("search"),
+            menu: t("menu"),
+            closeMenu: t("closeMenu"),
+            categories: t("categories"),
+            call: t("call"),
+            viewAll: t("viewAll"),
+          },
+          contactPhone: store.contact_phone,
+          localeSlot: (
+            <LocaleSwitcher
+              enabled={store.enabled_locales}
+              variant="compact"
+              notice={t("translationNotice")}
+            />
+          ),
+          accountSlot: (
+            <Suspense fallback={<AccountMenuFallback />}>
+              <AccountMenuSlot />
+            </Suspense>
+          ),
+          cartSlot: (
+            <Suspense fallback={<CartButtonFallback />}>
+              <CartButton store={store} locale={locale} />
+            </Suspense>
+          ),
+        })}
+      </div>
+      <div id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none *:w-full">
+        {children}
+      </div>
+      <div className="contents print:hidden">
+        {renderSection("footer", store.theme.sections.footer, footerProps)}
+      </div>
+      {store.footer.social.whatsapp && (
+        <ContactBubble href={store.footer.social.whatsapp} label={t("whatsappChat")} />
+      )}
     </>
   );
 }

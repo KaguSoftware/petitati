@@ -66,7 +66,7 @@ async function Content({ params }: { params: Props["params"] }) {
             <dd className="text-lg font-semibold tabular-nums">{money(toCollect)}</dd>
           </div>
         </dl>
-        {canStart && <StartRunButton token={token} label={t("startRun")} />}
+        {canStart && <StartRunButton token={token} label={t("startRun")} count={open.filter((s) => s.state === "assigned").length} />}
       </header>
 
       <StopList token={token} open={open} done={done} locale={locale} codEnabled={settings.codEnabled} />

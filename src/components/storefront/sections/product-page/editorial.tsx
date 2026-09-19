@@ -37,7 +37,7 @@ export function ProductPageEditorial({ product, breadcrumb, labels, purchasePane
           )}
         </div>
       </div>
-      <section className="mt-16 border-t border-foreground/15 pt-10">{reviewsSection}</section>
+      <section id="reviews" className="scroll-mt-24 mt-16 border-t border-foreground/15 pt-10">{reviewsSection}</section>
     </main>
   );
 }

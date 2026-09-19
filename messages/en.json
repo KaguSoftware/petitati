@@ -42,7 +42,8 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "capsLockOn": "Caps Lock is on",
-    "clearSearch": "Clear search"
+    "clearSearch": "Clear search",
+    "range": "{from}–{to} of {total}"
   },
   "nav": {
     "home": "Home",
@@ -60,7 +61,8 @@
     "call": "Call us",
     "translationNotice": "This shop is Turkish. Pages are translated automatically and may contain mistakes.",
     "viewAll": "View all",
-    "whatsappChat": "Chat with us on WhatsApp"
+    "whatsappChat": "Chat with us on WhatsApp",
+    "skipToContent": "Skip to content"
   },
   "home": {
     "heroTitle": "Everything your pet loves",
@@ -117,7 +119,8 @@
     "rateStars": "Rate {count} out of 5",
     "chooseOptions": "Choose options",
     "zoomImage": "View photo full screen",
-    "closeImage": "Close photo"
+    "closeImage": "Close photo",
+    "saveToWishlist": "Save to wishlist"
   },
   "cart": {
     "title": "Your cart",
@@ -378,7 +381,14 @@
       "unsavedTitle": "Leave without saving?",
       "unsavedBody": "Your changes on this page have not been saved yet. If you leave now, they are lost.",
       "unsavedStay": "Stay and keep editing",
-      "unsavedLeave": "Leave without saving"
+      "unsavedLeave": "Leave without saving",
+      "notFoundTitle": "Not found",
+      "notFoundBody": "This page, order or product does not exist, or it was deleted.",
+      "backToDashboard": "Back to the dashboard",
+      "crashTitle": "This page failed to load",
+      "crashBody": "Something went wrong on our side. Try again; the rest of the admin still works.",
+      "retry": "Try again",
+      "errorRef": "Reference"
     },
     "roles": {
       "owner": "Owner",
@@ -1984,7 +1994,8 @@
       "verified": "Verified",
       "unverified": "Awaiting DNS",
       "makePrimary": "Use as the primary domain",
-      "dns": "Point a CNAME record for {hostname} to {target}."
+      "dns": "Point a CNAME record for {hostname} to {target}.",
+      "removeConfirm": "Remove {hostname}?"
     },
     "errors": {
       "defaultStore": "The default store cannot be changed this way.",
@@ -2247,6 +2258,10 @@
       "failed": "Something went wrong. Try again."
     },
     "find": "Find a stop: order number, name, street…",
-    "noMatch": "No stop matches that."
+    "noMatch": "No stop matches that.",
+    "startRunConfirm": {
+      "title": "Start the run?",
+      "body": "{count, plural, one {# parcel is} other {# parcels are}} marked as shipped and the customers are told it is on the way."
+    }
   }
 }

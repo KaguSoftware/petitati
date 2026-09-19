@@ -43,7 +43,7 @@ async function MovementsList({ locale, searchParams }: { locale: string; searchP
     <>
       <MovementsFilters reason={reason} variantFilter={variantFilter} />
       <MovementsTable rows={rows} locale={ctx.locale} />
-      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/inventory/movements" query={query} labels={{ prev: t("previous"), next: t("next") }} />
+      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/inventory/movements" query={query} labels={{ prev: t("previous"), next: t("next"), range: t.raw("range") as string }} />
     </>
   );
 }

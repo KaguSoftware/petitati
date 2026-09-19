@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 /** A round white button that reads on any photo; the heart fills red when the product is saved. */
 export const wishlistButtonClass =
-  "inline-flex size-11 items-center justify-center rounded-full bg-card text-card-foreground shadow-md ring-1 ring-foreground/10 transition hover:scale-105 focus-visible:ring-4 focus-visible:ring-ring/50 focus-visible:outline-none motion-reduce:transition-none disabled:opacity-70";
+  "inline-flex size-11 items-center justify-center rounded-full bg-card text-card-foreground shadow-md ring-1 ring-foreground/10 transition hover:scale-105 active:scale-95 focus-visible:ring-4 focus-visible:ring-ring/50 focus-visible:outline-none motion-reduce:transition-none disabled:opacity-70";
 
 export function WishlistButton({
   storeSlug,
@@ -29,8 +29,10 @@ export function WishlistButton({
   return (
     <button
       type="button"
+      // One fixed name + the pressed state: screen readers then say "Save to wishlist, pressed"
+      // instead of announcing the change twice (the label AND the state used to flip together).
       aria-pressed={optimistic}
-      aria-label={optimistic ? t("removeFromWishlist") : t("addToWishlist")}
+      aria-label={t("saveToWishlist")}
       disabled={pending}
       onClick={() =>
         start(async () => {

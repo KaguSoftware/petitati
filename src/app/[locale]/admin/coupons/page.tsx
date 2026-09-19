@@ -47,7 +47,7 @@ async function CouponsList({ locale, searchParams }: { locale: string; searchPar
         query={query}
         emptyAction={list.q ? undefined : <NewCouponButton storeId={ctx.store.id} currency={ctx.store.currency} />}
       />
-      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/coupons" query={query} labels={{ prev: t("previous"), next: t("next") }} />
+      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/coupons" query={query} labels={{ prev: t("previous"), next: t("next"), range: t.raw("range") as string }} />
     </>
   );
 }

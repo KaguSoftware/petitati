@@ -25,7 +25,7 @@ export function QuantityStepper({ value, onChange, min = 1, max = null, disabled
   const t = useTranslations("product");
   const atMin = disabled || value <= min;
   const atMax = disabled || (max !== null && value >= max);
-  const step = "grid size-11 place-items-center transition-colors hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset";
+  const step = "grid size-11 place-items-center transition-colors hover:bg-muted active:bg-foreground/10 disabled:opacity-40 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset";
 
   return (
     <div dir="ltr" className={cn("inline-flex h-11 items-center rounded-lg border bg-card", className)}>

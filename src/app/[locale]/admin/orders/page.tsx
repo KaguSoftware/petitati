@@ -61,7 +61,7 @@ async function OrdersList({ locale, searchParams }: { locale: string; searchPara
       getTranslations("common"),
       ...BUCKETS.map((b) => listOrders(ctx.store.id, { ...list, status: b === "all" ? undefined : b, from, to })),
     ]);
-    const labels = { prev: tc("previous"), next: tc("next") };
+    const labels = { prev: tc("previous"), next: tc("next"), range: tc.raw("range") as string };
     const courierOptions = couriers.map((c) => ({ id: c.id, name: c.name }));
     const panels = BUCKETS.map((b, i) => {
       const query = { status: b === "all" ? undefined : b };
@@ -101,7 +101,7 @@ async function OrdersList({ locale, searchParams }: { locale: string; searchPara
     courierId ? getCourier(ctx.store.id, courierId) : Promise.resolve(null),
     getTranslations("common"),
   ]);
-  const labels = { prev: tc("previous"), next: tc("next") };
+  const labels = { prev: tc("previous"), next: tc("next"), range: tc.raw("range") as string };
   const query = currentQuery(sp, ["q", "status", "from", "to", "sort", "dir", "courier"]);
   return (
     <>

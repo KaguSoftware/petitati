@@ -37,7 +37,7 @@ async function CustomersList({ locale, searchParams }: { locale: string; searchP
     <>
       <CustomersFilters marketing={marketing} />
       <CustomersTable rows={rows} locale={ctx.locale} currency={ctx.store.currency} sort={{ sort: list.sort, dir: list.dir }} query={query} />
-      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/customers" query={query} labels={{ prev: t("previous"), next: t("next") }} />
+      <Pagination page={list.page} pageSize={list.pageSize} total={total} basePath="/admin/customers" query={query} labels={{ prev: t("previous"), next: t("next"), range: t.raw("range") as string }} />
     </>
   );
 }

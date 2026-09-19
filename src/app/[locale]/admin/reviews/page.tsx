@@ -41,7 +41,7 @@ async function ReviewsList({ locale, searchParams }: { locale: string; searchPar
     getTranslations("admin"),
     ...(plain ? REVIEW_STATUSES.map((s) => listReviews(ctx.store.id, { status: s, page: 1, ...listOpts })) : []),
   ]);
-  const labels = { prev: t("previous"), next: t("next") };
+  const labels = { prev: t("previous"), next: t("next"), range: t.raw("range") as string };
 
   if (plain) {
     const panels = REVIEW_STATUSES.map((s, i) => ({
