@@ -38,7 +38,11 @@
     "breadcrumb": "Buradasınız",
     "copied": "Kopyalandı",
     "share": "Paylaş",
-    "linkCopied": "Bağlantı kopyalandı"
+    "linkCopied": "Bağlantı kopyalandı",
+    "showPassword": "Şifreyi göster",
+    "hidePassword": "Şifreyi gizle",
+    "capsLockOn": "Caps Lock açık",
+    "clearSearch": "Aramayı temizle"
   },
   "nav": {
     "home": "Ana sayfa",
@@ -161,7 +165,14 @@
       "shipping": "Lütfen bir kargo yöntemi seçin.",
       "failed": "Siparişiniz oluşturulamadı. Lütfen tekrar deneyin."
     },
-    "shippingMethod": "Teslimat yöntemi"
+    "shippingMethod": "Teslimat yöntemi",
+    "requiredNote": "Zorunlu alanlar",
+    "fieldErrors": {
+      "required": "Bu alanı doldurun.",
+      "tooShort": "Bu çok kısa görünüyor.",
+      "tooLong": "Bu çok uzun.",
+      "invalid": "Bu alanı kontrol edin."
+    }
   },
   "account": {
     "title": "Hesabım",
@@ -188,7 +199,14 @@
     "wishlistEmptyTitle": "Henüz kayıtlı ürün yok",
     "noAddressesTitle": "Henüz adres yok",
     "deleteAddressTitle": "Bu adres silinsin mi?",
-    "deleteAddressBody": "Kayıtlı adreslerinizden kaldırılacak. Daha sonra tekrar ekleyebilirsiniz."
+    "deleteAddressBody": "Kayıtlı adreslerinizden kaldırılacak. Daha sonra tekrar ekleyebilirsiniz.",
+    "addressSaved": "Adres kaydedildi",
+    "passwordErrors": {
+      "invalid": "En az 8 karakter kullanın.",
+      "samePassword": "Mevcut şifrenizden farklı bir şifre seçin.",
+      "weakPassword": "Bu şifre tahmin edilmesi çok kolay. Daha uzun bir şifre deneyin.",
+      "failed": "Şifrenizi değiştiremedik. Tekrar deneyin."
+    }
   },
   "auth": {
     "signIn": "Giriş yap",
@@ -937,7 +955,8 @@
           "pricing": "Fiyat ve stok",
           "photos": "Fotoğraflar"
         }
-      }
+      },
+      "seoLength": "{count}/{limit} karakter · arama sonuçları yaklaşık {limit} karakter gösterir"
     },
     "categories": {
       "title": "Kategoriler",

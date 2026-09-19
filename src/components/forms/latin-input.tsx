@@ -1,5 +1,6 @@
 import type * as React from "react";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "./password-input";
 import { cn } from "@/lib/utils";
 
 /** Inputs whose content is always Latin (emails, passwords, phone digits, codes) stay LTR under RTL locales. */
@@ -26,6 +27,8 @@ export function latinInputProps(kind: LatinKind): Partial<React.ComponentProps<"
 }
 
 export function LatinInput({ kind, className, ...props }: React.ComponentProps<typeof Input> & { kind: LatinKind }) {
+  // Every password field gets the show/hide eye and the Caps Lock hint.
+  if (kind === "password") return <PasswordInput className={className} {...props} />;
   return (
     <Input
       {...latinInputProps(kind)}

@@ -1,3 +1,4 @@
+import { cloneElement, isValidElement, type ReactElement } from "react";
 import { useTranslations } from "next-intl";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
@@ -19,15 +20,23 @@ export function FormField({ name, label, description, errors, required, classNam
   const t = useTranslations("admin.common");
   const raw = errors?.[name];
   const message = raw ? (t.has(raw) ? t(raw) : raw) : undefined;
+  // Tie the error (or the description) to the control so screen readers read it with the field.
+  const helpId = message ? `${name}-error` : description ? `${name}-description` : undefined;
+  const control = isValidElement(children)
+    ? cloneElement(children as ReactElement<Record<string, unknown>>, {
+        "aria-invalid": message ? true : undefined,
+        "aria-describedby": helpId,
+      })
+    : children;
   return (
     <Field className={cn(className)} data-invalid={message ? "" : undefined}>
       <FieldLabel htmlFor={name}>
         {label}
         {required && <span aria-hidden className="text-destructive">*</span>}
       </FieldLabel>
-      {children}
-      {description && !message && <FieldDescription>{description}</FieldDescription>}
-      {message && <FieldError>{message}</FieldError>}
+      {control}
+      {description && !message && <FieldDescription id={`${name}-description`}>{description}</FieldDescription>}
+      {message && <FieldError id={`${name}-error`}>{message}</FieldError>}
     </Field>
   );
 }

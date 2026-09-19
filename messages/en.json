@@ -38,7 +38,11 @@
     "breadcrumb": "You are here",
     "copied": "Copied",
     "share": "Share",
-    "linkCopied": "Link copied"
+    "linkCopied": "Link copied",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "capsLockOn": "Caps Lock is on",
+    "clearSearch": "Clear search"
   },
   "nav": {
     "home": "Home",
@@ -161,7 +165,14 @@
       "shipping": "Please choose a shipping method.",
       "failed": "We could not place your order. Please try again."
     },
-    "shippingMethod": "Shipping method"
+    "shippingMethod": "Shipping method",
+    "requiredNote": "Required fields",
+    "fieldErrors": {
+      "required": "Fill this in.",
+      "tooShort": "This looks too short.",
+      "tooLong": "This is too long.",
+      "invalid": "Check this field."
+    }
   },
   "account": {
     "title": "My account",
@@ -188,7 +199,14 @@
     "wishlistEmptyTitle": "Nothing saved yet",
     "noAddressesTitle": "No addresses yet",
     "deleteAddressTitle": "Delete this address?",
-    "deleteAddressBody": "It will be removed from your saved addresses. You can add it again later."
+    "deleteAddressBody": "It will be removed from your saved addresses. You can add it again later.",
+    "addressSaved": "Address saved",
+    "passwordErrors": {
+      "invalid": "Use at least 8 characters.",
+      "samePassword": "Choose a password different from your current one.",
+      "weakPassword": "This password is too easy to guess. Try a longer one.",
+      "failed": "We could not change your password. Try again."
+    }
   },
   "auth": {
     "signIn": "Sign in",
@@ -937,7 +955,8 @@
           "pricing": "Prices & stock",
           "photos": "Photos"
         }
-      }
+      },
+      "seoLength": "{count}/{limit} characters · search results show about {limit}"
     },
     "categories": {
       "title": "Categories",

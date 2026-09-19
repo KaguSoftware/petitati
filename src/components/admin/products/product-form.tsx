@@ -147,10 +147,10 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
             <details className="group rounded-lg border">
               <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium">{t("products.seo")}</summary>
               <div className="flex flex-col gap-4 border-t p-3">
-                <FormField name="seo_title" label={t("products.seoTitle")}>
+                <FormField name="seo_title" label={t("products.seoTitle")} description={<SeoLength value={current.seo_title} limit={SEO_TITLE_LIMIT} />}>
                   <Input id="seo_title" value={current.seo_title} onChange={(e) => patch("seo_title", e.target.value)} />
                 </FormField>
-                <FormField name="seo_description" label={t("products.seoDescription")}>
+                <FormField name="seo_description" label={t("products.seoDescription")} description={<SeoLength value={current.seo_description} limit={SEO_DESCRIPTION_LIMIT} />}>
                   <Textarea id="seo_description" rows={2} value={current.seo_description} onChange={(e) => patch("seo_description", e.target.value)} />
                 </FormField>
               </div>
@@ -255,5 +255,19 @@ export function ProductForm({ storeId, locale, defaultLocale, enabledLocales, pr
         </div>
       )}
     </form>
+  );
+}
+
+/** Roughly what a search result shows before cutting the text off (a guide, not a hard limit). */
+const SEO_TITLE_LIMIT = 60;
+const SEO_DESCRIPTION_LIMIT = 160;
+
+function SeoLength({ value, limit }: { value: string; limit: number }) {
+  const t = useTranslations("admin.products");
+  const count = value.length;
+  return (
+    <span aria-live="polite" className={count > limit ? "font-medium text-amber-700 dark:text-amber-400" : undefined}>
+      {t("seoLength", { count, limit })}
+    </span>
   );
 }

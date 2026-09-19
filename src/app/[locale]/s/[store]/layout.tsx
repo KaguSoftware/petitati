@@ -33,18 +33,12 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]/s/[sto
   };
 }
 
-/** Phone browser bar in the store's page colour; `viewportFit: cover` makes the safe-area insets real (bottom dock). */
-export async function generateViewport({ params }: LayoutProps<"/[locale]/s/[store]">): Promise<Viewport> {
-  const { store } = await storeContext(params);
-  return {
-    viewportFit: "cover",
-    themeColor: [
-      { media: "(prefers-color-scheme: light)", color: store.theme.colors.background },
-      // Approximates the derived dark ground (globals.css, `.dark [data-store-theme]`), which is a near-black of the brand hue.
-      { media: "(prefers-color-scheme: dark)", color: "#15191c" },
-    ],
-  };
-}
+/**
+ * `viewportFit: cover` makes the safe-area insets real (the bottom dock). Static on purpose: under
+ * Cache Components a viewport that read the store (params) would force every storefront page to
+ * render at request time. The store's browser-bar colour is emitted as <meta> by the layout below.
+ */
+export const viewport: Viewport = { viewportFit: "cover" };
 
 export default async function StoreLayout({ children, params }: LayoutProps<"/[locale]/s/[store]">) {
   const ctx = await storeContext(params);
@@ -62,6 +56,10 @@ export default async function StoreLayout({ children, params }: LayoutProps<"/[l
         className={cn("flex min-h-screen flex-col bg-background font-sans text-foreground *:w-full", NAVBAR_VARS[store.theme.sections.navbar])}
         style={themeToCssVars(store.theme, locale) as React.CSSProperties}
       >
+        {/* Phone browser bar in the store's page colour (React hoists these into <head>). The dark value
+            approximates the derived dark ground (globals.css, `.dark [data-store-theme]`). */}
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content={store.theme.colors.background} />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#15191c" />
         {/* Portals (sheets, dialogs, menus, toasts) render outside this div: mirror the fonts onto <html>. */}
         <StoreFontVars body={fontStack(store.theme.fonts.body, locale)} heading={fontStack(store.theme.fonts.heading, locale)} />
         <StoreProvider

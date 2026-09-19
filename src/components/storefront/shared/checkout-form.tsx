@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { cloneElement, isValidElement, useActionState, useEffect, useRef, useState, type ReactElement } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,12 +38,31 @@ interface Props {
   onShippingChange?: (id: string) => void;
 }
 
-function Field({ name, label, error, children }: { name: string; label: string; error?: string; children: React.ReactNode }) {
+/**
+ * Label + control + error. The error is tied to the control (`aria-invalid` + `aria-describedby`)
+ * so screen readers read it with the field, and required fields carry a visible star.
+ */
+function Field({ name, label, error, required, children }: { name: string; label: string; error?: string; required?: boolean; children: React.ReactNode }) {
+  const errorId = `${name}-error`;
+  const control = isValidElement(children)
+    ? cloneElement(children as ReactElement<Record<string, unknown>>, { "aria-invalid": error ? true : undefined, "aria-describedby": error ? errorId : undefined })
+    : children;
   return (
     <div className="grid gap-1.5">
-      <Label htmlFor={name}>{label}</Label>
-      {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      <Label htmlFor={name}>
+        {label}
+        {required && (
+          <span aria-hidden className="text-destructive">
+            *
+          </span>
+        )}
+      </Label>
+      {control}
+      {error && (
+        <p id={errorId} className="text-xs text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -54,17 +73,29 @@ export function CheckoutForm({ storeSlug, locale, currency, email, phone, addres
   const [state, action, pending] = useActionState(placeOrderAction, {} as CheckoutState);
   const defaultAddr = addresses.find((a) => a.is_default) ?? addresses[0];
   const [addr, setAddr] = useState<AddressRow | undefined>(defaultAddr);
-  const fe = state.fieldErrors ?? {};
+  // The action sends codes (required / tooShort / tooLong / invalid); unknown ones read as "invalid".
+  const fe = Object.fromEntries(Object.entries(state.fieldErrors ?? {}).map(([k, code]) => [k, t.has(`fieldErrors.${code}`) ? t(`fieldErrors.${code}`) : t("fieldErrors.invalid")]));
+  const formRef = useRef<HTMLFormElement>(null);
+  // After a rejected submit, put the cursor in the first field that needs fixing.
+  useEffect(() => {
+    if (state.fieldErrors && Object.keys(state.fieldErrors).length) formRef.current?.querySelector<HTMLElement>("[aria-invalid=true]")?.focus();
+  }, [state]);
 
   return (
-    <form action={action} className="flex flex-col gap-8">
+    <form ref={formRef} action={action} className="flex flex-col gap-8">
+      <p className="-mb-4 text-sm text-muted-foreground">
+        <span aria-hidden className="text-destructive">
+          *
+        </span>{" "}
+        {t("requiredNote")}
+      </p>
       <input type="hidden" name="storeSlug" value={storeSlug} />
       <input type="hidden" name="locale" value={locale} />
 
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">{t("contact")}</h2>
         {!email && <p className="text-sm text-muted-foreground">{t("guestNotice")}</p>}
-        <Field name="email" label={t("email")} error={fe.email}>
+        <Field name="email" label={t("email")} error={fe.email} required>
           <LatinInput kind="email" id="email" name="email" defaultValue={email ?? ""} required autoComplete="email" />
         </Field>
         <Field name="phone" label={t("phone")} error={fe.phone}>
@@ -90,17 +121,17 @@ export function CheckoutForm({ storeSlug, locale, currency, email, phone, addres
             ))}
           </div>
         )}
-        <Field name="full_name" label={t("fullName")} error={fe.full_name}>
+        <Field name="full_name" label={t("fullName")} error={fe.full_name} required>
           <Input id="full_name" name="full_name" key={`fn-${addr?.id}`} defaultValue={addr?.full_name ?? ""} required autoComplete="name" />
         </Field>
-        <Field name="line1" label={t("addressLine1")} error={fe.line1}>
+        <Field name="line1" label={t("addressLine1")} error={fe.line1} required>
           <Input id="line1" name="line1" key={`l1-${addr?.id}`} defaultValue={addr?.line1 ?? ""} required autoComplete="address-line1" />
         </Field>
         <Field name="line2" label={t("addressLine2")} error={fe.line2}>
           <Input id="line2" name="line2" key={`l2-${addr?.id}`} defaultValue={addr?.line2 ?? ""} autoComplete="address-line2" />
         </Field>
         <div className="grid grid-cols-1 gap-4 @phablet:grid-cols-2">
-          <Field name="city" label={t("city")} error={fe.city}>
+          <Field name="city" label={t("city")} error={fe.city} required>
             <Input id="city" name="city" key={`c-${addr?.id}`} defaultValue={addr?.city ?? ""} required autoComplete="address-level2" />
           </Field>
           <Field name="region" label={t("region")} error={fe.region}>
@@ -109,7 +140,7 @@ export function CheckoutForm({ storeSlug, locale, currency, email, phone, addres
           <Field name="postal_code" label={t("postalCode")} error={fe.postal_code}>
             <LatinInput kind="postal" id="postal_code" name="postal_code" key={`p-${addr?.id}`} defaultValue={addr?.postal_code ?? ""} autoComplete="postal-code" />
           </Field>
-          <Field name="country" label={t("country")} error={fe.country}>
+          <Field name="country" label={t("country")} error={fe.country} required>
             <CountrySelect id="country" name="country" key={`co-${addr?.id}`} defaultValue={addr?.country ?? defaultCountry} required />
           </Field>
         </div>

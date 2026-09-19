@@ -38,7 +38,11 @@
     "breadcrumb": "مسیر شما",
     "copied": "کپی شد",
     "share": "اشتراک‌گذاری",
-    "linkCopied": "لینک کپی شد"
+    "linkCopied": "لینک کپی شد",
+    "showPassword": "نمایش رمز",
+    "hidePassword": "پنهان کردن رمز",
+    "capsLockOn": "Caps Lock روشن است",
+    "clearSearch": "پاک کردن جستجو"
   },
   "nav": {
     "home": "خانه",
@@ -161,7 +165,14 @@
       "shipping": "لطفاً روش ارسال را انتخاب کنید.",
       "failed": "ثبت سفارش انجام نشد. لطفاً دوباره تلاش کنید."
     },
-    "shippingMethod": "روش ارسال"
+    "shippingMethod": "روش ارسال",
+    "requiredNote": "فیلدهای ضروری",
+    "fieldErrors": {
+      "required": "این را پر کنید.",
+      "tooShort": "این خیلی کوتاه است.",
+      "tooLong": "این خیلی بلند است.",
+      "invalid": "این فیلد را دوباره نگاه کنید."
+    }
   },
   "account": {
     "title": "حساب من",
@@ -188,7 +199,14 @@
     "wishlistEmptyTitle": "هنوز چیزی ذخیره نکرده‌اید",
     "noAddressesTitle": "هنوز آدرسی ندارید",
     "deleteAddressTitle": "این آدرس پاک شود؟",
-    "deleteAddressBody": "از آدرس‌های ذخیره‌شده شما برداشته می‌شود. بعداً می‌توانید دوباره اضافه کنید."
+    "deleteAddressBody": "از آدرس‌های ذخیره‌شده شما برداشته می‌شود. بعداً می‌توانید دوباره اضافه کنید.",
+    "addressSaved": "آدرس ذخیره شد",
+    "passwordErrors": {
+      "invalid": "دست‌کم ۸ نویسه بنویسید.",
+      "samePassword": "رمزی غیر از رمز فعلی‌تان انتخاب کنید.",
+      "weakPassword": "این رمز خیلی ساده است. رمز بلندتری امتحان کنید.",
+      "failed": "رمز عوض نشد. دوباره امتحان کنید."
+    }
   },
   "auth": {
     "signIn": "ورود",
@@ -937,7 +955,8 @@
           "pricing": "قیمت و موجودی",
           "photos": "عکس‌ها"
         }
-      }
+      },
+      "seoLength": "{count}/{limit} نویسه · نتیجهٔ جستجو حدود {limit} نویسه نشان می‌دهد"
     },
     "categories": {
       "title": "دسته‌بندی‌ها",

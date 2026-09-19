@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { ClearInputButton } from "@/components/shared/clear-input-button";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +20,9 @@ export function SearchForm({
 }) {
   const router = useRouter();
   const params = useSearchParams();
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Uncontrolled input (the URL owns the query); this only decides whether the × shows.
+  const [hasValue, setHasValue] = useState(!!params.get("q"));
   return (
     <form
       role="search"
@@ -31,8 +36,10 @@ export function SearchForm({
     >
       <Search aria-hidden className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
+        ref={inputRef}
         name="q"
         type="search"
+        onInput={(e) => setHasValue(e.currentTarget.value !== "")}
         dir="auto"
         inputMode="search"
         enterKeyHint="search"
@@ -40,8 +47,20 @@ export function SearchForm({
         defaultValue={params.get("q") ?? ""}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="h-9 rounded-full border-transparent bg-muted/60 ps-8 pe-3 focus-visible:bg-card [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+        className={cn(
+          "h-9 rounded-full border-transparent bg-muted/60 ps-8 pe-3 focus-visible:bg-card [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none",
+          hasValue && "pe-9",
+        )}
       />
+      {hasValue && (
+        <ClearInputButton
+          onClear={() => {
+            if (inputRef.current) inputRef.current.value = "";
+            setHasValue(false);
+            inputRef.current?.focus();
+          }}
+        />
+      )}
     </form>
   );
 }

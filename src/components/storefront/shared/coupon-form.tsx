@@ -18,7 +18,7 @@ export function CouponForm({ storeSlug, appliedCode }: { storeSlug: string; appl
         <span>
           {t("couponCode")}: <strong dir="ltr">{appliedCode}</strong>
         </span>
-        <Button type="submit" variant="ghost" size="icon-sm" aria-label={t("remove")}>
+        <Button type="submit" variant="ghost" size="icon" aria-label={t("remove")} className="size-10">
           <X />
         </Button>
       </form>
@@ -34,7 +34,11 @@ export function CouponForm({ storeSlug, appliedCode }: { storeSlug: string; appl
           {t("applyCoupon")}
         </Button>
       </div>
-      {state.error === "coupon_invalid" && <p className="text-sm text-destructive">{t("couponInvalid")}</p>}
+      {state.error === "coupon_invalid" && (
+        <p role="alert" className="text-sm text-destructive">
+          {t("couponInvalid")}
+        </p>
+      )}
     </form>
   );
 }

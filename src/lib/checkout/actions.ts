@@ -48,7 +48,14 @@ export async function placeOrderAction(_prev: CheckoutState, formData: FormData)
   const parsed = checkoutSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] = issue.message;
+    // Codes, not zod's English messages: the form translates them (checkout.fieldErrors.*).
+    const raw = Object.fromEntries(formData);
+    for (const issue of parsed.error.issues) {
+      const key = String(issue.path[0]);
+      if (fieldErrors[key]) continue;
+      const empty = typeof raw[key] !== "string" || raw[key].trim() === "";
+      fieldErrors[key] = empty ? "required" : issue.code === "too_small" ? "tooShort" : issue.code === "too_big" ? "tooLong" : "invalid";
+    }
     return { error: "invalid", fieldErrors };
   }
   const input = parsed.data;

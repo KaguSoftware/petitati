@@ -34,8 +34,12 @@ export function ProfileForm({ fullName, email, phone }: ProfileProps) {
         <Label htmlFor="phone-number">{t("phone")}</Label>
         <PhoneField defaultCountry={phone.country} defaultNumber={phone.national} error={state.error && state.error !== "invalid" && state.error !== "auth" ? ta(`errors.${state.error}`) : undefined} />
       </div>
-      {state.ok && <p className="text-sm text-muted-foreground">{t("saved")}</p>}
-      {(state.error === "invalid" || state.error === "auth") && <p className="text-sm text-destructive">{tc("error")}</p>}
+      <p role="status" className="text-sm text-muted-foreground empty:hidden">{state.ok ? t("saved") : ""}</p>
+      {(state.error === "invalid" || state.error === "auth") && (
+        <p role="alert" className="text-sm text-destructive">
+          {tc("error")}
+        </p>
+      )}
       <Button type="submit" size="lg" disabled={pending} className="self-start">{tc("save")}</Button>
     </form>
   );
@@ -51,8 +55,12 @@ export function PasswordForm() {
         <Label htmlFor="password">{t("newPassword")}</Label>
         <LatinInput kind="password" id="password" name="password" minLength={8} required autoComplete="new-password" />
       </div>
-      {state.ok && <p className="text-sm text-muted-foreground">{t("saved")}</p>}
-      {state.error && <p className="text-sm text-destructive">{state.error}</p>}
+      <p role="status" className="text-sm text-muted-foreground empty:hidden">{state.ok ? t("saved") : ""}</p>
+      {state.error && (
+        <p role="alert" className="text-sm text-destructive">
+          {t.has(`passwordErrors.${state.error}`) ? t(`passwordErrors.${state.error}`) : tc("error")}
+        </p>
+      )}
       <Button type="submit" size="lg" disabled={pending} className="self-start">{tc("save")}</Button>
     </form>
   );

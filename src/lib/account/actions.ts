@@ -168,7 +168,8 @@ export async function updatePasswordAction(_prev: SimpleState, formData: FormDat
   if (!parsed.success) return { error: "invalid" };
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
-  if (error) return { error: error.message };
+  // Codes the form can translate, never the provider's English message.
+  if (error) return { error: error.code === "same_password" ? "samePassword" : error.code === "weak_password" ? "weakPassword" : "failed" };
   return { ok: true };
 }
 

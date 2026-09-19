@@ -9,7 +9,12 @@ import { subscribeNewsletterAction, type SimpleState } from "@/lib/account/actio
 export function NewsletterForm({ storeSlug }: { storeSlug: string }) {
   const t = useTranslations("footer");
   const [state, action, pending] = useActionState(subscribeNewsletterAction, {} as SimpleState);
-  if (state.ok) return <p className="text-sm">{t("subscribed")}</p>;
+  if (state.ok)
+    return (
+      <p role="status" className="text-sm">
+        {t("subscribed")}
+      </p>
+    );
   return (
     <form action={action} className="flex w-full max-w-md gap-2">
       <input type="hidden" name="storeSlug" value={storeSlug} />

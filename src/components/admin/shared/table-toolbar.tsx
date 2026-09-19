@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Input } from "@/components/ui/input";
+import { ClearInputButton } from "@/components/shared/clear-input-button";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ export function TableToolbar({ searchPlaceholder, children, actions, className }
   const { setParam } = useListNavigation();
   const [value, setValue] = useState(params.get("q") ?? "");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(
     () => () => {
@@ -39,12 +41,13 @@ export function TableToolbar({ searchPlaceholder, children, actions, className }
         <div className="relative w-full sm:w-64">
           <Search aria-hidden className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            ref={inputRef}
             type="search"
             dir="auto"
             value={value}
             placeholder={searchPlaceholder ?? t("search")}
             aria-label={searchPlaceholder ?? t("search")}
-            className="ps-8 [&::-webkit-search-cancel-button]:appearance-none"
+            className={cn("ps-8 [&::-webkit-search-cancel-button]:appearance-none", value && "pe-9")}
             onChange={(e) => {
               const next = e.target.value;
               setValue(next);
@@ -52,6 +55,16 @@ export function TableToolbar({ searchPlaceholder, children, actions, className }
               timer.current = setTimeout(() => setParam("q", next.trim() || null), 300);
             }}
           />
+          {value && (
+            <ClearInputButton
+              onClear={() => {
+                if (timer.current) clearTimeout(timer.current);
+                setValue("");
+                setParam("q", null);
+                inputRef.current?.focus();
+              }}
+            />
+          )}
         </div>
       )}
       {children}

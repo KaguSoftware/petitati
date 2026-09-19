@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -80,7 +81,10 @@ function AddressForm({ storeSlug, address, defaultCountry, onDone }: { storeSlug
   const tc = useTranslations("common");
   const [state, action, pending] = useActionState(async (prev: SimpleState, fd: FormData) => {
     const res = await saveAddressAction(prev, fd);
-    if (res.ok) onDone();
+    if (res.ok) {
+      toast.success(ta("addressSaved"));
+      onDone();
+    }
     return res;
   }, {} as SimpleState);
 
@@ -104,7 +108,11 @@ function AddressForm({ storeSlug, address, defaultCountry, onDone }: { storeSlug
         <Checkbox name="is_default" defaultChecked={address?.is_default ?? false} />
         {ta("defaultAddress")}
       </Label>
-      {state.error && <p className="text-sm text-destructive @phablet:col-span-2">{tc("error")}</p>}
+      {state.error && (
+        <p role="alert" className="text-sm text-destructive @phablet:col-span-2">
+          {tc("error")}
+        </p>
+      )}
       <div className="flex gap-2 @phablet:col-span-2">
         <Button type="submit" size="lg" disabled={pending}>{tc("save")}</Button>
         <Button type="button" variant="ghost" size="lg" onClick={onDone}>{tc("cancel")}</Button>
