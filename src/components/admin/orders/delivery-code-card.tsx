@@ -3,6 +3,7 @@
 import { RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/shared/copy-button";
 import { reissueDeliveryCodeAction } from "@/lib/admin/orders/actions";
 import { useOptimisticAction } from "../shared/use-optimistic-action";
 
@@ -35,9 +36,12 @@ export function DeliveryCodeCard({ storeId, orderId, code, attempts, limit, canR
 
   return (
     <div className="flex flex-col gap-2">
-      <p dir="ltr" className="text-center text-2xl font-semibold tracking-[0.3em] tabular-nums">
-        {code}
-      </p>
+      <div className="flex items-center justify-center gap-1">
+        <p dir="ltr" className="text-2xl font-semibold tracking-[0.3em] tabular-nums">
+          {code}
+        </p>
+        <CopyButton value={code} label={t("deliverCode.copyCode")} />
+      </div>
       <p className={`text-center text-xs ${locked ? "font-medium text-destructive" : "text-muted-foreground"}`}>
         {locked ? t("deliverCode.locked") : t("deliverCode.attemptsLeft", { count: left })}
       </p>

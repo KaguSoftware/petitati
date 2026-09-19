@@ -13,7 +13,7 @@ export function ProductPageBold({ product, breadcrumb, labels, purchasePanel, re
         <ProductGallery
           images={product.images}
           fallbackAlt={product.name}
-          labels={{ previous: labels.previousImage, next: labels.nextImage, imageOf: labels.imageOf }}
+          labels={{ previous: labels.previousImage, next: labels.nextImage, imageOf: labels.imageOf, zoom: labels.zoomImage, close: labels.closeImage }}
           stageClassName="aspect-[4/3] border-4 border-foreground @tablet:aspect-[16/9]"
           sizes="(min-width: 1280px) 1280px, 100vw"
           thumbs="side"

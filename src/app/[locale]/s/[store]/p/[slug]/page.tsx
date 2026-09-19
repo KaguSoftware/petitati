@@ -15,6 +15,7 @@ import { ProductEditSlot } from "@/components/storefront/admin/product-edit-slot
 import { AddToCartPanel } from "@/components/storefront/shared/add-to-cart-panel";
 import { ReviewForm } from "@/components/storefront/shared/review-form";
 import { StickyBuyBar } from "@/components/storefront/shared/sticky-buy-bar";
+import { ShareButton } from "@/components/storefront/shared/share-button";
 import { VariantSelectionProvider } from "@/components/storefront/shared/variant-selection";
 import { GuestWishlistButton, WishlistButton } from "@/components/storefront/shared/wishlist-button";
 
@@ -78,13 +79,18 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/s/[st
       previousImage: t("previousImage"),
       nextImage: t("nextImage"),
       imageOf: t.raw("imageOf") as string,
+      zoomImage: t("zoomImage"),
+      closeImage: t("closeImage"),
     },
     promises,
     purchasePanel: <AddToCartPanel product={product} storeSlug={store.slug} currency={store.currency} locale={locale} formId={formId} />,
     wishlistSlot: (
-      <Suspense>
-        <ProductWishlist storeId={store.id} storeSlug={store.slug} productId={product.id} />
-      </Suspense>
+      <div className="flex flex-col gap-2">
+        <Suspense>
+          <ProductWishlist storeId={store.id} storeSlug={store.slug} productId={product.id} />
+        </Suspense>
+        <ShareButton title={product.name} />
+      </div>
     ),
     relatedSlot: leaf ? (
       <Suspense>

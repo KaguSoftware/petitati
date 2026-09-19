@@ -13,6 +13,7 @@ import { pickJson } from "@/lib/catalog/types";
 import { Badge } from "@/components/ui/badge";
 import { PageShell, pageHeading } from "@/components/storefront/shared/page-shell";
 import { PrintButton } from "@/components/storefront/shared/print-button";
+import { CopyButton } from "@/components/shared/copy-button";
 import { ProductImage } from "@/components/storefront/shared/product-image";
 import type { OrderStatus } from "@/lib/db/types";
 import { dateTimeFormat } from "@/lib/number";
@@ -58,9 +59,12 @@ async function OrderContent({ ctx, id, searchParams }: { ctx: StoreContext; id: 
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className={cn("bidi-auto font-semibold tracking-tight", pageHeading.sub)}>
-            {t("title")} {order.number}
-          </h1>
+          <div className="flex items-center gap-1">
+            <h1 className={cn("bidi-auto font-semibold tracking-tight", pageHeading.sub)}>
+              {t("title")} {order.number}
+            </h1>
+            <CopyButton value={order.number} label={t("copyNumber")} />
+          </div>
           <p className="text-sm text-muted-foreground">
             {t("placedAt")} {dateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(order.placed_at))}
           </p>
@@ -76,9 +80,12 @@ async function OrderContent({ ctx, id, searchParams }: { ctx: StoreContext; id: 
       {DELIVERY_CODE_VISIBLE.includes(order.status) && (
         <section className="flex flex-col gap-1 rounded-xl border border-dashed p-4 text-center">
           <h2 className="text-sm font-medium text-muted-foreground">{t("deliveryCode")}</h2>
-          <p dir="ltr" className="text-3xl font-semibold tracking-[0.3em] tabular-nums">
-            {order.delivery_code}
-          </p>
+          <div className="flex items-center justify-center gap-1">
+            <p dir="ltr" className="text-3xl font-semibold tracking-[0.3em] tabular-nums">
+              {order.delivery_code}
+            </p>
+            <CopyButton value={order.delivery_code} label={t("copyCode")} />
+          </div>
           <p className="text-sm text-muted-foreground">{t("deliveryCodeHint")}</p>
         </section>
       )}

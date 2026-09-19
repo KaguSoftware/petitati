@@ -35,7 +35,10 @@
     "errorOffline": "Bağlantınız kopmuş görünüyor. İnternetinizi kontrol edip tekrar deneyin.",
     "errorRef": "Referans",
     "backHome": "Ana sayfaya dön",
-    "breadcrumb": "Buradasınız"
+    "breadcrumb": "Buradasınız",
+    "copied": "Kopyalandı",
+    "share": "Paylaş",
+    "linkCopied": "Bağlantı kopyalandı"
   },
   "nav": {
     "home": "Ana sayfa",
@@ -108,7 +111,9 @@
     "decreaseQty": "Adedi azalt",
     "increaseQty": "Adedi artır",
     "rateStars": "5 üzerinden {count} ver",
-    "chooseOptions": "Seçenek belirleyin"
+    "chooseOptions": "Seçenek belirleyin",
+    "zoomImage": "Fotoğrafı tam ekran gör",
+    "closeImage": "Fotoğrafı kapat"
   },
   "cart": {
     "title": "Sepetiniz",
@@ -528,7 +533,8 @@
         "label": "Teslimat kodu",
         "attemptsLeft": "Kod kilitlenmeden önce {count} deneme kaldı.",
         "locked": "Çok fazla hatalı deneme sonrası kilitlendi. Yeni bir kod oluşturun.",
-        "reissued": "Yeni kod oluşturuldu"
+        "reissued": "Yeni kod oluşturuldu",
+        "copyCode": "Teslimat kodunu kopyala"
       },
       "slip": {
         "open": "Teslimat fişini yazdır",
@@ -544,7 +550,8 @@
       },
       "delivery": "Teslimat",
       "courierFilter": "Kurye:",
-      "clearCourier": "Kurye filtresini kaldır"
+      "clearCourier": "Kurye filtresini kaldır",
+      "copyNumber": "Sipariş numarasını kopyala"
     },
     "discountType": {
       "percent": "Yüzde",
@@ -1897,7 +1904,9 @@
         "cancelled": "Bu sipariş iptal edildi.",
         "refunded": "Bu siparişin ücreti iade edildi."
       }
-    }
+    },
+    "copyNumber": "Sipariş numarasını kopyala",
+    "copyCode": "Teslimat kodunu kopyala"
   },
   "stores": {
     "title": "Mağazalar",

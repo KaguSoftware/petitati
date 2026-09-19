@@ -5,6 +5,7 @@ import { OrderActions } from "@/components/admin/orders/order-actions";
 import { OrderDetail } from "@/components/admin/orders/order-detail";
 import { CrumbLabel } from "@/components/admin/shared/crumb-label";
 import { PageHeader } from "@/components/admin/shared/page-header";
+import { CopyButton } from "@/components/shared/copy-button";
 import { OptimisticStatusBadge } from "@/components/admin/shared/optimistic-status-badge";
 import { TableSkeleton } from "@/components/admin/shared/table-skeleton";
 import { requireAdminPage } from "@/lib/admin/context";
@@ -62,7 +63,10 @@ async function Content({ params }: { params: Props["params"] }) {
         back={{ href: "/admin/orders", label: t("nav.orders") }}
         title={
           <span className="flex flex-wrap items-center gap-3">
-            <span dir="ltr">{order.number}</span>
+            <span className="flex items-center gap-1">
+              <span dir="ltr">{order.number}</span>
+              <CopyButton value={order.number} label={t("orders.copyNumber")} />
+            </span>
             <OptimisticStatusBadge id={order.id} kind="order" value={order.status} className="text-sm" />
           </span>
         }

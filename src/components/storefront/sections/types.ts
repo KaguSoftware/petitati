@@ -96,6 +96,9 @@ export interface ProductPageProps {
     nextImage: string;
     /** template with `{n}` and `{total}` placeholders */
     imageOf: string;
+    /** Turn on the full-screen photo viewer (optional so previews can leave it off). */
+    zoomImage?: string;
+    closeImage?: string;
   };
   purchasePanel: ReactNode;
   reviewsSection: ReactNode;

@@ -19,7 +19,7 @@ export function ProductPageMinimal({ product, breadcrumb, labels, purchasePanel,
         <ProductGallery
           images={product.images}
           fallbackAlt={product.name}
-          labels={{ previous: labels.previousImage, next: labels.nextImage, imageOf: labels.imageOf }}
+          labels={{ previous: labels.previousImage, next: labels.nextImage, imageOf: labels.imageOf, zoom: labels.zoomImage, close: labels.closeImage }}
           stageClassName="aspect-square rounded-2xl ring-1 ring-foreground/5"
           sizes="(min-width: 768px) 50vw, 100vw"
           thumbs="row"

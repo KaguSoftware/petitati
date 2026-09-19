@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
-import { useEffect, useRef, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight, ImageOff, Maximize2 } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { ImageLightbox } from "./image-lightbox";
 import { ofLabel, useCarousel } from "./use-carousel";
 import { useVariantImages, useVariantSelection } from "./variant-selection";
 
@@ -11,7 +12,8 @@ interface Props {
   images: { url: string; alt: string; variantId?: string | null }[];
   /** Alt text when a photo has none / for the empty placeholder. */
   fallbackAlt: string;
-  labels: { previous: string; next: string; imageOf: string };
+  /** `zoom` + `close` turn on the full-screen viewer (tap the photo to open it). */
+  labels: { previous: string; next: string; imageOf: string; zoom?: string; close?: string };
   /** Classes of the stage box: aspect ratio, radius, frame. */
   stageClassName?: string;
   sizes?: string;
@@ -45,6 +47,8 @@ export function ProductGallery({ images: allImages, fallbackAlt, labels, stageCl
   useEffect(() => go(0), [selectedVariant, go]);
   const many = count > 1;
   const listRef = useRef<HTMLUListElement>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const zoomable = count > 0 && !!labels.zoom && !!labels.close;
 
   // Keep the active thumbnail in view when the rail scrolls (never scrolls the page: the rail is the only overflow).
   useEffect(() => {
@@ -96,6 +100,18 @@ export function ProductGallery({ images: allImages, fallbackAlt, labels, stageCl
             </div>
           ))
         )}
+        {zoomable && (
+          <button
+            type="button"
+            onClick={() => setViewerOpen(true)}
+            aria-label={labels.zoom}
+            className="absolute inset-0 z-[5] cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+          >
+            <span aria-hidden className="absolute bottom-3 start-3 grid size-9 place-items-center rounded-full bg-card/90 text-foreground shadow-md ring-1 ring-foreground/10 @desktop:opacity-0 @desktop:group-hover:opacity-100">
+              <Maximize2 className="size-4" />
+            </span>
+          </button>
+        )}
         {many && (
           <>
             {arrow("prev")}
@@ -109,6 +125,17 @@ export function ProductGallery({ images: allImages, fallbackAlt, labels, stageCl
         )}
         {overlay}
       </div>
+      {zoomable && (
+        <ImageLightbox
+          images={images}
+          fallbackAlt={fallbackAlt}
+          labels={{ previous: labels.previous, next: labels.next, imageOf: labels.imageOf, zoom: labels.zoom!, close: labels.close! }}
+          open={viewerOpen}
+          onOpenChange={setViewerOpen}
+          index={active}
+          onIndexChange={go}
+        />
+      )}
       {many && (
         <ul ref={listRef} className={LIST[thumbs].list}>
           {images.map((img, i) => (

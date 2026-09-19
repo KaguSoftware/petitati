@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { copyText } from "@/components/shared/copy-button";
 import { deleteCourierAction, getCourierLinkAction, rotateCourierTokenAction } from "@/lib/admin/delivery/actions";
 import { useOptimisticAction } from "../shared/use-optimistic-action";
 import { CourierDialog, type CourierDraft } from "./courier-dialog";
@@ -65,7 +66,7 @@ export function CourierRowActions({ storeId, locale, courier, hasStops, variant 
 
   async function copy() {
     if (!link) return;
-    await navigator.clipboard.writeText(link);
+    if (!(await copyText(link))) return;
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }

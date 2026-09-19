@@ -35,7 +35,10 @@
     "errorOffline": "به نظر می‌رسد اینترنت ندارید. اتصال را بررسی کنید و دوباره تلاش کنید.",
     "errorRef": "کد پیگیری",
     "backHome": "برگشت به خانه",
-    "breadcrumb": "مسیر شما"
+    "breadcrumb": "مسیر شما",
+    "copied": "کپی شد",
+    "share": "اشتراک‌گذاری",
+    "linkCopied": "لینک کپی شد"
   },
   "nav": {
     "home": "خانه",
@@ -108,7 +111,9 @@
     "decreaseQty": "کم کردن تعداد",
     "increaseQty": "زیاد کردن تعداد",
     "rateStars": "امتیاز {count} از ۵",
-    "chooseOptions": "گزینه را انتخاب کنید"
+    "chooseOptions": "گزینه را انتخاب کنید",
+    "zoomImage": "دیدن عکس در اندازهٔ بزرگ",
+    "closeImage": "بستن عکس"
   },
   "cart": {
     "title": "سبد خرید شما",
@@ -528,7 +533,8 @@
         "label": "کد تحویل",
         "attemptsLeft": "{count} تلاش تا قفل شدن کد باقی مانده است.",
         "locked": "چند بار اشتباه وارد شد و قفل شد. کد جدید بسازید.",
-        "reissued": "کد جدید ساخته شد"
+        "reissued": "کد جدید ساخته شد",
+        "copyCode": "کپی کد تحویل"
       },
       "slip": {
         "open": "چاپ برگهٔ تحویل",
@@ -544,7 +550,8 @@
       },
       "delivery": "تحویل",
       "courierFilter": "پیک:",
-      "clearCourier": "حذف فیلتر پیک"
+      "clearCourier": "حذف فیلتر پیک",
+      "copyNumber": "کپی شمارهٔ سفارش"
     },
     "discountType": {
       "percent": "درصدی",
@@ -1897,7 +1904,9 @@
         "cancelled": "این سفارش لغو شد.",
         "refunded": "پول این سفارش برگشت داده شد."
       }
-    }
+    },
+    "copyNumber": "کپی شمارهٔ سفارش",
+    "copyCode": "کپی کد تحویل"
   },
   "stores": {
     "title": "فروشگاه‌ها",

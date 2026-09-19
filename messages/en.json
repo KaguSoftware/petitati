@@ -35,7 +35,10 @@
     "errorOffline": "You appear to be offline. Check your connection and try again.",
     "errorRef": "Reference",
     "backHome": "Back to home",
-    "breadcrumb": "You are here"
+    "breadcrumb": "You are here",
+    "copied": "Copied",
+    "share": "Share",
+    "linkCopied": "Link copied"
   },
   "nav": {
     "home": "Home",
@@ -108,7 +111,9 @@
     "decreaseQty": "Decrease quantity",
     "increaseQty": "Increase quantity",
     "rateStars": "Rate {count} out of 5",
-    "chooseOptions": "Choose options"
+    "chooseOptions": "Choose options",
+    "zoomImage": "View photo full screen",
+    "closeImage": "Close photo"
   },
   "cart": {
     "title": "Your cart",
@@ -528,7 +533,8 @@
         "label": "Delivery code",
         "attemptsLeft": "{count} tries left before the code locks.",
         "locked": "Locked after too many wrong tries. Issue a new code.",
-        "reissued": "New code issued"
+        "reissued": "New code issued",
+        "copyCode": "Copy delivery code"
       },
       "slip": {
         "open": "Print delivery slip",
@@ -544,7 +550,8 @@
       },
       "delivery": "Delivery",
       "courierFilter": "Courier:",
-      "clearCourier": "Clear courier filter"
+      "clearCourier": "Clear courier filter",
+      "copyNumber": "Copy order number"
     },
     "discountType": {
       "percent": "Percentage",
@@ -1897,7 +1904,9 @@
         "cancelled": "This order was cancelled.",
         "refunded": "This order was refunded."
       }
-    }
+    },
+    "copyNumber": "Copy order number",
+    "copyCode": "Copy delivery code"
   },
   "stores": {
     "title": "Stores",
