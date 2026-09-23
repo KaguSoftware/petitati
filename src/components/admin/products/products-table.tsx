@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import { DataTable, type Column } from "../shared/data-table";
 import { EmptyState } from "../shared/empty-state";
 import { SortHeader } from "../shared/sort-header";
-import { BestsellerSwitch, FeaturedSwitch, ProductRowActions, VisibilityToggle } from "./product-row-controls";
-import { dateTimeFormat, numberFormat } from "@/lib/number";
+import { ProductRowActions, VisibilityToggle } from "./product-row-controls";
+import { numberFormat } from "@/lib/number";
 
 interface Props {
   rows: ProductListRow[];
@@ -25,13 +25,15 @@ interface Props {
 export async function ProductsTable({ rows, storeId, locale, currency, lowStockThreshold, canWrite, sort, query, emptyAction }: Props) {
   const t = await getTranslations("admin");
   const num = numberFormat(locale);
-  const date = dateTimeFormat(locale, { dateStyle: "medium" });
   const basePath = "/admin/products";
   const price = (r: ProductListRow) => {
     if (r.priceMin == null || r.priceMax == null) return <span className="text-muted-foreground">—</span>;
     const min = formatMoney(r.priceMin, currency, locale);
     return r.priceMin === r.priceMax ? min : `${min} – ${formatMoney(r.priceMax, currency, locale)}`;
   };
+  // Kept to what staff scan for: which product, is it on the site, price, stock. Featured,
+  // best seller, categories and dates live on the product page; the table must fit without
+  // sideways scrolling, so the name wraps to two lines instead of widening the table.
   const columns: Column<ProductListRow>[] = [
     {
       key: "name",
@@ -47,57 +49,26 @@ export async function ProductsTable({ rows, storeId, locale, currency, lowStockT
             )}
           </span>
           <span className="flex min-w-0 flex-col">
-            <span className="truncate font-medium group-hover:underline">{r.name}</span>
-            <span className="truncate text-xs text-muted-foreground" dir="ltr">
-              /{r.slug}
-            </span>
+            <span className="line-clamp-2 font-medium whitespace-normal group-hover:underline">{r.name}</span>
+            {r.brandName && <span className="truncate text-xs text-muted-foreground">{r.brandName}</span>}
           </span>
         </Link>
       ),
+      className: "w-full min-w-44",
     },
     { key: "status", header: t("products.visibility.header"), cell: (r) => <VisibilityToggle storeId={storeId} productId={r.id} status={r.status} disabled={!canWrite} /> },
-    { key: "price", header: t("products.price"), cell: (r) => <span className="tabular-nums whitespace-nowrap">{price(r)}</span>, hideBelow: "md" },
+    { key: "price", header: t("products.price"), cell: (r) => <span className="tabular-nums whitespace-nowrap">{price(r)}</span>, hideBelow: "sm" },
     {
       key: "stock",
       header: t("products.stock"),
       cell: (r) =>
         r.tracksStock ? (
-          <span className={cn("tabular-nums", r.stockTotal <= 0 ? "font-medium text-destructive" : r.stockTotal <= lowStockThreshold && "font-medium text-amber-700 dark:text-amber-300")}>
-            {num.format(r.stockTotal)}
-            <span className="ms-1 text-xs font-normal text-muted-foreground">{t("products.variantsCount", { count: r.variantCount })}</span>
-          </span>
+          <span className={cn("tabular-nums", r.stockTotal <= 0 ? "font-medium text-destructive" : r.stockTotal <= lowStockThreshold && "font-medium text-amber-700 dark:text-amber-300")}>{num.format(r.stockTotal)}</span>
         ) : (
           <span className="text-xs text-muted-foreground">{t("products.untracked")}</span>
         ),
       className: "text-end",
-      hideBelow: "sm",
-    },
-    { key: "brand", header: t("products.brand"), cell: (r) => <span className="text-muted-foreground">{r.brandName ?? "—"}</span>, hideBelow: "lg" },
-    {
-      key: "categories",
-      header: t("products.categories"),
-      cell: (r) => <span className="line-clamp-2 text-muted-foreground">{r.categoryNames.length ? r.categoryNames.join(", ") : "—"}</span>,
-      hideBelow: "lg",
-    },
-    {
-      key: "updated",
-      header: <SortHeader label={t("products.updated")} sortKey="updated_at" current={sort} basePath={basePath} query={query} />,
-      cell: (r) => <span className="text-muted-foreground tabular-nums whitespace-nowrap">{date.format(new Date(r.updated_at))}</span>,
-      hideBelow: "xl",
-    },
-    {
-      key: "featured",
-      header: t("products.featured"),
-      cell: (r) => <FeaturedSwitch storeId={storeId} productId={r.id} checked={r.is_featured} disabled={!canWrite} />,
-      className: "text-center",
       hideBelow: "md",
-    },
-    {
-      key: "bestseller",
-      header: t("products.bestseller"),
-      cell: (r) => <BestsellerSwitch storeId={storeId} productId={r.id} checked={r.is_bestseller} disabled={!canWrite} />,
-      className: "text-center",
-      hideBelow: "lg",
     },
     ...(canWrite
       ? [
