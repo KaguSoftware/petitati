@@ -430,3 +430,47 @@ export async function getShippingRates(storeId: string): Promise<ShippingRateRow
   if (error) throw error;
   return data;
 }
+
+/**
+ * For the /brands filter chips: each brand → the top-level categories ("pet types": Dog, Cat…)
+ * its active products sit under. One pass over product_categories, cached with the catalog.
+ */
+export async function getBrandPetTypes(storeId: string): Promise<Record<string, string[]>> {
+  "use cache";
+  cacheTag(catalogTag(storeId));
+  cacheLife("hours");
+
+  const db = createSupabaseAdminClient();
+  const [{ data: cats, error: cErr }, { data: prods, error: pErr }] = await Promise.all([
+    db.from("categories").select("id, parent_id").eq("store_id", storeId).eq("is_active", true).returns<{ id: string; parent_id: string | null }[]>(),
+    db
+      .from("products")
+      .select("brand_id, product_categories(category_id)")
+      .eq("store_id", storeId)
+      .eq("status", "active")
+      .not("brand_id", "is", null)
+      .returns<{ brand_id: string; product_categories: { category_id: string }[] }[]>(),
+  ]);
+  if (cErr) throw cErr;
+  if (pErr) throw pErr;
+  const parentOf = new Map((cats ?? []).map((c) => [c.id, c.parent_id]));
+  const rootOf = (id: string) => {
+    let cur = id;
+    for (let hops = 0; hops < 20; hops++) {
+      const p = parentOf.get(cur);
+      if (!p || !parentOf.has(p)) return parentOf.has(cur) ? cur : null;
+      cur = p;
+    }
+    return cur;
+  };
+  const out = new Map<string, Set<string>>();
+  for (const p of prods ?? []) {
+    for (const pc of p.product_categories) {
+      const root = rootOf(pc.category_id);
+      if (!root) continue;
+      if (!out.has(p.brand_id)) out.set(p.brand_id, new Set());
+      out.get(p.brand_id)!.add(root);
+    }
+  }
+  return Object.fromEntries([...out].map(([k, v]) => [k, [...v]]));
+}

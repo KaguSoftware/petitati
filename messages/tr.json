@@ -1964,7 +1964,11 @@
   "brands": {
     "title": "Markalar",
     "empty": "Ürünler eklendikçe markalar burada görünecek.",
-    "emptyTitle": "Henüz marka yok"
+    "emptyTitle": "Henüz marka yok",
+    "search": "Marka ara",
+    "petType": "Hayvan türü",
+    "allPets": "Tümü",
+    "noMatch": "Eşleşen marka yok."
   },
   "category": {
     "subcategories": "Alt kategoriler"

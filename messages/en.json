@@ -1964,7 +1964,11 @@
   "brands": {
     "title": "Brands",
     "empty": "Brands will appear here as products are added.",
-    "emptyTitle": "No brands yet"
+    "emptyTitle": "No brands yet",
+    "search": "Search brands",
+    "petType": "Pet type",
+    "allPets": "All",
+    "noMatch": "No brands match."
   },
   "category": {
     "subcategories": "Subcategories"
