@@ -106,13 +106,17 @@ export function countryName(code: string, locale: string): string {
   }
 }
 
+/**
+ * The short list the phone pickers show, nearest first: the shop sells to Iran and its
+ * neighbours (plus the Gulf and the two biggest diaspora countries), so a 245-row list was noise.
+ */
+export const PHONE_COUNTRY_CODES = [
+  "IR", "TR", "IQ", "AZ", "AM", "GE", "AF", "AE", "KW", "QA", "OM", "BH", "SA", "DE", "GB",
+] as const;
+
+export const PHONE_COUNTRIES: readonly Country[] = PHONE_COUNTRY_CODES.map((code) => byCode.get(code)!);
+
+/** Phone picker default: Turkish UI gets Turkey, everything else Iran (the main market). */
 export function defaultCountryForLocale(locale: string): string {
-  switch (locale) {
-    case "tr":
-      return "TR";
-    case "fa":
-      return "IR";
-    default:
-      return "US";
-  }
+  return locale === "tr" ? "TR" : "IR";
 }

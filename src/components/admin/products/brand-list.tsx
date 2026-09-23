@@ -1,17 +1,22 @@
-import { BadgeCheck, Pencil } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+"use client";
+
+import { ArrowDownAZ, BadgeCheck, ChevronDown, ChevronsUp, ChevronUp, Pencil } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { reorderBrandsAction, sortBrandsByNameAction } from "@/lib/admin/brands/actions";
 import type { BrandAdminRow } from "@/lib/admin/brands/types";
+import { numberFormat } from "@/lib/number";
+import { ConfirmDialog } from "../shared/confirm-dialog";
 import { DataTable, type Column } from "../shared/data-table";
 import { EmptyState } from "../shared/empty-state";
+import { useOptimisticAction } from "../shared/use-optimistic-action";
 import { BrandActiveSwitch, BrandDeleteButton, BrandDialog } from "./brand-dialog";
-import { numberFormat } from "@/lib/number";
 
 interface Props {
   rows: BrandAdminRow[];
   storeId: string;
-  locale: string;
   canWrite: boolean;
 }
 
@@ -25,10 +30,63 @@ function initials(name: string) {
     .join("");
 }
 
-export async function BrandList({ rows, storeId, locale, canWrite }: Props) {
-  const t = await getTranslations("admin");
+/**
+ * Brands in the order the shop shows them. The order is local state moved by arrow buttons (no
+ * drag dependency, works on touch); each move sends the whole id list, and rolls back on error.
+ */
+export function BrandList({ rows, storeId, canWrite }: Props) {
+  const t = useTranslations("admin");
+  const locale = useLocale();
   const num = numberFormat(locale);
+  const [order, setOrder] = useState(rows);
+  // A server refresh (new brand, A–Z, delete) replaces the local order.
+  const [seen, setSeen] = useState(rows);
+  if (seen !== rows) {
+    setSeen(rows);
+    setOrder(rows);
+  }
+  const { run, pending } = useOptimisticAction("admin.products");
+
+  function move(from: number, to: number) {
+    if (to < 0 || to >= order.length || from === to) return;
+    const snapshot = order;
+    const next = [...order];
+    const [row] = next.splice(from, 1);
+    next.splice(to, 0, row);
+    setOrder(next);
+    const fd = new FormData();
+    fd.set("storeId", storeId);
+    for (const b of next) fd.append("brandIds", b.id);
+    run(() => reorderBrandsAction({}, fd), { rollback: () => setOrder(snapshot) });
+  }
+
   const columns: Column<BrandAdminRow>[] = [
+    {
+      key: "position",
+      header: t("brands.position"),
+      cell: (r) => {
+        const i = order.indexOf(r);
+        return (
+          <div className="flex items-center gap-1">
+            <span className="w-7 text-center text-sm font-medium tabular-nums text-muted-foreground">{num.format(i + 1)}</span>
+            {canWrite && (
+              <>
+                <Button type="button" variant="ghost" size="icon-xs" aria-label={t("brands.moveTop")} title={t("brands.moveTop")} disabled={i === 0} onClick={() => move(i, 0)}>
+                  <ChevronsUp />
+                </Button>
+                <Button type="button" variant="ghost" size="icon-xs" aria-label={t("brands.moveUp")} disabled={i === 0} onClick={() => move(i, i - 1)}>
+                  <ChevronUp />
+                </Button>
+                <Button type="button" variant="ghost" size="icon-xs" aria-label={t("brands.moveDown")} disabled={i === order.length - 1} onClick={() => move(i, i + 1)}>
+                  <ChevronDown />
+                </Button>
+              </>
+            )}
+          </div>
+        );
+      },
+      className: "w-36",
+    },
     {
       key: "name",
       header: t("brands.name"),
@@ -42,12 +100,7 @@ export async function BrandList({ rows, storeId, locale, canWrite }: Props) {
               initials(r.name)
             )}
           </span>
-          <span className="flex min-w-0 flex-col">
-            <span className="truncate font-medium">{r.name}</span>
-            <span className="truncate text-xs text-muted-foreground" dir="ltr">
-              /{r.slug}
-            </span>
-          </span>
+          <span className="truncate font-medium">{r.name}</span>
         </div>
       ),
     },
@@ -62,7 +115,6 @@ export async function BrandList({ rows, storeId, locale, canWrite }: Props) {
       className: "text-end",
       hideBelow: "sm",
     },
-    { key: "sort", header: t("brands.sortOrder"), cell: (r) => <span className="text-muted-foreground tabular-nums">{num.format(r.sort_order)}</span>, className: "text-end", hideBelow: "lg" },
     {
       key: "active",
       header: t("brands.active"),
@@ -93,19 +145,45 @@ export async function BrandList({ rows, storeId, locale, canWrite }: Props) {
         ]
       : []),
   ];
+
   return (
-    <DataTable
-      columns={columns}
-      rows={rows}
-      rowKey={(r) => r.id}
-      empty={
-        <EmptyState
-          icon={BadgeCheck}
-          title={t("brands.empty")}
-          description={t("brands.emptyHint")}
-          action={canWrite ? <BrandDialog storeId={storeId} trigger={<Button type="button">{t("brands.new")}</Button>} /> : null}
-        />
-      }
-    />
+    <div className="flex flex-col gap-3">
+      {order.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-muted-foreground">{t("brands.orderHint")}</p>
+          {canWrite && (
+            <ConfirmDialog
+              trigger={
+                <Button type="button" variant="outline" size="sm" disabled={pending}>
+                  <ArrowDownAZ data-icon="inline-start" />
+                  {t("brands.sortAz")}
+                </Button>
+              }
+              title={t("brands.sortAzTitle")}
+              description={t("brands.sortAzDescription")}
+              confirmLabel={t("brands.sortAz")}
+              action={() => {
+                const fd = new FormData();
+                fd.set("storeId", storeId);
+                return sortBrandsByNameAction({}, fd);
+              }}
+            />
+          )}
+        </div>
+      )}
+      <DataTable
+        columns={columns}
+        rows={order}
+        rowKey={(r) => r.id}
+        empty={
+          <EmptyState
+            icon={BadgeCheck}
+            title={t("brands.empty")}
+            description={t("brands.emptyHint")}
+            action={canWrite ? <BrandDialog storeId={storeId} trigger={<Button type="button">{t("brands.new")}</Button>} /> : null}
+          />
+        }
+      />
+    </div>
   );
 }

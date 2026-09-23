@@ -233,8 +233,15 @@
       "phoneTaken": "This phone number is already in use.",
       "oauth": "Google sign-in failed. Please try again.",
       "credentials": "Wrong email or password.",
-      "emailNotConfirmed": "Confirm your email first — we sent you the link."
-    }
+      "emailNotConfirmed": "Confirm your email first — we sent you the link.",
+      "passwordShort": "Use at least 8 characters."
+    },
+    "finishingSignIn": "Signing you in",
+    "finishingSignInHint": "One moment…",
+    "linkExpired": "This link has expired or was already used. Sign in, or ask for a new invite.",
+    "completeInviteIntro": "Welcome! Choose a password and add your phone number to finish.",
+    "choosePassword": "Choose a password",
+    "choosePasswordHint": "At least 8 characters. You'll use it with your email to sign in."
   },
   "orderStatus": {
     "pending_payment": "Pending payment",
@@ -288,8 +295,8 @@
         "text": "Your payment details stay protected."
       },
       "returns": {
-        "title": "Easy returns",
-        "text": "14 days to change your mind."
+        "title": "Easy exchanges",
+        "text": "14 days to swap for another size or item."
       },
       "support": {
         "title": "Friendly support",
@@ -583,7 +590,13 @@
       "delivery": "Delivery",
       "courierFilter": "Courier:",
       "clearCourier": "Clear courier filter",
-      "copyNumber": "Copy order number"
+      "copyNumber": "Copy order number",
+      "toBuy": {
+        "title": "To buy",
+        "hint": "Where to buy each item in this order. Opened links turn grey.",
+        "buyOn": "Buy on {site}",
+        "noLink": "No buy link yet"
+      }
     },
     "discountType": {
       "percent": "Percentage",
@@ -865,6 +878,14 @@
       "shortDescription": "Short description",
       "description": "Description",
       "emptyHint": "Create your first product or adjust the filters.",
+      "visibility": {
+        "header": "On site",
+        "on": "Visible",
+        "off": "Hidden",
+        "archived": "Archived",
+        "hideHint": "Shown in the shop. Click to hide it.",
+        "showHint": "Not shown in the shop. Click to show it."
+      },
       "actions": {
         "viewStorefront": "View on storefront",
         "activate": "Set active",
@@ -879,13 +900,16 @@
         "hasOrders": "This product appears in orders, so it cannot be deleted. Archive it instead.",
         "tooManyVariants": "Too many variants would be created (limit 200). Reduce the option values.",
         "variantHasOrders": "This variant appears in orders and cannot be deleted. Deactivate it instead.",
-        "variantInCarts": "This variant is in a shopper's cart. Deactivate it instead of deleting."
+        "variantInCarts": "This variant is in a shopper's cart. Deactivate it instead of deleting.",
+        "variantNameRequired": "Every row needs a name (e.g. 2 kg or Small).",
+        "skuTaken": "Another product already uses one of these SKUs."
       },
       "fieldErrors": {
         "slugFormat": "Only lowercase letters, digits and dashes.",
         "optionNameRequired": "Every option needs a name in the default language.",
         "optionValuesRequired": "Every option needs at least one value.",
-        "optionValueRequired": "Every value needs a label in the default language."
+        "optionValueRequired": "Every value needs a label in the default language.",
+        "parentLoop": "A category can't go inside itself or one of its own subcategories."
       },
       "options": {
         "title": "Options",
@@ -970,49 +994,98 @@
           "photos": "Photos"
         }
       },
-      "seoLength": "{count}/{limit} characters · search results show about {limit}"
+      "seoLength": "{count}/{limit} characters · search results show about {limit}",
+      "table": {
+        "title": "Price & stock",
+        "hintSingle": "Set the price and how many you have. If it comes in sizes or types, add them below.",
+        "hintSeveral": "One row per size or type. Customers pick one of these names on the product page.",
+        "chooseBy": "Customers choose by",
+        "chooseByPlaceholder": "e.g. Size, Weight, Flavour",
+        "name": "Name",
+        "namePlaceholder": "e.g. 2 kg",
+        "unnamed": "No name",
+        "price": "Price",
+        "stock": "Stock",
+        "notTracked": "Not counted",
+        "stockViaInventory": "Stock changes go through Inventory",
+        "adjust": "change",
+        "sku": "SKU",
+        "buyLink": "Buy link",
+        "openLink": "Open the link",
+        "more": "More settings",
+        "remove": "Remove this row",
+        "compareAt": "Old price",
+        "compareAtHint": "Shown crossed out.",
+        "cost": "Your cost",
+        "costHint": "Only you see this.",
+        "weight": "Weight (g)",
+        "barcode": "Barcode",
+        "isActive": "On sale",
+        "trackInventory": "Count stock",
+        "allowBackorder": "Sell when out of stock",
+        "isDefault": "Selected first",
+        "addRow": "Add a size or type",
+        "makeSeveral": "It comes in several sizes or types"
+      }
     },
     "categories": {
       "title": "Categories",
       "hint": "Group products for navigation. Nested categories show under their parent.",
       "new": "New category",
       "edit": "Edit category",
-      "dialogHint": "The name is required in the store's default language.",
+      "dialogHint": "Type the name in any language. That's all that's needed.",
       "name": "Name",
       "description": "Description",
       "slug": "URL slug",
-      "parent": "Parent",
-      "noParent": "No parent (top level)",
-      "sortOrder": "Sort order",
+      "parent": "Put inside",
+      "noParent": "None (main category)",
       "image": "Image",
       "replaceImage": "Replace image",
-      "active": "Visible in the storefront",
+      "active": "Show in shop",
       "products": "Products",
       "empty": "No categories yet",
       "emptyHint": "Create categories to organise the catalogue.",
       "delete": {
         "title": "Delete this category?",
         "description": "{count, plural, =0 {No products are linked.} =1 {1 product loses this category.} other {# products lose this category.}} Sub-categories move to the top level."
-      }
+      },
+      "parentHint": "Pick a category to put this one inside it. Leave as top level for a main category.",
+      "newSub": "New subcategory in {parent}",
+      "addSub": "Subcategory",
+      "addSubFor": "Add a subcategory to {name}",
+      "inParent": "in {parent}",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "advanced": "Advanced: web address",
+      "slugHint": "Leave empty to make it from the name."
     },
     "brands": {
       "title": "Brands",
       "hint": "Manufacturer brands (Royal Canin, Gourmet…). Each product can belong to one brand.",
       "new": "New brand",
       "edit": "Edit brand",
-      "dialogHint": "The slug is generated from the name; edit it only if you need a different URL.",
+      "dialogHint": "Just the name. The web address is made for you.",
       "name": "Name",
       "slug": "URL slug",
       "logo": "Logo",
       "replaceLogo": "Replace logo",
-      "sortOrder": "Sort order",
-      "active": "Visible in the storefront",
+      "active": "Show in shop",
       "products": "Products",
       "empty": "No brands yet",
       "emptyHint": "Create brands to let shoppers browse by manufacturer.",
       "deleteConfirm": "Delete this brand?",
       "deleteDescription": "{count, plural, =0 {No products are linked.} =1 {1 product loses this brand.} other {# products lose this brand.}} Products themselves are kept.",
-      "none": "No brand"
+      "none": "No brand",
+      "advanced": "Advanced: web address",
+      "slugHint": "Leave empty to make it from the name.",
+      "position": "Order",
+      "moveTop": "Move to top",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "orderHint": "The shop lists brands in this order. Use the arrows to move one.",
+      "sortAz": "Sort A–Z",
+      "sortAzTitle": "Sort all brands A–Z?",
+      "sortAzDescription": "Your current order is replaced by alphabetical order. You can move brands again afterwards."
     },
     "inventory": {
       "subtitle": "Stock per variant. Adjustments are recorded as movements.",
@@ -1507,7 +1580,7 @@
         "social": "Social links",
         "socialHint": "Full https:// links. WhatsApp accepts wa.me links.",
         "trust": "Trust strip",
-        "trustHint": "Four small promises above the footer (shipping, payment, returns, support). Leave the list empty to use the defaults.",
+        "trustHint": "Four small promises above the footer (shipping, payment, exchanges, support). Leave the list empty to use the defaults.",
         "trustEnabled": "Show the trust strip",
         "item": "Item {n}",
         "addItem": "Add item",
@@ -1518,7 +1591,7 @@
         "icons": {
           "truck": "Truck",
           "shield-check": "Shield",
-          "rotate-ccw": "Returns arrow",
+          "rotate-ccw": "Exchange arrows",
           "headset": "Headset",
           "badge-percent": "Discount badge",
           "gift": "Gift"

@@ -18,9 +18,8 @@ import { ConfirmDialog } from "../shared/confirm-dialog";
 import { FormField } from "../shared/form-field";
 import { ImageUploader } from "../shared/image-uploader";
 import { LocaleTabs } from "../shared/locale-tabs";
-import { NumberInput } from "../shared/number-input";
 import { useActionToast } from "../shared/use-action-toast";
-import { slugify, useProductFieldErrors } from "./product-form";
+import { useProductFieldErrors } from "./product-form";
 
 interface Props {
   storeId: string;
@@ -29,14 +28,39 @@ interface Props {
   enabledLocales: Locale[];
   /** Existing category to edit; omit for "new". */
   category?: CategoryAdminRow;
-  /** Candidate parents (the category itself is filtered out). */
+  /** Every category; the dialog leaves out this one and its own subcategories. */
   parents: CategoryOption[];
+  /** "+ Subcategory" on a row: new category that starts under this parent. */
+  presetParent?: { id: string; name: string };
   trigger: React.ReactElement;
+}
+
+/**
+ * Parent choices as an indented tree ("— Dogs", "—— Dog food"), without `selfId` and everything
+ * under it, so a category can never become its own grandchild.
+ */
+function parentChoices(all: CategoryOption[], selfId?: string): { id: string; label: string }[] {
+  const ids = new Set(all.map((c) => c.id));
+  const kids = new Map<string | null, CategoryOption[]>();
+  for (const c of all) {
+    const key = c.parentId && ids.has(c.parentId) ? c.parentId : null;
+    kids.set(key, [...(kids.get(key) ?? []), c]);
+  }
+  const out: { id: string; label: string }[] = [];
+  const walk = (parent: string | null, depth: number) => {
+    for (const c of kids.get(parent) ?? []) {
+      if (c.id === selfId) continue; // skips the whole branch below it too
+      out.push({ id: c.id, label: `${"— ".repeat(depth)}${c.name}` });
+      walk(c.id, depth + 1);
+    }
+  };
+  walk(null, 0);
+  return out;
 }
 
 const NONE = "__none";
 
-export function CategoryDialog({ storeId, locale, defaultLocale, enabledLocales, category, parents, trigger }: Props) {
+export function CategoryDialog({ storeId, locale, defaultLocale, enabledLocales, category, parents, presetParent, trigger }: Props) {
   const t = useTranslations("admin");
   const [open, setOpen] = useState(false);
   return (
@@ -50,8 +74,9 @@ export function CategoryDialog({ storeId, locale, defaultLocale, enabledLocales,
             defaultLocale={defaultLocale}
             enabledLocales={enabledLocales}
             category={category}
-            parents={parents.filter((p) => p.id !== category?.id)}
-            title={category ? t("categories.edit") : t("categories.new")}
+            parents={parents}
+            presetParent={presetParent}
+            title={category ? t("categories.edit") : presetParent ? t("categories.newSub", { parent: presetParent.name }) : t("categories.new")}
             onDone={() => setOpen(false)}
           />
         )}
@@ -60,7 +85,7 @@ export function CategoryDialog({ storeId, locale, defaultLocale, enabledLocales,
   );
 }
 
-function CategoryForm({ storeId, locale, defaultLocale, enabledLocales, category, parents, title, onDone }: Omit<Props, "trigger"> & { title: string; onDone: () => void }) {
+function CategoryForm({ storeId, locale, defaultLocale, enabledLocales, category, parents, presetParent, title, onDone }: Omit<Props, "trigger"> & { title: string; onDone: () => void }) {
   const t = useTranslations("admin");
   const [state, action, pending] = useActionToast(saveCategoryAction, { errorNamespace: "admin.products", onSuccess: onDone });
   const errors = useProductFieldErrors(state.fieldErrors);
@@ -79,19 +104,20 @@ function CategoryForm({ storeId, locale, defaultLocale, enabledLocales, category
     const wanted = state.fieldErrors?.translations as Locale | undefined;
     if (wanted && enabledLocales.includes(wanted)) setActive(wanted);
   }
+  // Empty = the server makes one from the name; only the Advanced section shows it.
   const [slug, setSlug] = useState(category?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(!!category);
-  const [parentId, setParentId] = useState(category?.parent_id ?? NONE);
+  const [parentId, setParentId] = useState(category?.parent_id ?? presetParent?.id ?? NONE);
   const [imageUrl, setImageUrl] = useState(category?.image_url ?? "");
 
   const current = translations[active] ?? { name: "", description: "" };
-  const missing = enabledLocales.filter((l) => !translations[l]?.name.trim());
-  const parentItems = [{ value: NONE, label: t("categories.noParent") }, ...parents.map((p) => ({ value: p.id, label: p.name }))];
+  // A name in any one language is enough (the server copies it to the default language).
+  const anyName = enabledLocales.some((l) => translations[l]?.name.trim());
+  const missing = anyName ? [] : [active];
+  const parentItems = [{ value: NONE, label: t("categories.noParent") }, ...parentChoices(parents, category?.id).map((p) => ({ value: p.id, label: p.label }))];
   const nameError = errors?.name && (state.fieldErrors?.translations ?? defaultLocale) === active ? { name: errors.name } : undefined;
 
   function patch(field: "name" | "description", value: string) {
     setTranslations((prev) => ({ ...prev, [active]: { ...(prev[active] ?? { name: "", description: "" }), [field]: value } }));
-    if (field === "name" && active === defaultLocale && !slugTouched) setSlug(slugify(value));
   }
 
   return (
@@ -106,9 +132,9 @@ function CategoryForm({ storeId, locale, defaultLocale, enabledLocales, category
         <DialogDescription>{t("categories.dialogHint")}</DialogDescription>
       </DialogHeader>
 
-      <LocaleTabs locales={enabledLocales} value={active} onValueChange={setActive} missing={missing} required={defaultLocale} />
+      {enabledLocales.length > 1 && <LocaleTabs locales={enabledLocales} value={active} onValueChange={setActive} missing={missing} />}
       <div key={active} className="flex flex-col gap-4" lang={active} dir={active === "fa" ? "rtl" : "ltr"}>
-        <FormField name="name" label={t("categories.name")} errors={nameError} required={active === defaultLocale}>
+        <FormField name="name" label={t("categories.name")} errors={nameError} required={!anyName}>
           <Input id="name" value={current.name} onChange={(e) => patch("name", e.target.value)} autoComplete="off" />
         </FormField>
         <FormField name="description" label={t("categories.description")}>
@@ -116,21 +142,7 @@ function CategoryForm({ storeId, locale, defaultLocale, enabledLocales, category
         </FormField>
       </div>
 
-      <FormField name="slug" label={t("categories.slug")} errors={errors} required>
-        <LatinInput
-          kind="code"
-          id="slug"
-          name="slug"
-          value={slug}
-          className="normal-case tracking-normal"
-          onChange={(e) => {
-            setSlugTouched(true);
-            setSlug(e.target.value.toLowerCase());
-          }}
-        />
-      </FormField>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormField name="parent_id" label={t("categories.parent")} errors={errors}>
+      <FormField name="parent_id" label={t("categories.parent")} description={t("categories.parentHint")} errors={errors}>
           <Select items={parentItems} value={parentId} onValueChange={(v) => v && setParentId(String(v))} modal={false}>
             <SelectTrigger id="parent_id" className="w-full">
               <SelectValue />
@@ -143,11 +155,7 @@ function CategoryForm({ storeId, locale, defaultLocale, enabledLocales, category
               ))}
             </SelectContent>
           </Select>
-        </FormField>
-        <FormField name="sort_order" label={t("categories.sortOrder")} errors={errors}>
-          <NumberInput id="sort_order" name="sort_order" defaultValue={category?.sort_order ?? 0} min={0} />
-        </FormField>
-      </div>
+      </FormField>
 
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t("categories.image")}</span>
@@ -169,6 +177,15 @@ function CategoryForm({ storeId, locale, defaultLocale, enabledLocales, category
         <span>{t("categories.active")}</span>
         <Switch name="is_active" defaultChecked={category?.is_active ?? true} />
       </Label>
+
+      <details className="rounded-lg border px-3 py-2" open={!!errors?.slug}>
+        <summary className="cursor-pointer text-sm text-muted-foreground select-none">{t("categories.advanced")}</summary>
+        <div className="pt-3">
+          <FormField name="slug" label={t("categories.slug")} description={t("categories.slugHint")} errors={errors}>
+            <LatinInput kind="code" id="slug" name="slug" value={slug} className="normal-case tracking-normal" onChange={(e) => setSlug(e.target.value.toLowerCase())} />
+          </FormField>
+        </div>
+      </details>
 
       <DialogFooter>
         <Button type="button" variant="ghost" onClick={onDone}>

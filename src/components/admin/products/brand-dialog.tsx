@@ -14,11 +14,10 @@ import type { BrandAdminRow } from "@/lib/admin/brands/types";
 import { ConfirmDialog } from "../shared/confirm-dialog";
 import { FormField } from "../shared/form-field";
 import { ImageUploader } from "../shared/image-uploader";
-import { NumberInput } from "../shared/number-input";
 import { clearOptimistic, setOptimistic, useOptimisticRow } from "../shared/optimistic-store";
 import { useActionToast } from "../shared/use-action-toast";
 import { useOptimisticAction } from "../shared/use-optimistic-action";
-import { slugify, useProductFieldErrors } from "./product-form";
+import { useProductFieldErrors } from "./product-form";
 
 interface Props {
   storeId: string;
@@ -46,8 +45,8 @@ function BrandForm({ storeId, brand, title, onDone }: Omit<Props, "trigger"> & {
   const errors = useProductFieldErrors(state.fieldErrors);
   // Every field is controlled: React resets uncontrolled inputs after a form action completes.
   const [name, setName] = useState(brand?.name ?? "");
+  // Empty = the server makes one from the name (Farsi included); only the Advanced section shows it.
   const [slug, setSlug] = useState(brand?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(!!brand);
   const [logoUrl, setLogoUrl] = useState(brand?.logo_url ?? "");
   const [active, setActive] = useState(brand?.is_active ?? true);
 
@@ -68,28 +67,17 @@ function BrandForm({ storeId, brand, title, onDone }: Omit<Props, "trigger"> & {
           value={name}
           autoComplete="off"
           dir="auto"
-          onChange={(e) => {
-            setName(e.target.value);
-            if (!slugTouched) setSlug(slugify(e.target.value));
-          }}
+          onChange={(e) => setName(e.target.value)}
         />
       </FormField>
-      <FormField name="slug" label={t("brands.slug")} errors={errors}>
-        <LatinInput
-          kind="code"
-          id="slug"
-          name="slug"
-          value={slug}
-          className="normal-case tracking-normal"
-          onChange={(e) => {
-            setSlugTouched(true);
-            setSlug(e.target.value.toLowerCase());
-          }}
-        />
-      </FormField>
-      <FormField name="sort_order" label={t("brands.sortOrder")} errors={errors}>
-        <NumberInput id="sort_order" name="sort_order" defaultValue={brand?.sort_order ?? 0} min={0} />
-      </FormField>
+      <details className="group rounded-lg border px-3 py-2" open={!!errors?.slug}>
+        <summary className="cursor-pointer text-sm text-muted-foreground select-none">{t("brands.advanced")}</summary>
+        <div className="pt-3">
+          <FormField name="slug" label={t("brands.slug")} description={t("brands.slugHint")} errors={errors}>
+            <LatinInput kind="code" id="slug" name="slug" value={slug} className="normal-case tracking-normal" onChange={(e) => setSlug(e.target.value.toLowerCase())} />
+          </FormField>
+        </div>
+      </details>
 
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t("brands.logo")}</span>

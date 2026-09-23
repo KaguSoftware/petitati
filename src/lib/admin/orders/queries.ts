@@ -115,6 +115,8 @@ export interface OrderDetail extends OrderRow {
   refunds: RefundRow[];
   order_events: OrderEventWithActor[];
   customers: { id: string; full_name: string | null; phone: string | null; email: string } | null;
+  /** Where the shop buys each line (order item id → supplier link), from product_sources. */
+  buyLinks: Record<string, string>;
 }
 
 export async function getOrder(storeId: string, id: string): Promise<OrderDetail | null> {
@@ -125,7 +127,27 @@ export async function getOrder(storeId: string, id: string): Promise<OrderDetail
     .eq("store_id", storeId)
     .eq("id", id)
     .order("created_at", { referencedTable: "order_events", ascending: true })
-    .maybeSingle<OrderDetail>();
+    .maybeSingle<Omit<OrderDetail, "buyLinks">>();
   if (error) throw error;
-  return data ?? null;
+  if (!data) return null;
+  return { ...data, buyLinks: await buyLinksFor(db, storeId, data.order_items) };
+}
+
+/**
+ * The supplier link for every order line: the variant's own, else any link on the same product
+ * (the variant may have been replaced since). A failed read just shows no links.
+ */
+async function buyLinksFor(db: ReturnType<typeof createSupabaseAdminClient>, storeId: string, items: OrderItemRow[]): Promise<Record<string, string>> {
+  const productIds = [...new Set(items.map((i) => i.product_id).filter((x): x is string => !!x))];
+  if (productIds.length === 0) return {};
+  const { data } = await db.from("product_sources").select("variant_id, product_id, source_url").eq("store_id", storeId).in("product_id", productIds).returns<{ variant_id: string; product_id: string; source_url: string }[]>();
+  const byVariant = new Map((data ?? []).map((r) => [r.variant_id, r.source_url]));
+  const byProduct = new Map<string, string>();
+  for (const r of data ?? []) if (!byProduct.has(r.product_id)) byProduct.set(r.product_id, r.source_url);
+  const out: Record<string, string> = {};
+  for (const i of items) {
+    const url = (i.variant_id && byVariant.get(i.variant_id)) || (i.product_id && byProduct.get(i.product_id));
+    if (url) out[i.id] = url;
+  }
+  return out;
 }

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
+import { PHONE_COUNTRIES } from "@/lib/phone/countries";
 import { CountrySelect } from "./country-select";
 import { LatinInput } from "./latin-input";
 
@@ -29,7 +30,7 @@ export function PhoneField({ name = "phone", defaultCountry, defaultNumber = "",
           <Label htmlFor={countryId} className="sr-only">
             {labels?.country ?? t("phoneCountry")}
           </Label>
-          <CountrySelect id={countryId} name={`${name}_country`} defaultValue={defaultCountry} withDial required={required} />
+          <CountrySelect id={countryId} name={`${name}_country`} defaultValue={defaultCountry} countries={PHONE_COUNTRIES} withDial required={required} />
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor={numberId} className="sr-only">
@@ -42,7 +43,7 @@ export function PhoneField({ name = "phone", defaultCountry, defaultNumber = "",
             defaultValue={defaultNumber}
             required={required}
             autoComplete="tel-national"
-            placeholder="555 123 45 67"
+            placeholder={defaultCountry === "TR" ? "555 123 45 67" : "912 345 6789"}
             aria-invalid={error ? true : undefined}
           />
         </div>

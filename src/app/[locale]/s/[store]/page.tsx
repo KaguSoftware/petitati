@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/storefront/shared/json-ld";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
 import { getBestSellers, getBrands, getCategories, getProducts } from "@/lib/catalog/queries";
-import { featuredBrands } from "@/lib/catalog/brands";
+import { brandsWithProducts } from "@/lib/catalog/brands";
 import { renderSection } from "@/lib/theme/registry";
 import { resolveHero } from "@/lib/theme/hero";
 import { ProductGridFallback, ProductGridWithWishlist } from "@/components/storefront/product-grid-with-wishlist";
@@ -81,7 +81,7 @@ export default async function StoreHome({ params }: PageProps<"/[locale]/s/[stor
       <Suspense fallback={<ProductGridFallback ctx={ctx} title={t("featured")} products={featured.items} emptyLabel="" viewAllHref="/shop" viewAllLabel={t("viewAll")} />}>
         <ProductGridWithWishlist ctx={ctx} title={t("featured")} products={featured.items} emptyLabel="" viewAllHref="/shop" viewAllLabel={t("viewAll")} />
       </Suspense>
-      <BrandRow title={t("shopByBrand")} viewAllLabel={t("viewAll")} brands={featuredBrands(brands)} />
+      <BrandRow title={t("shopByBrand")} viewAllLabel={t("viewAll")} brands={brandsWithProducts(brands)} />
       <Suspense fallback={<ProductGridFallback ctx={ctx} title={t("newArrivals")} products={arrivals} emptyLabel="" viewAllHref="/shop?sort=newest" viewAllLabel={t("viewAll")} />}>
         <ProductGridWithWishlist ctx={ctx} title={t("newArrivals")} products={arrivals} emptyLabel="" viewAllHref="/shop?sort=newest" viewAllLabel={t("viewAll")} />
       </Suspense>

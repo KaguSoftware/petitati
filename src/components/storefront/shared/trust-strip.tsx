@@ -1,11 +1,12 @@
-import { BadgePercent, Gift, Headset, RotateCcw, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, BadgePercent, Gift, Headset, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
 import type { TrustIcon } from "@/lib/theme/footer";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<TrustIcon, LucideIcon> = {
   truck: Truck,
   "shield-check": ShieldCheck,
-  "rotate-ccw": RotateCcw,
+  // The key stays "rotate-ccw" (saved in store settings); the shop exchanges, it doesn't refund.
+  "rotate-ccw": ArrowLeftRight,
   headset: Headset,
   "badge-percent": BadgePercent,
   gift: Gift,

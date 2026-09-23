@@ -36,7 +36,8 @@ export function AdminSidebarNav({ items, onNavigate, className }: Props) {
               onClick={onNavigate}
               aria-current={active && !childActive ? "page" : undefined}
               className={cn(
-                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
+                // 34 px rows on desktop so the whole menu fits a 720 px laptop screen (no inner scroll); thumb-sized in the phone drawer.
+                "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition-colors md:py-1.5",
                 active && !childActive && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
                 active && childActive && "font-medium text-sidebar-foreground",
                 !active && "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",

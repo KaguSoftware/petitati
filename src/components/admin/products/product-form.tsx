@@ -1,5 +1,6 @@
 "use client";
 
+import { slugify } from "@/lib/slug";
 import { useTranslations } from "next-intl";
 import { UnsavedChangesGuard, useFormDirty } from "@/components/admin/shared/unsaved-changes";
 import { useMemo, useState, type ReactNode, useEffect, useRef } from "react";
@@ -46,17 +47,8 @@ const NO_BRAND = "__none";
 
 const EMPTY: ProductTranslationInput = { name: "", short_description: "", description: "", seo_title: "", seo_description: "" };
 
-const TR_MAP: Record<string, string> = { ç: "c", ğ: "g", ı: "i", ö: "o", ş: "s", ü: "u", İ: "i" };
-export function slugify(input: string): string {
-  return input
-    .replace(/[çğıöşüİ]/g, (c) => TR_MAP[c] ?? c)
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 120);
-}
+/** Re-exported for the brand and category dialogs (one slug rule everywhere, Farsi included). */
+export { slugify };
 
 /** Field-error keys that live under admin.products.fieldErrors rather than admin.common. */
 export function useProductFieldErrors(raw: Record<string, string> | undefined) {

@@ -140,8 +140,8 @@ export async function getBrands(storeId: string): Promise<BrandData[]> {
 
   const db = createSupabaseAdminClient();
   // Every active brand, each with its live count of active products (an embedded aggregate; the
-  // `products.status` filter scopes the count, not the brand rows). Callers that want only the
-  // brands worth showing to a shopper go through `featuredBrands` in ./brands.ts.
+  // `products.status` filter scopes the count, not the brand rows). Order is the admin's; the home row
+  // drops empty brands through `brandsWithProducts` in ./brands.ts.
   const { data, error } = await db
     .from("brands")
     .select("id, slug, name, logo_url, products(count)")

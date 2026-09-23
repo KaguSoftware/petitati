@@ -41,7 +41,7 @@ async function Content({ locale }: { locale: string }) {
         description={t("brands.hint")}
         actions={canWrite ? <BrandDialog storeId={ctx.store.id} trigger={<Button type="button">{t("brands.new")}</Button>} /> : null}
       />
-      <BrandList rows={rows} storeId={ctx.store.id} locale={ctx.locale} canWrite={canWrite} />
+      <BrandList rows={rows} storeId={ctx.store.id} canWrite={canWrite} />
     </>
   );
 }

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { getBrands, getCategories } from "@/lib/catalog/queries";
-import { featuredBrands } from "@/lib/catalog/brands";
+import { brandsWithProducts } from "@/lib/catalog/brands";
 import { sitemapProducts, storeFromHost } from "@/lib/seo/host-store";
 import { storeUrl } from "@/lib/seo/urls";
 
@@ -30,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/shop", { changeFrequency: "daily", priority: 0.9 }),
     entry("/brands", { changeFrequency: "weekly", priority: 0.5 }),
     ...categories.map((c) => entry(`/c/${c.slug}`, { changeFrequency: "daily", priority: 0.8 })),
-    ...featuredBrands(brands).map((b) => entry(`/b/${b.slug}`, { changeFrequency: "weekly", priority: 0.6 })),
+    ...brandsWithProducts(brands).map((b) => entry(`/b/${b.slug}`, { changeFrequency: "weekly", priority: 0.6 })),
     ...products.map((p) => entry(`/p/${p.slug}`, { lastModified: p.updatedAt, changeFrequency: "weekly", priority: 0.7 })),
     ...CONTENT_PAGES.filter((k) => Object.values(pages[k] ?? {}).some((v) => v?.trim())).map((k) => entry(`/${k}`, { changeFrequency: "yearly", priority: 0.2 })),
   ];

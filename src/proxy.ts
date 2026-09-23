@@ -35,6 +35,10 @@ export async function proxy(request: NextRequest) {
     slug = (await lookupSlugByHostname(hint.hostname)) ?? env.defaultStoreSlug();
   }
 
+  // Email links (sign-up confirm, password reset, staff invites) land on /auth/callback, a route
+  // handler outside [locale]. Prefixing it with a locale sent every one of them to a 404.
+  if (first === "auth") return NextResponse.next();
+
   // ---- 2. locale ----
   if (!isLocale(first)) {
     const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;

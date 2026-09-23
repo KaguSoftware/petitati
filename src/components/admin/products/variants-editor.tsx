@@ -1,28 +1,25 @@
 "use client";
 
-import { Plus, Sparkles, Trash2, X } from "lucide-react";
+import { ExternalLink, Plus, Settings2, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { LatinInput } from "@/components/forms/latin-input";
 import { Link } from "@/i18n/navigation";
-import { localeNames, type Locale } from "@/i18n/config";
-import { deleteVariantAction, generateVariantsAction, saveOptionsAction, saveVariantAction } from "@/lib/admin/products/actions";
+import type { Locale } from "@/i18n/config";
+import { saveVariantTableAction } from "@/lib/admin/products/actions";
 import type { OptionWithValues, VariantWithValues } from "@/lib/admin/products/types";
 import { pickJson } from "@/lib/catalog/types";
 import type { Translated } from "@/lib/db/types";
-import { cn } from "@/lib/utils";
-import { ConfirmDialog } from "../shared/confirm-dialog";
-import { FormField } from "../shared/form-field";
-import { MoneyInput } from "../shared/money-input";
-import { NumberInput } from "../shared/number-input";
-import { StatusBadge } from "../shared/status-badge";
-import { useActionToast } from "../shared/use-action-toast";
-import { useProductFieldErrors } from "./product-form";
+import { toMajor } from "@/lib/money";
 import { numberFormat } from "@/lib/number";
+import { cn } from "@/lib/utils";
+import { UnsavedChangesGuard } from "../shared/unsaved-changes";
+import { useActionToast } from "../shared/use-action-toast";
 
 interface Props {
   storeId: string;
@@ -36,146 +33,327 @@ interface Props {
   variants: VariantWithValues[];
 }
 
-interface DraftValue {
-  key: string;
-  id?: string;
-  value: Translated;
-  swatch: string;
-}
-interface DraftOption {
+/** One editable row = one variant. Money and numbers stay strings while typing. */
+interface Row {
   key: string;
   id?: string;
   name: Translated;
-  values: DraftValue[];
+  /** Read-only label for products imported with several options ("Small · Red"). */
+  fixedLabel?: string;
+  sku: string;
+  barcode: string;
+  price: string;
+  compare_at_price: string;
+  cost_price: string;
+  weight_grams: string;
+  initial_stock: string;
+  track_inventory: boolean;
+  allow_backorder: boolean;
+  is_active: boolean;
+  source_url: string;
+  /** Saved stock; null for a new row. */
+  stockQty: number | null;
 }
 
 let seq = 0;
-const nextKey = () => `k${++seq}`;
+const nextKey = () => `new${++seq}`;
+/** Persian/Arabic digits typed on a fa keyboard → ASCII, so the server parsers read them. */
+const ascii = (v: string) => v.replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0)).replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660)).replace(/[٫،]/g, ".");
+const digitsOnly = (v: string) => ascii(v).replace(/\D/g, "");
+const major = (minor: number | null | undefined, currency: string) => (minor == null ? "" : String(toMajor(minor, currency)));
 
-function toDraft(options: OptionWithValues[]): DraftOption[] {
-  return options.map((o) => ({ key: o.id, id: o.id, name: { ...o.name }, values: o.values.map((v) => ({ key: v.id, id: v.id, value: { ...v.value }, swatch: v.swatch ?? "" })) }));
+function toRows(variants: VariantWithValues[], options: OptionWithValues[], currency: string, locale: Locale, fallback: Locale): Row[] {
+  const values = new Map(options.flatMap((o) => o.values.map((v) => [v.id, v.value] as const)));
+  const multi = options.length >= 2;
+  return variants.map((v) => ({
+    key: v.id,
+    id: v.id,
+    name: (!multi && v.optionValueIds.map((id) => values.get(id)).find(Boolean)) || {},
+    fixedLabel: multi
+      ? v.optionValueIds
+          .map((id) => pickJson(values.get(id), locale, fallback))
+          .filter(Boolean)
+          .join(" · ")
+      : undefined,
+    sku: v.sku ?? "",
+    barcode: v.barcode ?? "",
+    price: major(v.price, currency),
+    compare_at_price: major(v.compare_at_price, currency),
+    cost_price: major(v.cost_price, currency),
+    weight_grams: v.weight_grams == null ? "" : String(v.weight_grams),
+    initial_stock: "",
+    track_inventory: v.track_inventory,
+    allow_backorder: v.allow_backorder,
+    is_active: v.is_active,
+    source_url: v.sourceUrl ?? "",
+    stockQty: v.stock_qty,
+  }));
 }
 
-export function VariantsEditor({ storeId, productId, currency, locale, defaultLocale, enabledLocales, lowStockThreshold, options, variants }: Props) {
-  const t = useTranslations("admin");
-  return (
-    <div className="flex flex-col gap-6">
-      <OptionsBuilder storeId={storeId} productId={productId} defaultLocale={defaultLocale} enabledLocales={enabledLocales} options={options} hasVariants={variants.length > 0} />
-      <VariantsList
-        storeId={storeId}
-        productId={productId}
-        currency={currency}
-        locale={locale}
-        defaultLocale={defaultLocale}
-        lowStockThreshold={lowStockThreshold}
-        options={options}
-        variants={variants}
-        title={t("products.variants")}
-      />
-    </div>
-  );
+function blankRow(template?: Row): Row {
+  return {
+    key: nextKey(),
+    name: {},
+    sku: "",
+    barcode: "",
+    price: template?.price ?? "",
+    compare_at_price: "",
+    cost_price: "",
+    weight_grams: "",
+    initial_stock: "",
+    track_inventory: true,
+    allow_backorder: false,
+    is_active: true,
+    source_url: "",
+    stockQty: null,
+  };
 }
 
-// ---------------------------------------------------------------- options
-
-function OptionsBuilder({ storeId, productId, defaultLocale, enabledLocales, options, hasVariants }: Pick<Props, "storeId" | "productId" | "defaultLocale" | "enabledLocales" | "options"> & { hasVariants: boolean }) {
-  const t = useTranslations("admin.products.options");
+/**
+ * "Prices & stock": the whole variant setup as one small table with one Save.
+ * Most products are a single row (price, stock, SKU, buy link). "Several sizes or types" turns it
+ * into named rows ("2 kg", "10 kg"); behind the scenes that is one product option whose values
+ * are the row names, which is what the storefront picker shows. The old options builder and
+ * "Generate variants" are gone from the UI (their server actions remain).
+ */
+export function VariantsEditor({ storeId, productId, currency, locale, defaultLocale, options, variants }: Props) {
+  const t = useTranslations("admin.products.table");
   const tc = useTranslations("admin.common");
-  const [draft, setDraft] = useState<DraftOption[]>(() => toDraft(options));
+  const num = numberFormat(locale);
+  const multi = options.length >= 2;
+
+  const initial = () => {
+    const rows = toRows(variants, options, currency, locale, defaultLocale);
+    return rows.length ? rows : [blankRow()];
+  };
+  const [rows, setRows] = useState<Row[]>(initial);
+  const [optionName, setOptionName] = useState<Translated>(() => ({ ...(options.length === 1 ? options[0].name : {}) }));
+  const [defaultKey, setDefaultKey] = useState(() => variants.find((v) => v.is_default)?.id ?? variants[0]?.id ?? "");
+  const [several, setSeveral] = useState(() => multi || options.length === 1 || variants.length > 1);
+  const [open, setOpen] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
-  // After a save the server re-renders with real ids: resync the draft (derived state) so a second save updates instead of re-creating.
-  const signature = JSON.stringify(options);
+
+  // After a save the server re-renders with real ids: resync the drafts (derived state).
+  const signature = JSON.stringify([variants, options]);
   const [seenSignature, setSeenSignature] = useState(signature);
   if (signature !== seenSignature) {
     setSeenSignature(signature);
-    setDraft(toDraft(options));
+    setRows(initial());
+    setOptionName({ ...(options.length === 1 ? options[0].name : {}) });
+    setDefaultKey(variants.find((v) => v.is_default)?.id ?? variants[0]?.id ?? "");
+    setSeveral(multi || options.length === 1 || variants.length > 1);
     setDirty(false);
   }
-  const [state, action, pending] = useActionToast(saveOptionsAction, { errorNamespace: "admin.products", onSuccess: () => setDirty(false) });
-  const [genState, generate, generating] = useActionToast(generateVariantsAction, { errorNamespace: "admin.products" });
-  const errors = useProductFieldErrors(state.fieldErrors);
-  void genState;
 
-  function update(fn: (prev: DraftOption[]) => DraftOption[]) {
-    setDraft(fn);
+  const [state, action, pending] = useActionToast(saveVariantTableAction, { errorNamespace: "admin.products", onSuccess: () => setDirty(false) });
+  const errorRow = state.error ? state.id : undefined;
+  const bad = (row: Row, field: string) => errorRow === row.key && !!state.fieldErrors?.[field];
+
+  function patch(key: string, change: Partial<Row>) {
+    setRows((prev) => prev.map((r) => (r.key === key ? { ...r, ...change } : r)));
     setDirty(true);
   }
-  const setOptionName = (key: string, l: Locale, v: string) => update((prev) => prev.map((o) => (o.key === key ? { ...o, name: { ...o.name, [l]: v } } : o)));
-  const setValue = (ok: string, vk: string, l: Locale, v: string) =>
-    update((prev) => prev.map((o) => (o.key === ok ? { ...o, values: o.values.map((x) => (x.key === vk ? { ...x, value: { ...x.value, [l]: v } } : x)) } : o)));
-  const setSwatch = (ok: string, vk: string, v: string) => update((prev) => prev.map((o) => (o.key === ok ? { ...o, values: o.values.map((x) => (x.key === vk ? { ...x, swatch: v } : x)) } : o)));
+  // Names are typed in the admin's language; other languages keep what they had.
+  const nameOf = (r: Row) => r.name[locale] ?? pickJson(r.name, locale, defaultLocale);
+  const firstKey = rows[0]?.key ?? "";
+  const effectiveDefault = rows.some((r) => r.key === defaultKey) ? defaultKey : firstKey;
 
-  const payload = draft.map((o) => ({ id: o.id, name: o.name, values: o.values.map((v, i) => ({ id: v.id, value: v.value, swatch: v.swatch || null, sort_order: i })) }));
+  const payload = rows.map((r) => ({
+    key: r.key,
+    id: r.id,
+    name: multi ? {} : r.name,
+    sku: r.sku,
+    barcode: r.barcode,
+    price: r.price,
+    compare_at_price: r.compare_at_price,
+    cost_price: r.cost_price,
+    weight_grams: r.weight_grams,
+    initial_stock: r.initial_stock,
+    track_inventory: r.track_inventory,
+    allow_backorder: r.allow_backorder,
+    is_active: r.is_active,
+    source_url: r.source_url,
+  }));
 
   return (
     <section className="flex flex-col gap-4 rounded-xl border bg-card p-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-sm font-medium text-muted-foreground">{t("title")}</h2>
-          <p className="text-xs text-muted-foreground">{t("hint")}</p>
-        </div>
-        <form action={generate}>
-          <input type="hidden" name="storeId" value={storeId} />
-          <input type="hidden" name="productId" value={productId} />
-          <Button type="submit" size="sm" variant={hasVariants ? "outline" : "default"} disabled={generating || dirty || draft.some((o) => o.values.length === 0)} title={dirty ? t("saveFirst") : undefined}>
-            <Sparkles />
-            {t("generate")}
-          </Button>
-        </form>
+      <UnsavedChangesGuard dirty={dirty} />
+      <div>
+        <h2 className="font-medium">{t("title")}</h2>
+        <p className="text-sm text-muted-foreground">{several ? t("hintSeveral") : t("hintSingle")}</p>
       </div>
 
       <form action={action} className="flex flex-col gap-4">
         <input type="hidden" name="storeId" value={storeId} />
         <input type="hidden" name="productId" value={productId} />
-        <input type="hidden" name="options" value={JSON.stringify(payload)} />
-        {errors?.options && <p className="text-sm text-destructive">{errors.options}</p>}
-        {draft.length === 0 && <p className="text-sm text-muted-foreground">{t("none")}</p>}
-        {draft.map((o, oi) => (
-          <div key={o.key} className="flex flex-col gap-3 rounded-lg border p-3">
-            <div className="flex items-start gap-2">
-              <div className="grid flex-1 gap-2 sm:grid-cols-3">
-                {enabledLocales.map((l) => (
-                  <FormField key={l} name={`opt-${o.key}-${l}`} label={`${t("name")} · ${localeNames[l]}`} required={l === defaultLocale}>
-                    <Input id={`opt-${o.key}-${l}`} lang={l} dir={l === "fa" ? "rtl" : "ltr"} value={o.name[l] ?? ""} onChange={(e) => setOptionName(o.key, l, e.target.value)} placeholder={l === defaultLocale ? t("namePlaceholder") : undefined} />
-                  </FormField>
-                ))}
-              </div>
-              <Button type="button" variant="ghost" size="icon-sm" aria-label={tc("remove")} className="mt-5 text-muted-foreground" onClick={() => update((prev) => prev.filter((x) => x.key !== o.key))}>
-                <Trash2 />
-              </Button>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">{t("values")}</span>
-              {o.values.map((v) => (
-                <div key={v.key} className="flex items-center gap-2">
-                  <div className="grid flex-1 gap-2 sm:grid-cols-3">
-                    {enabledLocales.map((l) => (
-                      <Input key={l} aria-label={`${t("value")} · ${localeNames[l]}`} lang={l} dir={l === "fa" ? "rtl" : "ltr"} value={v.value[l] ?? ""} onChange={(e) => setValue(o.key, v.key, l, e.target.value)} placeholder={localeNames[l]} />
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span aria-hidden className="size-5 shrink-0 rounded-full border" style={{ background: /^#[0-9a-f]{3,8}$/i.test(v.swatch) ? v.swatch : "transparent" }} />
-                    <LatinInput kind="code" aria-label={t("swatch")} value={v.swatch} onChange={(e) => setSwatch(o.key, v.key, e.target.value)} placeholder="#hex" className="w-24 normal-case tracking-normal" />
-                  </div>
-                  <Button type="button" variant="ghost" size="icon-sm" aria-label={tc("remove")} className="text-muted-foreground" onClick={() => update((prev) => prev.map((x) => (x.key === o.key ? { ...x, values: x.values.filter((y) => y.key !== v.key) } : x)))}>
-                    <X />
-                  </Button>
-                </div>
-              ))}
-              <Button type="button" variant="ghost" size="sm" className="w-fit" onClick={() => update((prev) => prev.map((x, i) => (i === oi ? { ...x, values: [...x.values, { key: nextKey(), value: {}, swatch: "" }] } : x)))}>
-                <Plus />
-                {t("addValue")}
-              </Button>
-            </div>
+        <input type="hidden" name="rows" value={JSON.stringify(payload)} />
+        <input type="hidden" name="optionName" value={JSON.stringify(several && !multi ? optionName : {})} />
+        <input type="hidden" name="defaultKey" value={effectiveDefault} />
+
+        {several && !multi && (
+          <div className="grid max-w-sm gap-1.5">
+            <Label htmlFor="option-name">{t("chooseBy")}</Label>
+            <Input
+              id="option-name"
+              value={optionName[locale] ?? pickJson(optionName, locale, defaultLocale)}
+              placeholder={t("chooseByPlaceholder")}
+              onChange={(e) => {
+                setOptionName((prev) => ({ ...prev, [locale]: e.target.value }));
+                setDirty(true);
+              }}
+            />
           </div>
-        ))}
+        )}
+
+        {/* Column headings, desktop only; on phones every field carries its own label. */}
+        <div className={cn("hidden gap-2 px-1 text-xs font-medium text-muted-foreground lg:grid", several ? "lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_7rem_minmax(0,1fr)_minmax(0,1.4fr)_4.5rem]" : "lg:grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_minmax(0,1.4fr)_4.5rem]")}>
+          {several && <span>{t("name")}</span>}
+          <span>{t("price")}</span>
+          <span>{t("stock")}</span>
+          <span>{t("sku")}</span>
+          <span>{t("buyLink")}</span>
+          <span />
+        </div>
+
+        <ul className="flex flex-col gap-2">
+          {rows.map((r) => {
+            const f = (name: string) => `${name}-${r.key}`;
+            const stockEditable = r.stockQty == null || (r.track_inventory && r.stockQty === 0);
+            const isOpen = open === r.key;
+            return (
+              <li key={r.key} className={cn("rounded-lg border p-2", !r.is_active && "bg-muted/40", errorRow === r.key && "border-destructive")}>
+                <div className={cn("grid items-end gap-2 sm:grid-cols-2", several ? "lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_7rem_minmax(0,1fr)_minmax(0,1.4fr)_4.5rem]" : "lg:grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_minmax(0,1.4fr)_4.5rem]")}>
+                  {several && (
+                    <Field id={f("name")} label={t("name")}>
+                      {r.fixedLabel != null ? (
+                        <span className="flex h-9 items-center truncate px-1 font-medium">{r.fixedLabel || t("unnamed")}</span>
+                      ) : (
+                        <Input id={f("name")} value={nameOf(r)} placeholder={t("namePlaceholder")} aria-invalid={bad(r, "name") || undefined} onChange={(e) => patch(r.key, { name: { ...r.name, [locale]: e.target.value } })} />
+                      )}
+                    </Field>
+                  )}
+                  <Field id={f("price")} label={t("price")}>
+                    <MoneyField id={f("price")} currency={currency} value={r.price} invalid={bad(r, "price")} required onChange={(v) => patch(r.key, { price: v })} />
+                  </Field>
+                  <Field id={f("stock")} label={t("stock")}>
+                    {!r.track_inventory ? (
+                      <span className="flex h-9 items-center px-1 text-sm text-muted-foreground">{t("notTracked")}</span>
+                    ) : stockEditable ? (
+                      <Input id={f("stock")} inputMode="numeric" dir="ltr" className="tabular-nums" value={r.initial_stock} placeholder="0" aria-invalid={bad(r, "initial_stock") || undefined} onChange={(e) => patch(r.key, { initial_stock: digitsOnly(e.target.value) })} />
+                    ) : (
+                      <Link href={`/admin/inventory?q=${encodeURIComponent(r.sku)}`} title={t("stockViaInventory")} className="flex h-9 items-center gap-1 px-1 text-sm tabular-nums hover:underline">
+                        {num.format(r.stockQty ?? 0)}
+                        <span className="text-xs text-muted-foreground">{t("adjust")}</span>
+                      </Link>
+                    )}
+                  </Field>
+                  <Field id={f("sku")} label={t("sku")}>
+                    <LatinInput kind="code" id={f("sku")} value={r.sku} className="tracking-normal" onChange={(e) => patch(r.key, { sku: e.target.value })} />
+                  </Field>
+                  <Field id={f("link")} label={t("buyLink")}>
+                    <InputGroup>
+                      <InputGroupInput id={f("link")} dir="ltr" inputMode="url" autoComplete="off" placeholder="https://www.trendyol.com/…" value={r.source_url} aria-invalid={bad(r, "source_url") || undefined} onChange={(e) => patch(r.key, { source_url: e.target.value.trim() })} />
+                      {/^https?:\/\//.test(r.source_url) && (
+                        <InputGroupAddon align="inline-end">
+                          <a href={r.source_url} target="_blank" rel="noreferrer" aria-label={t("openLink")} className="text-muted-foreground hover:text-foreground">
+                            <ExternalLink className="size-4" />
+                          </a>
+                        </InputGroupAddon>
+                      )}
+                    </InputGroup>
+                  </Field>
+                  <div className="flex items-center justify-end gap-0.5 sm:col-span-2 lg:col-span-1">
+                    <Button type="button" variant="ghost" size="icon-sm" aria-expanded={isOpen} aria-label={t("more")} title={t("more")} onClick={() => setOpen(isOpen ? null : r.key)} className={cn(isOpen && "bg-muted")}>
+                      <Settings2 />
+                    </Button>
+                    {rows.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={t("remove")}
+                        title={t("remove")}
+                        className="text-muted-foreground hover:text-destructive"
+                        onClick={() => {
+                          setRows((prev) => prev.filter((x) => x.key !== r.key));
+                          setDirty(true);
+                        }}
+                      >
+                        <Trash2 />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {isOpen && (
+                  <div className="mt-3 grid gap-3 border-t pt-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <Field id={f("compare")} label={t("compareAt")} hint={t("compareAtHint")}>
+                      <MoneyField id={f("compare")} currency={currency} value={r.compare_at_price} invalid={bad(r, "compare_at_price")} onChange={(v) => patch(r.key, { compare_at_price: v })} />
+                    </Field>
+                    <Field id={f("cost")} label={t("cost")} hint={t("costHint")}>
+                      <MoneyField id={f("cost")} currency={currency} value={r.cost_price} invalid={bad(r, "cost_price")} onChange={(v) => patch(r.key, { cost_price: v })} />
+                    </Field>
+                    <Field id={f("weight")} label={t("weight")}>
+                      <Input id={f("weight")} inputMode="numeric" dir="ltr" className="tabular-nums" value={r.weight_grams} aria-invalid={bad(r, "weight_grams") || undefined} onChange={(e) => patch(r.key, { weight_grams: digitsOnly(e.target.value) })} />
+                    </Field>
+                    <Field id={f("barcode")} label={t("barcode")}>
+                      <LatinInput kind="code" id={f("barcode")} value={r.barcode} className="normal-case tracking-normal" onChange={(e) => patch(r.key, { barcode: e.target.value })} />
+                    </Field>
+                    <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm sm:col-span-2 lg:col-span-4">
+                      <Toggle label={t("isActive")} checked={r.is_active} onChange={(v) => patch(r.key, { is_active: v })} />
+                      <Toggle label={t("trackInventory")} checked={r.track_inventory} onChange={(v) => patch(r.key, { track_inventory: v })} />
+                      <Toggle label={t("allowBackorder")} checked={r.allow_backorder} onChange={(v) => patch(r.key, { allow_backorder: v })} />
+                      {several && (
+                        <Toggle
+                          label={t("isDefault")}
+                          checked={effectiveDefault === r.key}
+                          onChange={(v) => {
+                            if (v) setDefaultKey(r.key);
+                            setDirty(true);
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
         <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="outline" size="sm" disabled={draft.length >= 5} onClick={() => update((prev) => [...prev, { key: nextKey(), name: {}, values: [{ key: nextKey(), value: {}, swatch: "" }] }])}>
-            <Plus />
-            {t("add")}
-          </Button>
-          <Button type="submit" size="sm" disabled={pending || !dirty} className="ms-auto">
-            {pending ? tc("saving") : t("save")}
+          {several ? (
+            !multi && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setRows((prev) => [...prev, blankRow(prev[prev.length - 1])]);
+                  setDirty(true);
+                }}
+              >
+                <Plus data-icon="inline-start" />
+                {t("addRow")}
+              </Button>
+            )
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSeveral(true);
+                setRows((prev) => [...prev, blankRow(prev[0])]);
+                setDirty(true);
+              }}
+            >
+              <Plus data-icon="inline-start" />
+              {t("makeSeveral")}
+            </Button>
+          )}
+          <Button type="submit" disabled={pending || !dirty} className="ms-auto">
+            {pending ? tc("saving") : tc("save")}
           </Button>
         </div>
       </form>
@@ -183,193 +361,34 @@ function OptionsBuilder({ storeId, productId, defaultLocale, enabledLocales, opt
   );
 }
 
-// ---------------------------------------------------------------- variants
-
-function VariantsList({
-  storeId,
-  productId,
-  currency,
-  locale,
-  defaultLocale,
-  lowStockThreshold,
-  options,
-  variants,
-  title,
-}: Pick<Props, "storeId" | "productId" | "currency" | "locale" | "defaultLocale" | "lowStockThreshold" | "options" | "variants"> & { title: string }) {
-  const t = useTranslations("admin.products.variant");
-  const [adding, setAdding] = useState(false);
-  // One action state for every card: cards are keyed on their saved data and remount after a
-  // save, so the toast/pending/fieldErrors must live here. `state.id` says which card it concerns.
-  const [state, action, pending] = useActionToast(saveVariantAction, {
-    errorNamespace: "admin.products",
-    onSuccess: (s) => {
-      if (s.id?.startsWith("new:")) setAdding(false);
-    },
-  });
-  const errorsFor = (ref: string) => (state.id === ref ? state.fieldErrors : undefined);
-  const valueLabel = new Map<string, string>();
-  for (const o of options) for (const v of o.values) valueLabel.set(v.id, pickJson(v.value, locale, defaultLocale));
-  const label = (v: VariantWithValues) => {
-    const parts = v.optionValueIds.map((id) => valueLabel.get(id)).filter(Boolean);
-    return parts.length ? parts.join(" · ") : t("defaultLabel");
-  };
+function Field({ id, label, hint, children }: { id: string; label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-4 rounded-xl border bg-card p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-medium text-muted-foreground">
-          {title} <span className="tabular-nums">({variants.length})</span>
-        </h2>
-        {options.length === 0 && !adding && (
-          <Button type="button" size="sm" variant="outline" onClick={() => setAdding(true)}>
-            <Plus />
-            {t("add")}
-          </Button>
-        )}
-      </div>
-      {variants.length === 0 && !adding && <p className="text-sm text-muted-foreground">{options.length ? t("emptyGenerate") : t("empty")}</p>}
-      <div className="flex flex-col gap-3">
-        {adding && (
-          <VariantCard
-            storeId={storeId}
-            productId={productId}
-            currency={currency}
-            locale={locale}
-            lowStockThreshold={lowStockThreshold}
-            variant={null}
-            label={t("newVariant")}
-            isFirst={variants.length === 0}
-            onDone={() => setAdding(false)}
-            action={action}
-            pending={pending}
-            fieldErrors={errorsFor("new")}
-          />
-        )}
-        {variants.map((v) => (
-          // React resets uncontrolled fields after a form action, so the card is keyed on its saved
-          // data: a save remounts it with fresh defaults instead of stale ones.
-          <VariantCard key={`${v.id}:${v.sku}:${v.barcode}:${v.price}:${v.compare_at_price}:${v.cost_price}:${v.weight_grams}:${v.track_inventory}:${v.allow_backorder}:${v.is_default}:${v.is_active}`} storeId={storeId} productId={productId} currency={currency} locale={locale} lowStockThreshold={lowStockThreshold} variant={v} label={label(v)} isFirst={false} action={action} pending={pending} fieldErrors={errorsFor(v.id)} />
-        ))}
-      </div>
-    </section>
+    <div className="grid min-w-0 gap-1">
+      <Label htmlFor={id} className="text-xs font-medium text-muted-foreground lg:sr-only">
+        {label}
+      </Label>
+      {children}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+    </div>
   );
 }
 
-interface CardProps {
-  storeId: string;
-  productId: string;
-  currency: string;
-  locale: string;
-  lowStockThreshold: number;
-  variant: VariantWithValues | null;
-  label: string;
-  isFirst: boolean;
-  onDone?: () => void;
-  action: (formData: FormData) => void;
-  pending: boolean;
-  fieldErrors?: Record<string, string>;
+function MoneyField({ id, currency, value, onChange, invalid, required }: { id: string; currency: string; value: string; onChange: (v: string) => void; invalid?: boolean; required?: boolean }) {
+  return (
+    <InputGroup>
+      <InputGroupInput id={id} value={value} required={required} placeholder="0.00" inputMode="decimal" dir="ltr" autoComplete="off" className="text-start tabular-nums" aria-invalid={invalid || undefined} onChange={(e) => onChange(ascii(e.target.value))} />
+      <InputGroupAddon align="inline-end">
+        <InputGroupText className="text-xs font-medium tracking-wide uppercase">{currency}</InputGroupText>
+      </InputGroupAddon>
+    </InputGroup>
+  );
 }
 
-function VariantCard({ storeId, productId, currency, locale, lowStockThreshold, variant, label, isFirst, onDone, action, pending, fieldErrors }: CardProps) {
-  const t = useTranslations("admin.products.variant");
-  const tc = useTranslations("admin.common");
-  const errors = useProductFieldErrors(fieldErrors);
-  const initial = variant;
-  const id = variant?.id ?? "new";
-  const f = (name: string) => `${name}-${id}`;
-  const num = numberFormat(locale);
-  const level = variant ? (!variant.track_inventory ? "ok" : variant.stock_qty <= 0 ? "out" : variant.stock_qty <= lowStockThreshold ? "low" : "ok") : null;
-
+function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <form action={action} className={cn("flex flex-col gap-3 rounded-lg border p-3", variant && !variant.is_active && "opacity-70")}>
-      <input type="hidden" name="storeId" value={storeId} />
-      <input type="hidden" name="productId" value={productId} />
-      <input type="hidden" name="variantId" value={variant?.id ?? ""} />
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium">{label}</span>
-          {variant?.is_default && <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{t("default")}</span>}
-          {variant && level && (
-            <Link href={`/admin/inventory?q=${encodeURIComponent(variant.sku ?? "")}`} className="flex items-center gap-1.5 text-xs hover:underline">
-              <StatusBadge kind="stock" value={level} />
-              <span className="tabular-nums">{num.format(variant.stock_qty)}</span>
-            </Link>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {variant && (
-            <ConfirmDialog
-              trigger={
-                <Button type="button" variant="ghost" size="icon-sm" aria-label={tc("delete")} className="text-muted-foreground">
-                  <Trash2 />
-                </Button>
-              }
-              title={t("delete.title")}
-              description={t("delete.description")}
-              confirmLabel={tc("delete")}
-              destructive
-              action={async () => {
-                const fd = new FormData();
-                fd.set("storeId", storeId);
-                fd.set("variantId", variant.id);
-                const res = await deleteVariantAction({}, fd);
-                if (res.error === "variantHasOrders" || res.error === "variantInCarts") return { error: t(`errors.${res.error}`) };
-                return res;
-              }}
-            />
-          )}
-          {onDone && (
-            <Button type="button" variant="ghost" size="sm" onClick={onDone}>
-              {tc("cancel")}
-            </Button>
-          )}
-          <Button type="submit" size="sm" disabled={pending}>
-            {pending ? tc("saving") : tc("save")}
-          </Button>
-        </div>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <FormField name="sku" label={t("sku")} errors={errors}>
-          <LatinInput kind="code" id={f("sku")} name="sku" defaultValue={initial?.sku ?? ""} className="tracking-normal" />
-        </FormField>
-        <FormField name="barcode" label={t("barcode")} errors={errors}>
-          <LatinInput kind="code" id={f("barcode")} name="barcode" defaultValue={initial?.barcode ?? ""} className="normal-case tracking-normal" />
-        </FormField>
-        <FormField name="price" label={t("price")} errors={errors} required>
-          <MoneyInput id={f("price")} name="price" currency={currency} defaultValue={initial?.price ?? 0} required />
-        </FormField>
-        <FormField name="compare_at_price" label={t("compareAt")} errors={errors}>
-          <MoneyInput id={f("compare_at_price")} name="compare_at_price" currency={currency} defaultValue={initial?.compare_at_price} />
-        </FormField>
-        <FormField name="cost_price" label={t("cost")} errors={errors}>
-          <MoneyInput id={f("cost_price")} name="cost_price" currency={currency} defaultValue={initial?.cost_price} />
-        </FormField>
-        <FormField name="weight_grams" label={t("weight")} errors={errors}>
-          <NumberInput id={f("weight_grams")} name="weight_grams" defaultValue={initial?.weight_grams} min={0} step={10} />
-        </FormField>
-        {(!variant || (variant.track_inventory && variant.stock_qty === 0)) && (
-          <FormField name="initial_stock" label={t("initialStock")} errors={errors}>
-            <NumberInput id={f("initial_stock")} name="initial_stock" defaultValue={0} min={0} />
-          </FormField>
-        )}
-      </div>
-      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-        <Label className="flex items-center gap-2 font-normal">
-          <Switch size="sm" name="track_inventory" defaultChecked={initial?.track_inventory ?? true} />
-          {t("trackInventory")}
-        </Label>
-        <Label className="flex items-center gap-2 font-normal">
-          <Switch size="sm" name="allow_backorder" defaultChecked={initial?.allow_backorder ?? false} />
-          {t("allowBackorder")}
-        </Label>
-        <Label className="flex items-center gap-2 font-normal">
-          <Switch size="sm" name="is_default" defaultChecked={initial?.is_default ?? isFirst} />
-          {t("isDefault")}
-        </Label>
-        <Label className="flex items-center gap-2 font-normal">
-          <Switch size="sm" name="is_active" defaultChecked={initial?.is_active ?? true} />
-          {t("isActive")}
-        </Label>
-      </div>
-    </form>
+    <Label className="flex items-center gap-2 font-normal">
+      <Switch size="sm" checked={checked} onCheckedChange={onChange} />
+      {label}
+    </Label>
   );
 }

@@ -5,7 +5,8 @@ import { TableSkeleton } from "./shared/table-skeleton";
 export function AdminShellSkeleton() {
   return (
     <div className="flex min-h-screen bg-background" aria-busy>
-      <aside className="hidden w-60 shrink-0 flex-col border-e bg-sidebar md:flex">
+      {/* Pinned like the real sidebar: the skeleton shows for seconds on a cold load and must not scroll away. */}
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col self-start border-e bg-sidebar md:flex">
         <div className="flex h-14 items-center border-b px-4">
           <Skeleton className="h-5 w-32" />
         </div>

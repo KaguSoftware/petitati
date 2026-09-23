@@ -13,6 +13,47 @@ import { deleteProductAction, setProductStatusAction, toggleBestsellerAction, to
 import type { ProductStatus } from "@/lib/db/types";
 import { clearOptimistic, setOptimistic, useOptimisticRow } from "../shared/optimistic-store";
 import { useOptimisticAction } from "../shared/use-optimistic-action";
+import { cn } from "@/lib/utils";
+
+/**
+ * On-site toggle in the products table: a hollow pill, green while the product shows on the
+ * storefront (active), grey otherwise. Flips active ↔ draft; an archived product turns active.
+ * Shares the optimistic `status` with the row menu so both move together.
+ */
+export function VisibilityToggle({ storeId, productId, status: serverStatus, disabled }: { storeId: string; productId: string; status: ProductStatus; disabled?: boolean }) {
+  const t = useTranslations("admin.products.visibility");
+  const { status } = useOptimisticRow(productId, { status: serverStatus });
+  const { run } = useOptimisticAction("admin.products");
+  const on = status === "active";
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      disabled={disabled}
+      title={on ? t("hideHint") : t("showHint")}
+      onClick={() => {
+        const next: ProductStatus = on ? "draft" : "active";
+        const fd = new FormData();
+        fd.set("storeId", storeId);
+        fd.set("productId", productId);
+        fd.set("status", next);
+        run(() => setProductStatusAction({}, fd), {
+          optimistic: () => setOptimistic(productId, { status: next }),
+          rollback: () => clearOptimistic(productId, ["status"]),
+        });
+      }}
+      className={cn(
+        "inline-flex h-7 min-w-20 items-center justify-center gap-1.5 rounded-full border px-3 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+        on
+          ? "border-emerald-600 text-emerald-700 hover:bg-emerald-500/10 dark:border-emerald-400 dark:text-emerald-300"
+          : "border-border text-muted-foreground hover:bg-muted",
+      )}
+    >
+      <span aria-hidden className={cn("size-1.5 rounded-full", on ? "bg-emerald-600 dark:bg-emerald-400" : "bg-muted-foreground/50")} />
+      {on ? t("on") : status === "archived" ? t("archived") : t("off")}
+    </button>
+  );
+}
 
 /** Featured toggle in the products table: flips instantly, rolls back if the server rejects. */
 export function FeaturedSwitch({ storeId, productId, checked, disabled }: { storeId: string; productId: string; checked: boolean; disabled?: boolean }) {

@@ -158,6 +158,9 @@ export async function getProductForEdit(storeId: string, id: string): Promise<Pr
     .maybeSingle<EditRaw>();
   if (error) throw error;
   if (!data) return null;
+  // Buy links live in product_sources (one per variant). A failed read only hides the links.
+  const { data: sources } = await db.from("product_sources").select("variant_id, source_url").eq("product_id", id).eq("store_id", storeId).returns<{ variant_id: string; source_url: string }[]>();
+  const sourceOf = new Map((sources ?? []).map((r) => [r.variant_id, r.source_url]));
   const { product_translations, product_options, product_variants, product_images, product_categories, ...product } = data;
   const options = [...product_options]
     .sort((a, b) => a.sort_order - b.sort_order)
@@ -167,7 +170,7 @@ export async function getProductForEdit(storeId: string, id: string): Promise<Pr
   options.forEach((o, oi) => o.values.forEach((v, vi) => rank.set(v.id, oi * 1000 + vi)));
   const key = (ids: string[]) => ids.map((id) => rank.get(id) ?? 999_999).sort((a, b) => a - b);
   const variants = [...product_variants]
-    .map(({ variant_option_values, ...v }) => ({ ...v, optionValueIds: variant_option_values.map((x) => x.option_value_id) }))
+    .map(({ variant_option_values, ...v }) => ({ ...v, optionValueIds: variant_option_values.map((x) => x.option_value_id), sourceUrl: sourceOf.get(v.id) ?? null }))
     .sort((a, b) => {
       const ka = key(a.optionValueIds);
       const kb = key(b.optionValueIds);

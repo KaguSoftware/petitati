@@ -4,7 +4,6 @@ import { Tags } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { storeContext } from "@/lib/tenant/context";
 import { getBrands } from "@/lib/catalog/queries";
-import { featuredBrands } from "@/lib/catalog/brands";
 import { Link } from "@/i18n/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/storefront/shared/brand-mark";
@@ -17,11 +16,10 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/s/[store
   return { title: t("title"), alternates: pageAlternates(store, locale, "/brands") };
 }
 
-/** Brand index: a tile per brand worth showing (≥ MIN_BRAND_PRODUCTS active products), biggest first, linking to /b/<slug>. */
+/** Brand index: every active brand, in the order the admin set, each linking to /b/<slug>. */
 export default async function BrandsPage({ params }: PageProps<"/[locale]/s/[store]/brands">) {
   const ctx = await storeContext(params);
-  const [t, tn, allBrands] = await Promise.all([getTranslations("brands"), getTranslations("nav"), getBrands(ctx.store.id)]);
-  const brands = featuredBrands(allBrands);
+  const [t, tn, brands] = await Promise.all([getTranslations("brands"), getTranslations("nav"), getBrands(ctx.store.id)]);
 
   return (
     <PageShell title={t("title")}>

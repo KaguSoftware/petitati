@@ -11,7 +11,7 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox";
 import { OverlayScroll } from "@/components/ui/overlay-scroll";
-import { COUNTRIES, countryFlag, countryName } from "@/lib/phone/countries";
+import { COUNTRIES, type Country, countryFlag, countryName } from "@/lib/phone/countries";
 import { cn } from "@/lib/utils";
 
 interface CountryItem {
@@ -31,21 +31,26 @@ interface Props {
   disabled?: boolean;
   className?: string;
   onValueChange?: (code: string | null) => void;
+  /** A short list shown in the given order (no alphabetical sort). The current value is kept even when not in it. */
+  countries?: readonly Country[];
 }
 
 /** Searchable country picker (Base UI Combobox). Names are localised via Intl.DisplayNames. */
-export function CountrySelect({ name, id, defaultValue, withDial = false, required, disabled, className, onValueChange }: Props) {
+export function CountrySelect({ name, id, defaultValue, withDial = false, required, disabled, className, onValueChange, countries }: Props) {
   const locale = useLocale();
   const t = useTranslations("common");
-  const items = useMemo<CountryItem[]>(
-    () =>
-      COUNTRIES.map((c) => {
-        const label = countryName(c.code, locale);
-        return { value: c.code, label: withDial ? `${label} (+${c.dial})` : label, dial: c.dial };
-      }).sort((a, b) => a.label.localeCompare(b.label, locale)),
-    [locale, withDial],
-  );
-  const initial = defaultValue ? (items.find((i) => i.value === defaultValue.toUpperCase()) ?? null) : null;
+  const current = defaultValue?.toUpperCase();
+  const items = useMemo<CountryItem[]>(() => {
+    const toItem = (c: Country): CountryItem => {
+      const label = countryName(c.code, locale);
+      return { value: c.code, label: withDial ? `${label} (+${c.dial})` : label, dial: c.dial };
+    };
+    if (!countries) return COUNTRIES.map(toItem).sort((a, b) => a.label.localeCompare(b.label, locale));
+    const list = countries.map(toItem);
+    const saved = current && !countries.some((c) => c.code === current) ? COUNTRIES.find((c) => c.code === current) : undefined;
+    return saved ? [...list, toItem(saved)] : list;
+  }, [locale, withDial, countries, current]);
+  const initial = current ? (items.find((i) => i.value === current) ?? null) : null;
 
   return (
     <Combobox<CountryItem>

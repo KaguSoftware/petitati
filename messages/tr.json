@@ -233,8 +233,15 @@
       "phoneTaken": "Bu telefon numarası zaten kullanılıyor.",
       "oauth": "Google ile giriş başarısız. Tekrar deneyin.",
       "credentials": "E-posta veya şifre yanlış.",
-      "emailNotConfirmed": "Önce e-postanızı doğrulayın — bağlantıyı gönderdik."
-    }
+      "emailNotConfirmed": "Önce e-postanızı doğrulayın — bağlantıyı gönderdik.",
+      "passwordShort": "En az 8 karakter kullanın."
+    },
+    "finishingSignIn": "Giriş yapılıyor",
+    "finishingSignInHint": "Bir saniye…",
+    "linkExpired": "Bu bağlantının süresi dolmuş ya da zaten kullanılmış. Giriş yapın veya yeni bir davet isteyin.",
+    "completeInviteIntro": "Hoş geldiniz! Bitirmek için bir şifre seçin ve telefon numaranızı ekleyin.",
+    "choosePassword": "Şifre seçin",
+    "choosePasswordHint": "En az 8 karakter. E-postanızla birlikte giriş için kullanacaksınız."
   },
   "orderStatus": {
     "pending_payment": "Ödeme bekleniyor",
@@ -288,8 +295,8 @@
         "text": "Ödeme bilgileriniz korunur."
       },
       "returns": {
-        "title": "Kolay iade",
-        "text": "14 gün içinde iade edebilirsiniz."
+        "title": "Kolay değişim",
+        "text": "14 gün içinde değiştirebilirsiniz."
       },
       "support": {
         "title": "Yardımsever destek",
@@ -583,7 +590,13 @@
       "delivery": "Teslimat",
       "courierFilter": "Kurye:",
       "clearCourier": "Kurye filtresini kaldır",
-      "copyNumber": "Sipariş numarasını kopyala"
+      "copyNumber": "Sipariş numarasını kopyala",
+      "toBuy": {
+        "title": "Alınacaklar",
+        "hint": "Bu siparişteki her ürünü nereden alacağınız. Açılan linkler griye döner.",
+        "buyOn": "{site} üzerinden al",
+        "noLink": "Henüz satın alma linki yok"
+      }
     },
     "discountType": {
       "percent": "Yüzde",
@@ -865,6 +878,14 @@
       "shortDescription": "Kısa açıklama",
       "description": "Açıklama",
       "emptyHint": "İlk ürününüzü oluşturun veya filtreleri değiştirin.",
+      "visibility": {
+        "header": "Sitede",
+        "on": "Görünür",
+        "off": "Gizli",
+        "archived": "Arşivde",
+        "hideHint": "Mağazada görünüyor. Gizlemek için tıklayın.",
+        "showHint": "Mağazada görünmüyor. Göstermek için tıklayın."
+      },
       "actions": {
         "viewStorefront": "Mağazada görüntüle",
         "activate": "Aktif yap",
@@ -879,13 +900,16 @@
         "hasOrders": "Bu ürün siparişlerde yer aldığı için silinemez. Bunun yerine arşivleyin.",
         "tooManyVariants": "Çok fazla varyant oluşacak (sınır 200). Seçenek değerlerini azaltın.",
         "variantHasOrders": "Bu varyant siparişlerde yer aldığı için silinemez. Bunun yerine pasife alın.",
-        "variantInCarts": "Bu varyant bir müşterinin sepetinde. Silmek yerine pasife alın."
+        "variantInCarts": "Bu varyant bir müşterinin sepetinde. Silmek yerine pasife alın.",
+        "variantNameRequired": "Her satırın bir adı olmalı (ör. 2 kg veya Küçük).",
+        "skuTaken": "Bu SKU'lardan biri başka bir üründe kullanılıyor."
       },
       "fieldErrors": {
         "slugFormat": "Yalnızca küçük harf, rakam ve tire.",
         "optionNameRequired": "Her seçeneğin varsayılan dilde bir adı olmalı.",
         "optionValuesRequired": "Her seçeneğin en az bir değeri olmalı.",
-        "optionValueRequired": "Her değerin varsayılan dilde bir etiketi olmalı."
+        "optionValueRequired": "Her değerin varsayılan dilde bir etiketi olmalı.",
+        "parentLoop": "Bir kategori kendi içine veya kendi alt kategorisine konamaz."
       },
       "options": {
         "title": "Seçenekler",
@@ -970,49 +994,98 @@
           "photos": "Fotoğraflar"
         }
       },
-      "seoLength": "{count}/{limit} karakter · arama sonuçları yaklaşık {limit} karakter gösterir"
+      "seoLength": "{count}/{limit} karakter · arama sonuçları yaklaşık {limit} karakter gösterir",
+      "table": {
+        "title": "Fiyat ve stok",
+        "hintSingle": "Fiyatı ve kaç tane olduğunu girin. Beden veya çeşitleri varsa aşağıdan ekleyin.",
+        "hintSeveral": "Her beden veya çeşit için bir satır. Müşteri ürün sayfasında bu adlardan birini seçer.",
+        "chooseBy": "Müşteri neye göre seçer",
+        "chooseByPlaceholder": "ör. Beden, Ağırlık, Aroma",
+        "name": "Ad",
+        "namePlaceholder": "ör. 2 kg",
+        "unnamed": "Adsız",
+        "price": "Fiyat",
+        "stock": "Stok",
+        "notTracked": "Sayılmıyor",
+        "stockViaInventory": "Stok değişiklikleri Envanter'den yapılır",
+        "adjust": "değiştir",
+        "sku": "SKU",
+        "buyLink": "Satın alma linki",
+        "openLink": "Linki aç",
+        "more": "Diğer ayarlar",
+        "remove": "Bu satırı kaldır",
+        "compareAt": "Eski fiyat",
+        "compareAtHint": "Üstü çizili gösterilir.",
+        "cost": "Maliyetiniz",
+        "costHint": "Sadece siz görürsünüz.",
+        "weight": "Ağırlık (g)",
+        "barcode": "Barkod",
+        "isActive": "Satışta",
+        "trackInventory": "Stoğu say",
+        "allowBackorder": "Stok yokken de sat",
+        "isDefault": "İlk seçili",
+        "addRow": "Beden veya çeşit ekle",
+        "makeSeveral": "Birden çok beden veya çeşidi var"
+      }
     },
     "categories": {
       "title": "Kategoriler",
       "hint": "Ürünleri gezinme için gruplayın. Alt kategoriler üst kategorinin altında görünür.",
       "new": "Yeni kategori",
       "edit": "Kategoriyi düzenle",
-      "dialogHint": "Ad, mağazanın varsayılan dilinde zorunludur.",
+      "dialogHint": "Adı herhangi bir dilde yazın. Gereken sadece bu.",
       "name": "Ad",
       "description": "Açıklama",
       "slug": "URL kısa adı",
-      "parent": "Üst kategori",
-      "noParent": "Üst kategori yok (en üst düzey)",
-      "sortOrder": "Sıralama",
+      "parent": "İçine koy",
+      "noParent": "Yok (ana kategori)",
       "image": "Görsel",
       "replaceImage": "Görseli değiştir",
-      "active": "Mağazada görünür",
+      "active": "Mağazada göster",
       "products": "Ürünler",
       "empty": "Henüz kategori yok",
       "emptyHint": "Kataloğu düzenlemek için kategoriler oluşturun.",
       "delete": {
         "title": "Bu kategori silinsin mi?",
         "description": "{count, plural, =0 {Bağlı ürün yok.} =1 {1 ürün bu kategoriyi kaybeder.} other {# ürün bu kategoriyi kaybeder.}} Alt kategoriler en üst düzeye taşınır."
-      }
+      },
+      "parentHint": "Bunu başka bir kategorinin içine koymak için seçin. Ana kategori için boş bırakın.",
+      "newSub": "{parent} içinde yeni alt kategori",
+      "addSub": "Alt kategori",
+      "addSubFor": "{name} için alt kategori ekle",
+      "inParent": "{parent} içinde",
+      "moveUp": "Yukarı taşı",
+      "moveDown": "Aşağı taşı",
+      "advanced": "Gelişmiş: web adresi",
+      "slugHint": "Addan oluşturmak için boş bırakın."
     },
     "brands": {
       "title": "Markalar",
       "hint": "Üretici markaları (Royal Canin, Gourmet…). Her ürün tek bir markaya ait olabilir.",
       "new": "Yeni marka",
       "edit": "Markayı düzenle",
-      "dialogHint": "Kısa ad addan otomatik üretilir; yalnızca farklı bir URL gerekiyorsa değiştirin.",
+      "dialogHint": "Sadece adı yazın. Web adresi otomatik oluşturulur.",
       "name": "Ad",
       "slug": "URL kısa adı",
       "logo": "Logo",
       "replaceLogo": "Logoyu değiştir",
-      "sortOrder": "Sıralama",
-      "active": "Mağazada görünür",
+      "active": "Mağazada göster",
       "products": "Ürünler",
       "empty": "Henüz marka yok",
       "emptyHint": "Müşterilerin üreticiye göre gezinebilmesi için marka oluşturun.",
       "deleteConfirm": "Bu marka silinsin mi?",
       "deleteDescription": "{count, plural, =0 {Bağlı ürün yok.} =1 {1 ürün bu markayı kaybeder.} other {# ürün bu markayı kaybeder.}} Ürünlerin kendisi korunur.",
-      "none": "Marka yok"
+      "none": "Marka yok",
+      "advanced": "Gelişmiş: web adresi",
+      "slugHint": "Addan oluşturmak için boş bırakın.",
+      "position": "Sıra",
+      "moveTop": "En üste taşı",
+      "moveUp": "Yukarı taşı",
+      "moveDown": "Aşağı taşı",
+      "orderHint": "Mağaza markaları bu sırayla listeler. Taşımak için okları kullanın.",
+      "sortAz": "A–Z sırala",
+      "sortAzTitle": "Tüm markalar A–Z sıralansın mı?",
+      "sortAzDescription": "Mevcut sıranız alfabetik sırayla değiştirilir. Sonra yine taşıyabilirsiniz."
     },
     "inventory": {
       "subtitle": "Varyant başına stok. Düzeltmeler hareket olarak kaydedilir.",
@@ -1507,7 +1580,7 @@
         "social": "Sosyal bağlantılar",
         "socialHint": "Tam https:// bağlantıları. WhatsApp için wa.me bağlantısı da olur.",
         "trust": "Güven şeridi",
-        "trustHint": "Altbilginin üstünde dört kısa vaat (kargo, ödeme, iade, destek). Varsayılanları kullanmak için listeyi boş bırakın.",
+        "trustHint": "Altbilginin üstünde dört kısa vaat (kargo, ödeme, değişim, destek). Varsayılanları kullanmak için listeyi boş bırakın.",
         "trustEnabled": "Güven şeridini göster",
         "item": "Öğe {n}",
         "addItem": "Öğe ekle",
@@ -1518,7 +1591,7 @@
         "icons": {
           "truck": "Kamyon",
           "shield-check": "Kalkan",
-          "rotate-ccw": "İade oku",
+          "rotate-ccw": "Değişim okları",
           "headset": "Kulaklık",
           "badge-percent": "İndirim rozeti",
           "gift": "Hediye"

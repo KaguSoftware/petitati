@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AuthCard } from "@/components/storefront/auth/auth-card";
 import { CompleteProfileForm } from "@/components/storefront/auth/complete-profile-form";
 import { getSessionUser } from "@/lib/auth/session";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { defaultCountryForLocale } from "@/lib/phone/countries";
 import type { Metadata } from "next";
 import { storeContext } from "@/lib/tenant/context";
@@ -39,5 +40,9 @@ async function Form({ locale, searchParams }: { locale: string; searchParams: Pr
   const user = await getSessionUser();
   if (!user) redirect(`/${locale}/sign-in?next=${encodeURIComponent(`/${locale}/complete-profile?next=${encodeURIComponent(nextPath)}`)}`);
   if (user.profile.phone) redirect(nextPath);
-  return <CompleteProfileForm locale={locale} next={nextPath} defaultCountry={defaultCountryForLocale(locale)} askName={!user.profile.full_name} />;
+  // Invited staff also pick their password here (mirrors needsPassword in lib/auth/actions).
+  const { data } = await (await createSupabaseServerClient()).auth.getClaims();
+  const meta = (data?.claims?.user_metadata ?? {}) as { invited_to_store?: string; password_set?: boolean };
+  const askPassword = !!meta.invited_to_store && !meta.password_set;
+  return <CompleteProfileForm locale={locale} next={nextPath} defaultCountry={defaultCountryForLocale(locale)} askName={!user.profile.full_name} askPassword={askPassword} />;
 }

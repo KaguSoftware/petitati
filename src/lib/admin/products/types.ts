@@ -43,7 +43,8 @@ export interface ProductListFilters {
 }
 
 export type OptionWithValues = ProductOptionRow & { values: ProductOptionValueRow[] };
-export type VariantWithValues = ProductVariantRow & { optionValueIds: string[] };
+/** `sourceUrl`: where the shop buys this variant (product_sources), shown on orders so staff can re-order. */
+export type VariantWithValues = ProductVariantRow & { optionValueIds: string[]; sourceUrl: string | null };
 
 /** Full editable graph of one product. */
 export interface ProductEditData {

@@ -105,11 +105,12 @@ export async function completeProfileAction(_prev: AuthState, formData: FormData
       locale: z.string().min(2).max(2),
       next: z.string().optional(),
       full_name: z.string().trim().max(120).optional(),
+      password: z.string().optional(),
       ...phoneFields,
     })
     .safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: "invalid" };
-  const { locale, next, full_name, phone, phone_country } = parsed.data;
+  const { locale, next, full_name, phone, phone_country, password } = parsed.data;
 
   const user = await getSessionUser();
   if (!user) return { error: "auth" };
@@ -120,6 +121,12 @@ export async function completeProfileAction(_prev: AuthState, formData: FormData
 
   // Cookie client: RLS self-update policy, no service role needed.
   const supabase = await createSupabaseServerClient();
+  // Invited staff arrive without a password: they choose one here (the invite mail signed them in once).
+  if (await needsPassword()) {
+    if (!password || password.length < 8) return { error: "passwordShort", fieldErrors: { password: "passwordShort" } };
+    const { error: pwErr } = await supabase.auth.updateUser({ password, data: { password_set: true } });
+    if (pwErr) return { error: pwErr.message };
+  }
   const patch: Record<string, string> = { phone: normalized.e164, phone_country: normalized.country };
   if (full_name && !user.profile.full_name) patch.full_name = full_name;
   const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
@@ -127,6 +134,14 @@ export async function completeProfileAction(_prev: AuthState, formData: FormData
 
   revalidatePath("/", "layout");
   redirect(safeNext(next, locale));
+}
+
+/** An invited account (staff invite mail) that has not chosen a password yet. */
+async function needsPassword(): Promise<boolean> {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.auth.getClaims();
+  const meta = (data?.claims?.user_metadata ?? {}) as { invited_to_store?: string; password_set?: boolean };
+  return !!meta.invited_to_store && !meta.password_set;
 }
 
 export async function signOutAction(locale: string) {

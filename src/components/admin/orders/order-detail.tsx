@@ -1,3 +1,4 @@
+import { ExternalLink, ShoppingBasket } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { OrderDetail as OrderDetailData } from "@/lib/admin/orders/queries";
@@ -39,6 +40,15 @@ function Address({ a }: { a: OrderAddress | null }) {
   );
 }
 
+/** "trendyol.com" from a supplier link, for the button label. */
+function host(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www./, "");
+  } catch {
+    return url;
+  }
+}
+
 function Card({ title, children, className = "" }: { title: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
     <section className={`flex flex-col gap-3 rounded-xl border bg-card p-4 ${className}`}>
@@ -58,6 +68,41 @@ export async function OrderDetail({ order, storeId, locale, delivery }: { order:
   return (
     <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
       <div className="flex flex-col gap-4">
+        {Object.keys(order.buyLinks).length > 0 && (
+          <Card
+            title={
+              <span className="flex items-center gap-2">
+                <ShoppingBasket className="size-4" />
+                {t("orders.toBuy.title")}
+              </span>
+            }
+          >
+            <p className="-mt-1 text-xs text-muted-foreground">{t("orders.toBuy.hint")}</p>
+            <ul className="flex flex-col gap-1.5">
+              {order.order_items.map((i) => {
+                const url = order.buyLinks[i.id];
+                return (
+                  <li key={i.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                    <span className="w-8 shrink-0 font-semibold tabular-nums">{i.quantity}×</span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {i.product_name}
+                      {i.variant_name ? <span className="text-muted-foreground"> · {i.variant_name}</span> : null}
+                    </span>
+                    {url ? (
+                      // :visited greys a link out once it was opened, so the list doubles as a checklist.
+                      <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium text-primary hover:bg-muted visited:text-muted-foreground">
+                        {t("orders.toBuy.buyOn", { site: host(url) })}
+                        <ExternalLink className="size-3.5" />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">{t("orders.toBuy.noLink")}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
+        )}
         <Card title={t("orders.items")}>
           <ul className="divide-y">
             {order.order_items.map((i) => (
@@ -81,6 +126,14 @@ export async function OrderDetail({ order, storeId, locale, delivery }: { order:
                   <p className="truncate text-xs text-muted-foreground">
                     {i.variant_name ?? ""}
                     {i.sku ? ` · ${i.sku}` : ""}
+                    {order.buyLinks[i.id] && (
+                      <>
+                        {" · "}
+                        <a href={order.buyLinks[i.id]} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                          {host(order.buyLinks[i.id])}
+                        </a>
+                      </>
+                    )}
                   </p>
                 </div>
                 <span className="text-muted-foreground tabular-nums">

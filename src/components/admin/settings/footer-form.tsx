@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, BadgePercent, Gift, Headset, Plus, RotateCcw, ShieldCheck, Trash2, Truck, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowLeftRight, ArrowUp, BadgePercent, Gift, Headset, Plus, ShieldCheck, Trash2, Truck, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { UnsavedChangesGuard } from "@/components/admin/shared/unsaved-changes";
@@ -37,7 +37,7 @@ interface Props {
   footer: FooterContent;
 }
 
-const ICONS: Record<TrustIcon, LucideIcon> = { truck: Truck, "shield-check": ShieldCheck, "rotate-ccw": RotateCcw, headset: Headset, "badge-percent": BadgePercent, gift: Gift };
+const ICONS: Record<TrustIcon, LucideIcon> = { truck: Truck, "shield-check": ShieldCheck, "rotate-ccw": ArrowLeftRight, headset: Headset, "badge-percent": BadgePercent, gift: Gift };
 const SOCIAL_PLACEHOLDER: Record<SocialKey, string> = {
   instagram: "https://instagram.com/yourstore",
   facebook: "https://facebook.com/yourstore",
