@@ -23,9 +23,10 @@ const RULES = {
     ["kuru-kedi-mamasi", /kedi maması|kedi mamasi|kuru mama|cat food/i],
     ["kedi-vitaminleri", /vitamin|macun|malt|takviye|supplement|probiyotik/i],
     ["med-cats", /sağlık ürünü|ilaç|pire|kene|parazit|damla|antiseptik/i],
-    ["kedi-kumu-kuregi", /kürek|kurek/i],
     ["otomatik-kedi-tuvaleti", /otomatik.*tuvalet|akıllı.*tuvalet/i],
     ["kedi-tuvaleti", /tuvalet|kum kabı|litter box/i],
+    // after the boxes: many box titles add "ve Kürek" (with scoop)
+    ["kedi-kumu-kuregi", /kürek|kurek/i],
     ["kristal-kedi-kumu", /kristal|silika/i],
     ["bentonit-kedi-kumu", /kedi kumu|kum\b|litter/i],
     ["kedi-su-pinari", /pınar|pinar|çeşme|fountain/i],
