@@ -21,9 +21,15 @@ const SYSTEM = `You translate product listings of a Turkish pet shop into Englis
 - Use Latin digits (0-9) in both languages, including Persian. Keep units as "kg", "g", "ml", "l", "cm".
 - Product names read naturally for a shopper, in the usual word order of the target language.
 - Descriptions: translate faithfully and completely. Keep the line breaks and the order of lines; headings stay on their own line. Plain text only, no markdown. Fix obvious typos silently. Do not add claims that are not in the source.
-- Option values (sizes, colours, pack counts) are translated as short labels ("Açık Mavi" → "Light Blue" / "آبی روشن"; "3'lü" → "3-pack" / "بسته 3 عددی"; "12 kg" stays "12 kg").`;
+- Option values (sizes, colours, pack counts) are translated as short labels ("Açık Mavi" → "Light Blue" / "آبی روشن"; "3'lü" → "3-pack" / "بسته 3 عددی"; "12 kg" stays "12 kg").${
+  process.env.SUPPLIER === "trendyol"
+    ? `
+- The source names are marketplace seller titles, often stuffed with search keywords. Every name (en, fa, and a tidied Turkish one in "tr.name") is short and shop-like: brand first, then what the product is and its key detail (flavour, life stage, size or weight). Drop keyword lists, marketing adjectives, repeated words and brand repeats. At most about 70 characters.`
+    : ""
+}`;
 
 const productSchema = z.object({
+  tr: z.object({ name: z.string() }).optional(),
   en: z.object({ name: z.string(), description: z.string() }),
   fa: z.object({ name: z.string(), description: z.string() }),
   values: z.array(z.object({ tr: z.string(), en: z.string(), fa: z.string() })),

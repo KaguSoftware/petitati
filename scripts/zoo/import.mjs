@@ -9,7 +9,7 @@
 import { readFileSync } from "node:fs";
 import sharp from "sharp";
 import { AXES, groupText, loadCatalog, loadGroups, sha, slugify } from "./lib/catalog.mjs";
-import { SUPPLIER, db, markup, must, resolveStore, revalidateCatalog } from "./lib/db.mjs";
+import { SKU_PREFIX, SUPPLIER, db, markup, must, resolveStore, revalidateCatalog } from "./lib/db.mjs";
 import { fetchWithRetry } from "./lib/http.mjs";
 import { args, readJson } from "./lib/store.mjs";
 
@@ -37,7 +37,7 @@ if (opts["dry-run"]) {
     }
   }
   const multi = groups.filter((g) => g.members.length > 1);
-  console.log(`\n${catalog.length} zoo items → ${groups.length} products (${multi.length} with options, holding ${multi.reduce((n, g) => n + g.members.length, 0)} items)`);
+  console.log(`\n${catalog.length} ${SUPPLIER} items → ${groups.length} products (${multi.length} with options, holding ${multi.reduce((n, g) => n + g.members.length, 0)} items)`);
   process.exit(0);
 }
 
@@ -145,7 +145,7 @@ async function importGroup(group, categoryIds, brandIds) {
 
   const productFields = {
     brand_id: first.brand ? (brandIds.get(slugify(first.brand)) ?? null) : null,
-    tags: ["zoo"],
+    tags: [SUPPLIER],
   };
   if (productId) {
     must(await supabase.from("products").update(productFields).eq("id", productId), "update product");
@@ -160,11 +160,11 @@ async function importGroup(group, categoryIds, brandIds) {
   }
 
   // ---- names, descriptions, category ----
-  const names = { tr: { name: group.baseName, description: text.description } };
+  const names = { tr: { name: translation?.tr?.name ?? group.baseName, description: text.description } };
   if (translation) Object.assign(names, { en: translation.en, fa: translation.fa });
   must(
     await supabase.from("product_translations").upsert(
-      Object.entries(names).map(([locale, t]) => ({ product_id: productId, locale, name: t.name, description: t.description || null })),
+      Object.entries(names).map(([locale, t]) => ({ product_id: productId, locale, name: t.name, description: cleanDescription(t.description) })),
     ),
     "translations",
   );
@@ -213,7 +213,7 @@ async function importGroup(group, categoryIds, brandIds) {
   if (staleOptions.length) must(await supabase.from("product_options").delete().in("id", staleOptions), "stale options");
 
   // ---- variants ----
-  const altName = { tr: group.baseName, ...(translation ? { en: translation.en.name, fa: translation.fa.name } : {}) };
+  const altName = { tr: translation?.tr?.name ?? group.baseName, ...(translation ? { en: translation.en.name, fa: translation.fa.name } : {}) };
   for (const [index, member] of members.entries()) {
     const p = member.product;
     const source = sourceByExternal.get(member.externalId);
@@ -285,7 +285,7 @@ async function setStock(variantId, target, isNew) {
       variant_id: variantId,
       delta,
       reason: isNew ? "initial" : "correction",
-      note: "zoo.com.tr import",
+      note: `${SUPPLIER} import`,
     }),
     "stock movement",
   );
@@ -314,8 +314,8 @@ async function replaceImages(productId, variantId, p, memberIndex, alt) {
 
 async function removeEmptyProducts() {
   const zooProducts = must(
-    await supabase.from("products").select("id, slug, product_variants(id)").eq("store_id", store.id).contains("tags", ["zoo"]),
-    "zoo products",
+    await supabase.from("products").select("id, slug, product_variants(id)").eq("store_id", store.id).contains("tags", [SUPPLIER]),
+    "supplier products",
   );
   for (const product of zooProducts.filter((p) => !p.product_variants.length)) {
     const { count } = await supabase.from("order_items").select("id", { count: "exact", head: true }).eq("product_id", product.id);
@@ -334,9 +334,22 @@ async function freeSlug(base) {
 }
 
 async function freeSku(p) {
-  const base = `ZOO-${(p.sku || String(p.externalId)).toUpperCase()}`;
+  const base = `${SKU_PREFIX}-${(p.sku || String(p.externalId)).toUpperCase()}`;
   const { count } = await supabase.from("product_variants").select("id", { count: "exact", head: true }).eq("store_id", store.id).eq("sku", base);
   return count ? `${base}-${p.externalId}` : base;
+}
+
+/** Drop lines that are only a URL (marketplace sellers paste image links into their text) and junk origins. */
+function cleanDescription(text) {
+  const kept = String(text ?? "")
+    .split("\n")
+    .filter((line) => !/^\s*https?:\/\/\S+\s*$/.test(line))
+    // Trendyol sellers fill "Menşei" with junk codes (UM, TK, KP), so the origin line is left out
+    .filter((line) => SUPPLIER !== "trendyol" || !/^\s*(Menşei|Origin|کشور سازنده)\s*:/.test(line))
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return kept || null;
 }
 
 function gramsFrom(text) {

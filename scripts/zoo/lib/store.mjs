@@ -1,10 +1,10 @@
-// Local cache under .data/zoo (gitignored) so every stage is resumable and re-runs are cheap.
+// Local cache under .data/<supplier> (gitignored; SUPPLIER env, default zoo) so every stage is resumable and re-runs are cheap.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-export const DATA = join(ROOT, ".data", "zoo");
+export const DATA = join(ROOT, ".data", process.env.SUPPLIER ?? "zoo");
 
 export function readJson(rel, fallback = null) {
   const p = join(DATA, rel);

@@ -8,12 +8,12 @@ import { SUPPLIER, db, must, resolveStore, revalidateCatalog } from "./lib/db.mj
 import { args } from "./lib/store.mjs";
 
 if (!args().yes) {
-  console.log("this deletes every zoo-imported product; re-run with --yes");
+  console.log(`this deletes every ${SUPPLIER}-imported product; re-run with --yes`);
   process.exit(1);
 }
 const supabase = db();
 const store = await resolveStore(supabase);
-const products = must(await supabase.from("products").select("id, slug").eq("store_id", store.id).contains("tags", ["zoo"]), "products");
+const products = must(await supabase.from("products").select("id, slug").eq("store_id", store.id).contains("tags", [SUPPLIER]), "products");
 let deleted = 0;
 let archived = 0;
 for (const p of products) {

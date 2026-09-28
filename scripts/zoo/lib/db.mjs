@@ -18,11 +18,15 @@ export function must({ data, error }, what) {
 export async function resolveStore(supabase) {
   const slug = process.env.DEFAULT_STORE_SLUG ?? "default";
   const store = must(await supabase.from("stores").select("id, currency").eq("slug", slug).single(), `store ${slug}`);
-  if (store.currency !== "TRY") throw new Error(`store ${slug} sells in ${store.currency}; zoo prices are TRY`);
+  if (store.currency !== "TRY") throw new Error(`store ${slug} sells in ${store.currency}; supplier prices are TRY`);
   return store;
 }
 
-export const SUPPLIER = "zoo";
+/** Which supplier the stages work on: zoo (default) or trendyol. Tags products, keys product_sources. */
+export const SUPPLIER = process.env.SUPPLIER ?? "zoo";
+
+/** Prefix for the SKUs this supplier's variants get. */
+export const SKU_PREFIX = { zoo: "ZOO", trendyol: "TY" }[SUPPLIER] ?? SUPPLIER.toUpperCase();
 
 /** Our price for a supplier price: markup in basis points (1000 = +10%), whole kuruş. */
 export const markup = (kurus, bp = 1000) => (kurus == null ? null : Math.round((kurus * (10000 + bp)) / 10000));
